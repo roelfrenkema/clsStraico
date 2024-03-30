@@ -1,6 +1,6 @@
 # Documentation clsStraico.php
 
-![straico](https://blog.roelfrenkema.com/img/AI/straicoclass.png){: title="Straico" .w3-image}
+![straico](https://blog.roelfrenkema.com/img/AI/straicoclass.png) 
 
 [TOC]
 ## Download
