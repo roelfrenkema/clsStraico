@@ -2,10 +2,9 @@
 
 ![straico](https://blog.roelfrenkema.com/img/AI/straicoclass.png) 
 
-[TOC]
 ## Download
 
-[Latest version clsStraico here](https://blog.roelfrenkema.com/ai/){:target="_blank"} 
+[Latest version clsStraico here](https://blog.roelfrenkema.com/ai/) 
 
 ## About
 
@@ -95,7 +94,6 @@ clsStraico.php © 2024 by Roelfrenkema is licensed under CC BY-NC-SA 4.0. To vie
 | /viewpage | Show contents of \_PAGE\_ |
 | /logon | Write conversation to file |
 | /logoff | Stop writing to file |
-
 | | |   
 | Agents:| |
 | | |   
