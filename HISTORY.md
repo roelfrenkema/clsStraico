@@ -15,6 +15,10 @@ Latest release available here: [clsStraico Home](https://blog.roelfrenkema.com/a
 ## In progress 
 
  **In progress not available yet**
+
+## Version 1.4.0 - released 31-03-24
+
+Github release
  
 ## Commands
 
@@ -30,7 +34,7 @@ Latest release available here: [clsStraico Home](https://blog.roelfrenkema.com/a
 * **removed command /words** see new command debug
 * **removed command /internals** see new command debug
 
-## Version 1.3.0 - released 29-03-25
+## Version 1.3.0 - released 29-03-24
 
 ### Properties
 
@@ -63,7 +67,7 @@ Latest release available here: [clsStraico Home](https://blog.roelfrenkema.com/a
 * **tidy mod** - added test on startup if mod tidy is available. Thanks to Arturo.
 * **bugfixes** - too many little nagging things exterminated.
 
-## Version 1.2.0 - released 28-03-25
+## Version 1.2.0 - released 28-03-24
 
 ### Properties:
 
