@@ -6,6 +6,8 @@
 
 [Latest version clsStraico here](https://blog.roelfrenkema.com/ai/) 
 
+or use git to pull clone this repo.
+
 ## About
 
 This is the documentation for clsStraico.php, a PHP class to interact with the Straico api that comes with a punch intergrating several agents. It makes interacting with the Straico api from the commandline a great experience and offers insight, through its extensive documentation, in how to use the api.
