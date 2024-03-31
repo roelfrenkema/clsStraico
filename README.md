@@ -34,7 +34,6 @@ clsStraico.php © 2024 by Roelfrenkema is licensed under CC BY-NC-SA 4.0. To vie
 | private $aiInput | The complete **input string** for the LLM |
 | private $aiSkipper | Used to skip user references in some ai calls |
 | private $aiLog | Used to log output to file |
-{: .w3-table .w3-striped .w3-bordered }
 
 ## Methods
 
