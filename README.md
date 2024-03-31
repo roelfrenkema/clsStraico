@@ -68,7 +68,6 @@ clsStraico.php © 2024 by Roelfrenkema is licensed under CC BY-NC-SA 4.0. To vie
 | private functiom agentRegEx | Help with the often tedious task of making one. Could probably done by /tux too |
 | private function agentPwd | Help creating a save password |
 | private function agentHTML2MD | gives a markdown presentation of \_PAGE\_ |
-{: .w3-table .w3-striped .w3-bordered }
 
 ## Commands
 
@@ -109,13 +108,12 @@ clsStraico.php © 2024 by Roelfrenkema is licensed under CC BY-NC-SA 4.0. To vie
 | /research | research a topic and present the result in paper or article format |
 | /regex | produce a requested regular expression |
 | /mkpwd | Create password report on strength. Very Strong. |
-{: .w3-table .w3-striped .w3-bordered }
 
 
 ## Other info
 
-If you've become curious and would like to try Straico for yourself, feel free to use [this affiliate link](https://platform.straico.com/signup?fpr=roelf14){:target="_blank"}.
+If you've become curious and would like to try Straico for yourself, feel free to use [this affiliate link](https://platform.straico.com/signup?fpr=roelf14).
 
-clsStraico.php is released under [http://creativecommons.org/licenses/by-nc-sa/4.0/](http://creativecommons.org/licenses/by-nc-sa/4.0/){:target="_blank"}
+clsStraico.php is released under [http://creativecommons.org/licenses/by-nc-sa/4.0/](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 Hashtags: #ai #straico #blog #roelfrenkema #clsStraico #StraicoClass 
