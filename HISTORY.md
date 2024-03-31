@@ -10,12 +10,6 @@
 
 # Updates
 
-Latest release available here: [clsStraico Home](https://blog.roelfrenkema.com/ai) 
-
-## In progress 
-
- **In progress not available yet**
-
 ## Version 1.4.0 - released 31-03-24
 
 Github release
