@@ -38,11 +38,5 @@ while( $aiMessage !== "/exit" ){
   //No input available?
   if ($aiMessage == "") continue;
   
-
- 
-    //call api, do magic 
-    $answer = $straico->apiCompletion($aiMessage);
-    echo $answer."\n\n";
-
 }
 ?>

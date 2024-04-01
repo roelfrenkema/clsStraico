@@ -10,6 +10,9 @@
 
 # Updates for testing branch
 
+## Version 1.5.0 - released 31-03-24
+
+
 ## Methods
 
 **private function agentDream** provides prompt for the text-to-image model Stable Difussion
@@ -22,6 +25,7 @@
 **/research** changed name to **/academic** to reflect method and prompt.
 **/dream** provides prompt for the text-to-image model Stable Difussion
 **/textcheck** renames **/judge** and was updated with better prompt.
+**/rephrase** was removed as **/textcheck** should fully replace it
 
 ## Other
 

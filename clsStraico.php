@@ -145,6 +145,21 @@ Remember, the user has ADD, ADHD, AUTHISM or DYSLEXIA, so it is crucial that you
 ---------------
 
 It is your task with the information above to read the users DOCUMENT and create a readable gist for them. DOCUMENT: "';
+	private const HTML2MD = 'Transform user-provided content into well-structured Markdown format.
+
+Instructions.
+
+1. Adhere to proper conventions and syntax. 
+2. Analyze the input to determine the appropriate Markdown elements (headings, lists, links, code blocks, etc.) that can effectively organize and present the information. 
+3. Ensure the output maintains clarity, readability, and semantic structure while preserving the original intent and meaning of the content. 
+
+---------------
+
+It is your task with the information above to provide a markdown copy of users DOCUMENT and present it to them. DOCUMENT: "';
+	private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+	private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
+	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';	
+	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const TEXTCHECK = 'Analyze and improve the provided text:
 
 Instructions:
@@ -153,20 +168,15 @@ Instructions:
 2. Identify any spelling or grammatical errors.
 3. Evaluate its tone and style.
 4. Provide specific suggestions for enhancements.
-5 Ensure that the text is clear, concise, and engaging., including specific suggestions for enhancing clarity, conciseness, and overall effectiveness.
+5. Ensure that the text is clear, concise, and engaging., including specific suggestions for enhancing clarity, conciseness, and overall effectiveness.
+6. Ensure it has the by users choosen tone and targeted audience.
 
 ---------------
 
 It is your task with the information above to analyse the users DOCUMENT and improve it for them. DOCUMENT: "';
-	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';
-	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
-	private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
-	private const HTML2MD = 'Transform _PAGE_ into Markdown format.';
+
 	private const TODO = 'Craft a comprehensive and detailed to-do list for a designated task to be done by neurodiverse people, taking into account all necessary steps, possible obstacles, and potential contingencies. Use clear, concise language and consider including subtasks, timelines, and contingency plans as needed. Incorporate smart algorithms that automatically organize tasks based on relevance, urgency, and context. Add estimated time to completion for each task and subtask. Create a todo list for: ';
-	private const TONE = 'Rephrase the following: ';
 	private const TUX = 'You are Tux, a helpful penguin. Your knowledge extends to all Linux versions like f.i. Debian, Suse, Redhat and many others. Your expertise is the command line and as such you are aware of the multitude of shells like sh, bash, zsh and many others. You are knowledgeable in networking problems, administration, systemd, architecture, internal and external commands. You know all packages and package managers. You know how to use the git system, and how to compile from source. It is your task with this info above to answer the user question accurately, verbose and educational as possible. The question is: ';
-	private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
-	
 	public $aiLanguage;   //current working language - default English
 	public $aiMarkup;     //current markup default Markdown
 	public $aiModel;      //current working model
@@ -217,7 +227,7 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'google/gemini-pro';
-	$this->clsVersion = '1.4.0';
+	$this->clsVersion = '1.5.0';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -363,6 +373,10 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 		// Make a neurodivese gist of information
 		}elseif( substr($input,0,5) == "/gist") {
 			 $this->agentGist(substr($input,6));
+
+		// Show _PAGE_ in md format	
+		}elseif( substr($input,0,8) == "/html2md"){
+			$this->agentHtml2md($input,9);
 			 
 		// Write a mediumsize blog
 		}elseif( substr($input,0,11) == "/mediumblog"){
@@ -370,15 +384,11 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 
 		// Create a strong password 
 		}elseif( substr($input,0,6) == "/mkpwd"){
-			$this->agentPwd(substr($input,7));
+			$this->agentMkpwd(substr($input,7));
 
 		// Create a regex for user
 		}elseif( substr($input,0,6) == "/regex"){
 			$this->agentRegEx(substr($input,7));
-
-		// change the tone of a text
-		}elseif( substr($input,0,10) == "/rephrase"){
-			$this->agentTone(substr($input,11));
 
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
@@ -396,13 +406,10 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 		}elseif( substr($input,0,4) == "/tux"){
 			$this->agentTux(substr($input,5));
 			
-		// Show _PAGE_ in md format	
-		}elseif( substr($input,0,9) == "/viewpage"){
-			$this->agentHTML2MD();
-			
 		// Process user input	
 		}else{
-			return $input;
+			$answer = $this->apiCompletion($input);
+            echo $answer."\n\n";
 		}
 	}
 
@@ -518,6 +525,24 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 		echo "\n$apiOutput\n";
 	}
 	/*
+	* Function: agentBBlog($input)
+	* Input   : subject
+	* Output  : 1000 words
+	* Purpose : Create a of 1000 words
+	* 
+	* Remarks:
+	* 
+	*/
+	private function agentBBlog($input){
+			
+		$aiMessage = Straico::BBLOG.$input;
+					 
+			$apiOutput=$this->apiCompletion($aiMessage);
+			echo "\n$apiOutput\n";
+			return;
+		
+	}
+	/*
 	* Function: agentDream($input)
 	* Input   : subject
 	* Output  : a prompt for stable diffusion
@@ -590,22 +615,66 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 		
 	}
 	/*
-	* Function: agentTextcheck($input)
-	* Input   : A text to be judged
-	* Output  : A opinion on text
-	* Purpose : Helps with writing
+	* Function: agentHtml2md()
+	* Input   : _PAGE_
+	* Output  : _PAGE_ as a textfile
+	* Purpose : Help reading _PAGE_  
 	* 
 	* Remarks:
 	* 
 	*/
-	private function agentTextcheck($input){
-			
-		$aiMessage = Straico::TEXTCHECK.$input."\"";
+	private function agentHtml2md($input){
 
-					 
+		$this->aiSkipper = true;
+		
+		$aiMessage = Straico::HTML2MD.$input."\"";
+
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
+
+		$this->aiSkipper = false;
+
+	}	
+	/*
+	* Function: agentMBlog($input)
+	* Input   : subject
+	* Output  : 600 words
+	* Purpose : Create a of 600 words
+	* 
+	* Remarks:
+	* 
+	*/
+	private function agentMBlog($input){
+			
+		$aiMessage = Straico::MBLOG.$input;
+
+					 
+			$apiOutput=$this->apiCompletion($aiMessage);
+			echo "\n$apiOutput\n";
+			return;
+		
 	}
+	/*
+	* Function: agentMkpwd($input)
+	* Input   : a request for a save password
+	* Output  : The password
+	* Purpose : Help creating a save password  
+	* 
+	* Remarks:
+	* 
+	*/
+	private function agentMkpwd($input){
+		
+		$this->aiSkipper = true;
+
+		$aiMessage = Straico::MKPWD.$input; 
+
+		$apiOutput=$this->apiCompletion($aiMessage);
+
+		$this->aiSkipper = false;
+
+		echo "\n$apiOutput\n";
+	}	
 	/*
 	* Function: agentRegEx($input)
 	* Input   : a request for a regular expression
@@ -640,64 +709,22 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 		
 	}
 	/*
-	* Function: agentMBlog($input)
-	* Input   : subject
-	* Output  : 600 words
-	* Purpose : Create a of 600 words
+	* Function: agentTextcheck($input)
+	* Input   : A text to be judged
+	* Output  : A opinion on text
+	* Purpose : Helps with writing
 	* 
 	* Remarks:
 	* 
 	*/
-	private function agentMBlog($input){
+	private function agentTextcheck($input){
 			
-		$aiMessage = Straico::MBLOG.$input;
+		$aiMessage = Straico::TEXTCHECK.$input."\"";
 
 					 
-			$apiOutput=$this->apiCompletion($aiMessage);
-			echo "\n$apiOutput\n";
-			return;
-		
-	}
-	/*
-	* Function: agentBBlog($input)
-	* Input   : subject
-	* Output  : 1000 words
-	* Purpose : Create a of 1000 words
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentBBlog($input){
-			
-		$aiMessage = Straico::BBLOG.$input;
-
-					 
-			$apiOutput=$this->apiCompletion($aiMessage);
-			echo "\n$apiOutput\n";
-			return;
-		
-	}
-	/*
-	* Function: agentTextBrowser()
-	* Input   : _PAGE_
-	* Output  : _PAGE_ as a textfile
-	* Purpose : Help reading _PAGE_  
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentHTML2MD(){
-
-		$this->aiSkipper = true;
-		
-		$aiMessage = Straico::HTML2MD;
-
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
-
-		$this->aiSkipper = false;
-
-	}	
+	}
 	/*
 	* Function: agentTodo($input)
 	* Input   : a task for a todo list
@@ -721,28 +748,6 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 		
 	}
 	/*
-	* Function: agentTone($input)
-	* Input   : a message to rephrase
-	* Output  : rephrased text
-	* Purpose : Find the right tone for your text
-	* 
-	* Remarks:
-	* 
-	* This might seem a futile methode but it becomes extremely powerfull
-	* in combination with /settone, /settarget and even /setlanguage if 
-	* you are looking for a translation.
-	*/
-	private function agentTone($input){
-
-		$aiMessage = Straico::TONE.$tekst;
-
-					 
-			$apiOutput=$this->apiCompletion($aiMessage);
-			echo "\n$apiOutput\n";
-			return;
-		
-	}
-	/*
 	* Function: agentTux($input)
 	* Input   : requeston linux related maters
 	* Output  : returns a solution
@@ -761,27 +766,6 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 		echo "\n$apiOutput\n";
 
 	}
-	/*
-	* Function: agentPwd($input)
-	* Input   : a request for a save password
-	* Output  : The password
-	* Purpose : Help creating a save password  
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentPwd($input){
-		
-		$this->aiSkipper = true;
-
-		$aiMessage = Straico::MKPWD.$input; 
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-
-		$this->aiSkipper = false;
-
-		echo "\n$apiOutput\n";
-	}	
 	/*
 	* Function: apiModels()
 	* Input   : none
