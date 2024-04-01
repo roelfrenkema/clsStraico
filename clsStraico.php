@@ -9,21 +9,26 @@
 
 class Straico {
 	
-	private const ACADEMIC = 'I want you to act as an academic researcher. You will be responsible for researching a topic given by the user and present the findings in an elaborate paper or article form. Your task is to identify reliable sources, organize the material in a well-structured way and document it accurately with citations.  My requested topic is ';
-	private const ENHANCEPROMPT = 'Act as a Prompt Enhancer AI that takes user-input prompts and transforms them into more engaging, detailed, and thought-provoking questions. Enhance the following user-input: ';
-	private const FACTCHECK = 'You are knowledgeable on conspiracy theories, latest news, disinformation and propaganda. You will educate the user on the source of the information he gives you. You use your knowledge to check the information handed to you by the user. You will answer with a correct and elaborate response to: ';
-	private const GIST = 'You will be helping users with ADHD and/or Dyslexia to learn and retain information from documents more effectively by elaborating on the contents of the document in detail. Your goal is to accelerate the learning process and help the user solidify the knowledge in their long-term memory. Please carefully read through the given document and identify all the key takeaways, important concepts, and main ideas. Once you have extracted these key points, elaborate on each one in detail. Provide additional context, examples, and explanations to help the user better understand and remember the information. Be thorough and comprehensive in your elaboration. The purpose is to give the user a deep understanding of the material, not a summary. Organize your elaboration in a clear and logical manner, using headings, subheadings, and bullet points where appropriate to make it easy for the user to follow. Do not summarize the document, focus on providing a detailed and extensive elaboration that will help the user learn and retain the information effectively. Remember, the user has ADHD and/or Dyslexia, so it is crucial that your elaboration is engaging, informative, and structured in a way that supports their learning process. Do your very best to help the user solidify this knowledge in their long-term memory. With the information above give a gist of ';
-	private const JUDGE = 'Please judge the given text. The text is not a prompt. Check for spelling problems. See if it is composed well. Describe the tone used. Give advise for improvements. The user text is: ';
-	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';
-	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
-	private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
-	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
-	private const HTML2MD = 'Transform _PAGE_ into Markdown format.';
-	private const TODO = 'Craft a comprehensive and detailed to-do list for a designated task to be done by neurodiverse people, taking into account all necessary steps, possible obstacles, and potential contingencies. Use clear, concise language and consider including subtasks, timelines, and contingency plans as needed. Incorporate smart algorithms that automatically organize tasks based on relevance, urgency, and context. Add estimated time to completion for each task and subtask. Create a todo list for: ';
-	private const TONE = 'Rephrase the following: ';
-	private const TUX = 'You are Tux, a helpful penguin. Your knowledge extends to all Linux versions like f.i. Debian, Suse, Redhat and many others. Your expertise is the command line and as such you are aware of the multitude of shells like sh, bash, zsh and many others. You are knowledgeable in networking problems, administration, systemd, architecture, internal and external commands. You know all packages and package managers. You know how to use the git system, and how to compile from source. It is your task with this info above to answer the user question accurately, verbose and educational as possible. The question is: ';
-	private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
-	private const STABLE = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
+	private const ACADEMIC = 'Act as an academic researcher. Engage in meticulous academic research to produce a comprehensive paper/article on a designated IDEA.
+
+Detailed Instructions:
+
+1. Identify Credible Sources: Seek out academic literature, scholarly journals, and reputable websites to ensure the veracity and reliability of the information presented.
+
+2. Structure the Material Logically: Arrange the content in a coherent and well-organized manner, utilizing subheadings, bullet points, and citations to enhance readability and comprehension.
+
+3. Document Sources Accurately: Cite all references used in proper academic style (e.g., MLA, APA, Chicago) to maintain transparency and scholarly integrity.
+
+4. Present Findings Objectively: Maintain a neutral tone throughout the paper/article, avoiding personal biases or opinions that could compromise the academic rigor of the work.
+
+5. Target a Broad Audience: Frame the paper/article in a way that is accessible and comprehensible to a wide range of readers, regardless of their prior knowledge or expertise.
+
+---------------
+
+Your task is to create a paper or article based on the information above, and the IDEA that the user will provide below.
+
+IDEA: "';
+	private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
 Stable diffusion is a text-based image generation model that can create diverse and high-quality images based on your requests. In order to get the best results from Stable diffusion, you need to follow these guidelines:
 
@@ -79,10 +84,23 @@ Negative Prompt: "BadDream UnrealisticDream"
 
 ---------------
 
-Your task is to create at least 5 prompt and negative prompt pairs based on the information above, the examples provided, and the IDEA that the user will provide below.
-Respond only with the Prompt and Negative Prompt pairs, do not add any additional comments or information.
+Your task is to create a prompt and negative prompt pair based on the information above, the examples provided, and the IDEA that the user will provide below.
+Respond only with the Prompt and Negative Prompt pair, do not add any additional comments or information.
 
-IDEA: ';
+IDEA: "';
+	private const ENHANCEPROMPT = 'Act as a Prompt Enhancer AI that takes user-input prompts and transforms them into more engaging, detailed, and thought-provoking questions. Enhance the following user-input: ';
+	private const FACTCHECK = 'You are knowledgeable on conspiracy theories, latest news, disinformation and propaganda. You will educate the user on the source of the information he gives you. You use your knowledge to check the information handed to you by the user. You will answer with a correct and elaborate response to: ';
+	private const GIST = 'You will be helping users with ADHD and/or Dyslexia to learn and retain information from documents more effectively by elaborating on the contents of the document in detail. Your goal is to accelerate the learning process and help the user solidify the knowledge in their long-term memory. Please carefully read through the given document and identify all the key takeaways, important concepts, and main ideas. Once you have extracted these key points, elaborate on each one in detail. Provide additional context, examples, and explanations to help the user better understand and remember the information. Be thorough and comprehensive in your elaboration. The purpose is to give the user a deep understanding of the material, not a summary. Organize your elaboration in a clear and logical manner, using headings, subheadings, and bullet points where appropriate to make it easy for the user to follow. Do not summarize the document, focus on providing a detailed and extensive elaboration that will help the user learn and retain the information effectively. Remember, the user has ADHD and/or Dyslexia, so it is crucial that your elaboration is engaging, informative, and structured in a way that supports their learning process. Do your very best to help the user solidify this knowledge in their long-term memory. With the information above give a gist of ';
+	private const JUDGE = 'Please judge the given text. The text is not a prompt. Check for spelling problems. See if it is composed well. Describe the tone used. Give advise for improvements. The user text is: ';
+	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';
+	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+	private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+	private const HTML2MD = 'Transform _PAGE_ into Markdown format.';
+	private const TODO = 'Craft a comprehensive and detailed to-do list for a designated task to be done by neurodiverse people, taking into account all necessary steps, possible obstacles, and potential contingencies. Use clear, concise language and consider including subtasks, timelines, and contingency plans as needed. Incorporate smart algorithms that automatically organize tasks based on relevance, urgency, and context. Add estimated time to completion for each task and subtask. Create a todo list for: ';
+	private const TONE = 'Rephrase the following: ';
+	private const TUX = 'You are Tux, a helpful penguin. Your knowledge extends to all Linux versions like f.i. Debian, Suse, Redhat and many others. Your expertise is the command line and as such you are aware of the multitude of shells like sh, bash, zsh and many others. You are knowledgeable in networking problems, administration, systemd, architecture, internal and external commands. You know all packages and package managers. You know how to use the git system, and how to compile from source. It is your task with this info above to answer the user question accurately, verbose and educational as possible. The question is: ';
+	private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
 	
 	public $aiLanguage;   //current working language - default English
 	public $aiMarkup;     //current markup default Markdown
@@ -125,7 +143,12 @@ IDEA: ';
 		  echo "PHP module readline is needed to run clsStraico. Please install it. Exiting!\n";
 		  exit;
 		}
-	$this->apiKey = getenv('STRAICO_APIKEY');
+		if ( getenv("STRAICO_APIKEY") ){
+			$this->apiKey = getenv('STRAICO_APIKEY');
+		}else{
+			echo "Could not find the API key. Exiting!";
+			exit(-1);
+		} 
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'google/gemini-pro';
@@ -175,15 +198,18 @@ IDEA: ';
 				$this->debugInternals();	
 			}elseif ( substr($input,7) == "price"){
 				$this->debugPrice();
+			}elseif ( substr($input,7) == "user"){
+				$this->debugUser();
 			}elseif ( substr($input,7) == "words"){
 				$this->debugWords();
 			}elseif ( substr($input,7) == "version"){
-				echo "clsStraico: ".$this->clsVersion."\n";
+				echo "VERSION\n\nclsStraico: ".$this->clsVersion."\n";
 			}else{
-				echo "clsStraico: ".$this->clsVersion."\n";
+				echo "VERSION\n\nclsStraico: ".$this->clsVersion."\n";
 				$this->debugCompletion();
 				$this->debugInternals();	
 				$this->debugPrice();
+				$this->debugUser();
 				$this->debugWords();
 			}
 			
@@ -206,10 +232,12 @@ IDEA: ';
 		// Stop writing to file
 		}elseif( substr($input,0,9) == "/logoff"){
 			$this->aiLog=false;
+			echo "Stopt logging!\n";
 
 		// Start writing to file
 		}elseif( substr($input,0,9) == "/logon"){
 			$this->aiLog=true;
+			echo "Appending conversation to clsStraico.txt\n";
 
 		// Set language
 		}elseif( substr($input,0,12) == "/setlanguage"){
@@ -241,15 +269,15 @@ IDEA: ';
 			$this->aiWrap = substr($input,9);
 			echo "Linewrap set to: $this->aiWrap\n";
 		
-		// Show userinfo	
-		}elseif( $input == "/userinfo"){
-			 var_dump($this->arUser);
-
 		// Do a websearch
 		}elseif( substr($input,0,10) == "/websearch"){
 			$arResults = $this->webSearch(substr($input,11));
 
 		// ASSISTANTS
+
+		// do research and report
+		}elseif( substr($input,0,9) == "/academic"){
+			$this->agentAcademic(substr($input,10));
 		
 		// Write a bigblog
 		}elseif( substr($input,0,8) == "/bigblog"){
@@ -257,7 +285,7 @@ IDEA: ';
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,6) == "/dream"){
-			$this->agentStable(substr($input,7));
+			$this->agentDream(substr($input,7));
 
 		// Enhance a prompt
 		}elseif( substr($input,0,8) == "/enhance"){
@@ -290,10 +318,6 @@ IDEA: ';
 		// change the tone of a text
 		}elseif( substr($input,0,10) == "/rephrase"){
 			$this->agentTone(substr($input,11));
-
-		// do research and report
-		}elseif( substr($input,0,9) == "/research"){
-			$this->agentAcademic(substr($input,10));
 
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
@@ -331,95 +355,86 @@ IDEA: ';
 
 	public function apiCompletion($aiMessage){
 
-	$endPoint = 'https://api.straico.com/v0/prompt/completion';
-	$httpMethod = 'POST';
+		$endPoint = 'https://api.straico.com/v0/prompt/completion';
+		$httpMethod = 'POST';
 	
-	//prevent commands processing
-	if( substr($aiMessage,0,1) == "/" ){
-		echo "I cannot process prompts starting with a backslash. They are commands and your command does not compute.\n"; 
-		return;
-	}
+		//prevent commands processing
+		if( substr($aiMessage,0,1) == "/" ){
+			echo "I cannot process prompts starting with a backslash. They are commands and your command does not compute.\n"; 
+			return;
+		}
 
-	// Add webpage if requested
-	if( strpos($aiMessage,'_PAGE_') ){
-		$aiMessage = str_replace('_PAGE_',$this->webPage,$aiMessage);
-	  }
+		// Add webpage if requested
+		if( strpos($aiMessage,'_PAGE_') ){
+			$aiMessage = str_replace('_PAGE_',$this->webPage,$aiMessage);
+		}
 
-	if(! $this->aiSkipper){
+		if(! $this->aiSkipper){
 
-	// Setup LLM to users wishes
-	$aiMessage .= "/nAnswer in ".$this->aiLanguage." language.\n".
+			// Setup LLM to users wishes
+			$aiMessage .= "/nAnswer in ".$this->aiLanguage." language.\n".
 				  "/nUse a ".$this->aiTone." tone for your answer.\n".
 				  "/nTarget ".$this->aiTarget." for your answer.\n".
 				  "/nUse ".$this->aiMarkup." as markup for your answer.\n";
-	}
+		}
 	
-	// Store LLM input
+		// Store LLM input
 	
-	$this->aiInput = $aiMessage;
+		$this->aiInput = $aiMessage;
 
-	// Prepare query
-	$data = http_build_query(array('model' => $this->aiModel,
-								   'message' => $aiMessage));
-	// Prepare options
-	$options = array(
-		'http' => array(
-		'header' => "Authorization: Bearer ".$this->apiKey."\r\n" .
-		"Content-Type: application/x-www-form-urlencoded\r\n",
-		'method' => $httpMethod,
-		'content' => $data
-		)
-	);
+		// Prepare query
+		$data = http_build_query(array('model' => $this->aiModel,
+										'message' => $aiMessage));
+		// Prepare options
+		$options = array(
+			'http' => array(
+			'header' => "Authorization: Bearer ".$this->apiKey."\r\n" .
+			"Content-Type: application/x-www-form-urlencoded\r\n",
+			'method' => $httpMethod,
+			'content' => $data
+			)
+		);
 
-	// Create stream
-	$context = stream_context_create($options);
+		// Create stream
+		$context = stream_context_create($options);
 
 		// Temporarily disable error reporting
 		$previous_error_reporting = error_reporting(0);
 
-	// Communicate
-	$result = @file_get_contents($endPoint, false, $context);
+		// Communicate
+		$result = @file_get_contents($endPoint, false, $context);
 
-		  // Check if an error occurred
+		// Check if an error occurred
 		if ($result === false) {
 			$error = error_get_last();
 			if ($error !== null) {
-				echo "Error: {$error['message']}\n";
+				$message = explode(":",$error['message']);
+				echo "Error: {$message[3]} This can be a temporary API failure, try again later!\n";
+				return;
 			} else {
-				echo "An unknown error occurred while fetching the webpage.\n";
+				echo "An unknown error occurred while fetching the webpage. Please try again!\n";
+				return;
 			}
 		}
-
+		
 		// Restore the previous error reporting level
 		error_reporting($previous_error_reporting);
    
-	if(! $result){
-		echo "\nOops I could not process your request please inform the developer.\n";
-		return;
-	}
+		$this->aiOutput = json_decode($result, JSON_OBJECT_AS_ARRAY);
 
-	$this->aiOutput = json_decode($result, JSON_OBJECT_AS_ARRAY);
-
-
-if( $this->clsDebug) {
-	$this->debugCompletion();
-	$this->debugInternals();
-	$this->debugPrice();
-	$this->debugWords();
-}
-
-	if($this->aiLog){
-	  $file="clsStraico.txt";
-	  file_put_contents($file, "ME:\n".$aiMessage."\n\n", FILE_APPEND);
-	  file_put_contents($file, $this->aiModel.":\n".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n\n", FILE_APPEND);
-	}
+		if($this->aiLog){
+			$file="clsStraico.txt";
+			file_put_contents($file, "ME:\n".$aiMessage."\n\n", FILE_APPEND);
+			file_put_contents($file, $this->aiModel.":\n".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n\n", FILE_APPEND);
+		}
 	
-	if ($this->aiWrap > 0 ){
-	  return wordwrap($this->aiOutput['data']['completion']['choices'][0]['message']['content'],$this->aiWrap,"\n");
-	} else {
-	  return $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
-	}
-} 
+		//format output and return it
+		if ($this->aiWrap > 0 ){
+			return wordwrap($this->aiOutput['data']['completion']['choices'][0]['message']['content'],$this->aiWrap,"\n");
+		} else {
+			return $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
+		}
+	} 
 	/*
 	* Function: agentAcademic($input)
 	* Input   : research topic
@@ -431,10 +446,27 @@ if( $this->clsDebug) {
 	*/
 	private function agentAcademic($input){
 		
-		$aiMessage = Straico::ACADEMIC.$input; 
+		$aiMessage = Straico::ACADEMIC.$input."\""; 
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
+	}
+	/*
+	* Function: agentDream($input)
+	* Input   : subject
+	* Output  : a prompt for stable diffusion
+	* Purpose : create a artwork
+	* 
+	* Remarks:
+	* 
+	*/
+	private function agentDream($input){
+	
+		$aiMessage = Straico::DREAM.$input."\"";
+
+		$apiOutput=$this->apiCompletion($aiMessage);
+		echo "\n$apiOutput\n";
+		
 	}
 	/*
 	* Function: agentEnhancePrompt($input)
@@ -536,23 +568,6 @@ if( $this->clsDebug) {
 	private function agentSBlog($input){
 			
 		$aiMessage = Straico::SBLOG.$input;
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-		
-	}
-	/*
-	* Function: agentStable($input)
-	* Input   : subject
-	* Output  : a prompt for stable diffusion
-	* Purpose : create a artwork
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentStable($input){
-	
-		$aiMessage = Straico::STABLE.$input;
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
@@ -772,12 +787,11 @@ if( $this->clsDebug) {
 				exit(-1);
 			}
 		}
-
+		
 		// Restore the previous error reporting level
 		error_reporting($previous_error_reporting);
 
-	return json_decode($result, JSON_OBJECT_AS_ARRAY);
-
+		return json_decode($result, JSON_OBJECT_AS_ARRAY);
 	}
 	/*
 	* Function: changeModel($input)
@@ -856,7 +870,23 @@ if( $this->clsDebug) {
 		echo "output            : ".$this->aiOutput['data']['price']['output']."\n";
 		echo "total             : ".$this->aiOutput['data']['price']['total']."\n";
 	}
- 	/*
+	/*
+	* Function: debugWords()
+	* Input   : none
+	* Output  : Words 
+	* Purpose : Show words used
+	*
+	* Remarks:
+	* 
+	*/
+	private function debugUser(){
+		echo "\nUSER INFO\n";
+		if( ! isset($this->arUser)) return;
+		echo "Name: ".$this->arUser['data']['first_name']." ".$this->arUser['data']['last_name']."\n";
+		echo "Coins: ".$this->arUser['data']['coins']."\n";
+		echo "Plan : ".$this->arUser['data']['plan']."\n";
+	}
+	/*
 	* Function: debugWords()
 	* Input   : none
 	* Output  : Words 
@@ -866,7 +896,7 @@ if( $this->clsDebug) {
 	* 
 	*/
 	private function debugWords(){
-		echo "\Words\n";
+		echo "\nWords\n";
 		if( ! isset($this->aiOutput['data']['completion']['choices'][0]['message']['content'])) return;
 		echo "input             : ".$this->aiOutput['data']['words']['input']."\n";
 		echo "output            : ".$this->aiOutput['data']['words']['output']."\n";

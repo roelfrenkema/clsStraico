@@ -8,7 +8,17 @@
  */
 ```
 
-# Updates
+# Updates before version update
+
+## Commands
+
+**/userinfo** removed. Use **/debug user** now. 
+**/research** changed name to **/academic** to reflect method and prompt.
+
+## Other
+
+**apikey** - check if apikey is passed and correct. Check in \_-construct as well in Straico::apiUser
+**debug user** - removed command /userinfo and added user as option for debug
 
 ## Version 1.4.0 - released 31-03-24
 
