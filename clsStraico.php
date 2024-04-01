@@ -336,7 +336,7 @@ IDEA: ';
 	
 	//prevent commands processing
 	if( substr($aiMessage,0,1) == "/" ){
-		echo "I cannot process prompts starting with a backslash.\n"; 
+		echo "I cannot process prompts starting with a backslash. They are commands and your command does not compute.\n"; 
 		return;
 	}
 
@@ -743,19 +743,38 @@ if( $this->clsDebug) {
 	*/
 	private function apiUser(){
 
-	$endPoint = 'https://api.straico.com/v0/user';
-	$httpMethod = 'GET';
+		$endPoint = 'https://api.straico.com/v0/user';
+		$httpMethod = 'GET';
 
-	$options = array(
-		'http' => array(
-		'header' => "Authorization: Bearer ".$this->apiKey."\r\n",
-		'method' => $httpMethod
-		)
-	);
+		$options = array(
+			'http' => array(
+			'header' => "Authorization: Bearer ".$this->apiKey."\r\n",
+			'method' => $httpMethod
+			)
+		);
 
-	$context = stream_context_create($options);
+		$context = stream_context_create($options);
 
-	$result = file_get_contents($endPoint, false, $context);
+		// Temporarily disable error reporting
+		$previous_error_reporting = error_reporting(0);
+
+		$result = @file_get_contents($endPoint, false, $context);
+
+		  // Check if an error occurred
+		if ($result === false) {
+			$error = error_get_last();
+			if ($error !== null) {
+				$message = explode(":",$error['message']);
+				echo "Error: {$message[3]} Check your API key!\n";
+				exit(-1);
+			} else {
+				echo "An unknown error occurred while fetching the webpage.\n";
+				exit(-1);
+			}
+		}
+
+		// Restore the previous error reporting level
+		error_reporting($previous_error_reporting);
 
 	return json_decode($result, JSON_OBJECT_AS_ARRAY);
 
@@ -964,6 +983,7 @@ Alternatively use one of the following internal commands.
   Assistants:
             
     /bigblog            - Write blog on subject of 1000 words.
+    /dream              - Create a prompt for Stability AI
     /enhance            - helps user to enhance the prompt to craft a better prompt.
     /factcheck          - Check on a rumor, conspiracy or anything.
     /gist               - Give a gist of page retrieved by getpage.
