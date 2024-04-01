@@ -8,12 +8,20 @@
  */
 ```
 
-# Updates before version update
+# Updates for testing branch
+
+## Methods
+
+**private function agentDream** provides prompt for the text-to-image model Stable Difussion
+**private function agentGist($input)** now wil take input from cli too you will still be able to use \_PAGE\_ as input.
+**private function agentTextcheck($input)** new name for judge method. Seem nicer right? 
 
 ## Commands
 
 **/userinfo** removed. Use **/debug user** now. 
 **/research** changed name to **/academic** to reflect method and prompt.
+**/dream** provides prompt for the text-to-image model Stable Difussion
+**/textcheck** renames **/judge** and was updated with better prompt.
 
 ## Other
 

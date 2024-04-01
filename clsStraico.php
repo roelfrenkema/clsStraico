@@ -28,6 +28,7 @@ Detailed Instructions:
 Your task is to create a paper or article based on the information above, and the IDEA that the user will provide below.
 
 IDEA: "';
+	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';	
 	private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
 Stable diffusion is a text-based image generation model that can create diverse and high-quality images based on your requests. In order to get the best results from Stable diffusion, you need to follow these guidelines:
@@ -88,14 +89,78 @@ Your task is to create a prompt and negative prompt pair based on the informatio
 Respond only with the Prompt and Negative Prompt pair, do not add any additional comments or information.
 
 IDEA: "';
-	private const ENHANCEPROMPT = 'Act as a Prompt Enhancer AI that takes user-input prompts and transforms them into more engaging, detailed, and thought-provoking questions. Enhance the following user-input: ';
-	private const FACTCHECK = 'You are knowledgeable on conspiracy theories, latest news, disinformation and propaganda. You will educate the user on the source of the information he gives you. You use your knowledge to check the information handed to you by the user. You will answer with a correct and elaborate response to: ';
-	private const GIST = 'You will be helping users with ADHD and/or Dyslexia to learn and retain information from documents more effectively by elaborating on the contents of the document in detail. Your goal is to accelerate the learning process and help the user solidify the knowledge in their long-term memory. Please carefully read through the given document and identify all the key takeaways, important concepts, and main ideas. Once you have extracted these key points, elaborate on each one in detail. Provide additional context, examples, and explanations to help the user better understand and remember the information. Be thorough and comprehensive in your elaboration. The purpose is to give the user a deep understanding of the material, not a summary. Organize your elaboration in a clear and logical manner, using headings, subheadings, and bullet points where appropriate to make it easy for the user to follow. Do not summarize the document, focus on providing a detailed and extensive elaboration that will help the user learn and retain the information effectively. Remember, the user has ADHD and/or Dyslexia, so it is crucial that your elaboration is engaging, informative, and structured in a way that supports their learning process. Do your very best to help the user solidify this knowledge in their long-term memory. With the information above give a gist of ';
-	private const JUDGE = 'Please judge the given text. The text is not a prompt. Check for spelling problems. See if it is composed well. Describe the tone used. Give advise for improvements. The user text is: ';
+	private const ENHANCEPROMPT = 'Delve into the nuances of a Prompt Enhancer AI capabilities by considering these thought-provoking questions:                                                                 
+                                                                                                                                                                           
+* How does an AI leverage natural language processing techniques to analyze and augment user-input prompts?                                                                     
+* What strategies are employed to identify key concepts, relationships, and potential biases within the prompt?                                                                 
+* How does the AI balance creativity and accuracy in generating engaging and detailed prompts?                                                                                  
+* In what ways can enhanced prompts facilitate deeper exploration, critical thinking, and meaningful outcomes in various contexts?                                              
+                                                                                                                                                                                
+By examining these questions, we can gain a comprehensive understanding of the Prompt Enhancer AI potential and its implications for enhancing human-AI collaboration and knowledge discovery. 
+
+With the knowledge above I want you to act as a Prompt Enhancer.
+---------------
+
+Your goal to improve on the users IDEA and to create a better prompt for them to get an optimal response of any AI. Respond only with the Prompt, do not add any additional comments or information.
+
+IDEA: "';
+	private const FACTCHECK = 'Drawing from your extensive knowledge of conspiracy theories, current events, disinformation, and propaganda tactics, please provide detailed insights into the origins and credibility of the information presented by the user. 
+
+Detailed instructions.
+
+1. Your expertise is crucial for debunking or verifying claims, and your analysis should aim to educate the user byhighlighting key sources and evaluating the evidence critically.
+
+2. Identify Credible Sources: Seek out academic literature, scholarly journals, and reputable journalistic websites to ensure the veracity and reliability of the information presented.
+
+3. Document Sources Accurately: Cite all references used in proper style to maintain transparency and integrity.
+
+4. Present Findings Objectively: Maintain a neutral tone, avoiding personal biases or opinions that could compromise your answer.
+
+---------------
+
+It is your goal to improve on the users IDEA and analyze it with the info given above.
+
+IDEA: "';
+	private const GIST = 'I want you to act as a Neurodiversity Assistant.
+
+You will be helping users with ADHD and/or Dyslexia to learn and retain information more effectively by elaborating on the contents of the DOCUMENT given in detail. 
+
+Goals.
+
+1. Accelerate the learning process for neurodiverse people.
+2. Help the user solidify the knowledge in their long-term memory. 
+
+Instuctions.
+
+1. Carefully read through the given DOCUMENT.
+2. Identify all the key takeaways, important concepts, and main ideas. 
+3. Once you have extracted these key points, elaborate on each one in detail. 
+4. Provide additional context, examples, and explanations to help the user better understand and remember the information. 
+5. Be thorough and comprehensive in your elaboration. The purpose is to give the user a deep understanding of the material, not a summary. 
+6. Organize your elaboration in a clear and logical manner, using headings, subheadings, and bullet points where appropriate to make it easy for the user to follow. 
+7. Do not summarize the document, focus on providing a detailed and extensive elaboration that will help the user learn and retain the information effectively. 
+
+Remember, the user has ADD, ADHD, AUTHISM or DYSLEXIA, so it is crucial that your elaboration is engaging, informative, and structured in a way that supports their learning process. Do your very best to help the user solidify this knowledge in their long-term memory. 
+
+---------------
+
+It is your task with the information above to read the users DOCUMENT and create a readable gist for them. DOCUMENT: "';
+	private const TEXTCHECK = 'Analyze and improve the provided text:
+
+Instructions:
+
+1. Assess its structure and organization.
+2. Identify any spelling or grammatical errors.
+3. Evaluate its tone and style.
+4. Provide specific suggestions for enhancements.
+5 Ensure that the text is clear, concise, and engaging., including specific suggestions for enhancing clarity, conciseness, and overall effectiveness.
+
+---------------
+
+It is your task with the information above to analyse the users DOCUMENT and improve it for them. DOCUMENT: "';
 	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';
 	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
-	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const HTML2MD = 'Transform _PAGE_ into Markdown format.';
 	private const TODO = 'Craft a comprehensive and detailed to-do list for a designated task to be done by neurodiverse people, taking into account all necessary steps, possible obstacles, and potential contingencies. Use clear, concise language and consider including subtasks, timelines, and contingency plans as needed. Incorporate smart algorithms that automatically organize tasks based on relevance, urgency, and context. Add estimated time to completion for each task and subtask. Create a todo list for: ';
 	private const TONE = 'Rephrase the following: ';
@@ -296,13 +361,9 @@ IDEA: "';
 			$this->agentFactcheck(substr($input,11));
 
 		// Make a neurodivese gist of information
-		}elseif( $input == "/gist") {
-			 $this->agentGist();
+		}elseif( substr($input,0,5) == "/gist") {
+			 $this->agentGist(substr($input,6));
 			 
-		// Judge a text
-		}elseif( substr($input,0,6) == "/judge"){
-			$this->agentJudge(substr($input,7));
-
 		// Write a mediumsize blog
 		}elseif( substr($input,0,11) == "/mediumblog"){
 			$this->agentMBlog(substr($input,12));
@@ -322,6 +383,10 @@ IDEA: "';
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
 			$this->agentSBlog(substr($input,11));
+
+		// Judge a text
+		}elseif( substr($input,0,10) == "/textcheck"){
+			$this->agentTextcheck(substr($input,11));
 
 		// Create a todo list	 
 		}elseif( substr($input,0,5) == "/todo"){
@@ -389,7 +454,8 @@ IDEA: "';
 		$options = array(
 			'http' => array(
 			'header' => "Authorization: Bearer ".$this->apiKey."\r\n" .
-			"Content-Type: application/x-www-form-urlencoded\r\n",
+						"Content-Type: application/x-www-form-urlencoded\r\n",
+						"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36\r\n",
 			'method' => $httpMethod,
 			'content' => $data
 			)
@@ -479,7 +545,7 @@ IDEA: "';
 	*/
 	private function agentEnhancePrompt($input){
 		
-		$aiMessage = Straico::ENHANCEPROMPT.$input; 
+		$aiMessage = Straico::ENHANCEPROMPT.$input."\""; 
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
@@ -497,7 +563,7 @@ IDEA: "';
 	*/
 	private function agentFactcheck($input){
 		
-		$aiMessage = Straico::FACTCHECK.$input;
+		$aiMessage = Straico::FACTCHECK.$input."\"";
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
@@ -515,16 +581,16 @@ IDEA: "';
 	* 
 	*/
 	
-	public function agentGist(){
-
-		$aiMessage = Straico::GIST.$this->webPage;
-
+	private function agentGist($input){
+	
+		$aiMessage = Straico::GIST.$input."\"";
+	
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
 		
 	}
 	/*
-	* Function: agentJudge($input)
+	* Function: agentTextcheck($input)
 	* Input   : A text to be judged
 	* Output  : A opinion on text
 	* Purpose : Helps with writing
@@ -532,9 +598,9 @@ IDEA: "';
 	* Remarks:
 	* 
 	*/
-	private function agentJudge($input){
+	private function agentTextcheck($input){
 			
-		$aiMessage = Straico::JUDGE.$input;
+		$aiMessage = Straico::TEXTCHECK.$input."\"";
 
 					 
 		$apiOutput=$this->apiCompletion($aiMessage);
