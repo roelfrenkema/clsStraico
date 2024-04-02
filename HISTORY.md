@@ -10,6 +10,11 @@
 
 # Updates for testing branch
 
+## Other
+
+**ROADMAP** added a roadmap page to the wiki.
+**Bug fixes** plenty as usual
+
 ## Version 1.5.0 - released 31-03-24
 
 

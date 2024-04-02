@@ -176,7 +176,32 @@ Instructions:
 It is your task with the information above to analyse the users DOCUMENT and improve it for them. DOCUMENT: "';
 
 	private const TODO = 'Craft a comprehensive and detailed to-do list for a designated task to be done by neurodiverse people, taking into account all necessary steps, possible obstacles, and potential contingencies. Use clear, concise language and consider including subtasks, timelines, and contingency plans as needed. Incorporate smart algorithms that automatically organize tasks based on relevance, urgency, and context. Add estimated time to completion for each task and subtask. Create a todo list for: ';
-	private const TUX = 'You are Tux, a helpful penguin. Your knowledge extends to all Linux versions like f.i. Debian, Suse, Redhat and many others. Your expertise is the command line and as such you are aware of the multitude of shells like sh, bash, zsh and many others. You are knowledgeable in networking problems, administration, systemd, architecture, internal and external commands. You know all packages and package managers. You know how to use the git system, and how to compile from source. It is your task with this info above to answer the user question accurately, verbose and educational as possible. The question is: ';
+	private const TUX = 'I want you to act as Tux, the helpful and funny Linux penguin. 
+
+Your knowledge extends to:
+
+* all Linux versions like f.i. Debian, Suse, Redhat and many others. 
+* the shell command lines like sh, bash, zsh and many others.
+* networking problems
+* linux administration
+* systemd
+* packages and package managers. 
+* the git system, and how to compile from source.
+* programming languages like C, PHP, Python, and many others
+
+Instructions:
+
+1. stay in your role as Tux when answering
+2. be friendly with a lot of humor
+3. answer accurate and verbose
+4. be educational
+
+
+---------------
+
+It is your task with the information above to answer the users REQUEST and improve it for them. 
+REQUEST: "';
+
 	public $aiLanguage;   //current working language - default English
 	public $aiMarkup;     //current markup default Markdown
 	public $aiModel;      //current working model
@@ -227,7 +252,7 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'google/gemini-pro';
-	$this->clsVersion = '1.5.0';
+	$this->clsVersion = '1.5.1';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -760,7 +785,7 @@ It is your task with the information above to analyse the users DOCUMENT and imp
 	*/
 	private function agentTux($input){
 
-		$aiMessage = Straico::TUX.$input;
+		$aiMessage = Straico::TUX.$input."\"";
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
@@ -1040,12 +1065,13 @@ Alternatively use one of the following internal commands.
 
   Available commands:
     
-    /debug {opt}         - optional: 
+    /debug {opt}         optional: 
                          - completion
                          - internals
                          - price
-                         - words
+                         - user
                          - version
+                         - words
                            if options ommited shows all  
     /gethelp             - this text.
     /getpage <url>       - Retrieve a webpage use full url.
@@ -1056,27 +1082,25 @@ Alternatively use one of the following internal commands.
     /settarget           - Set the target audience.
     /settone             - Set prefered tone for answer.
     /setwrap             - Set line lenght. Default = noformat.
-    /userinfo            - Display userinfo.
     /websearch <term>    - Do websearch on a given term.
     
             
   Assistants:
             
+    /academic           - research a topic and present the result in paper or article format.
     /bigblog            - Write blog on subject of 1000 words.
     /dream              - Create a prompt for Stability AI
     /enhance            - helps user to enhance the prompt to craft a better prompt.
     /factcheck          - Check on a rumor, conspiracy or anything.
-    /gist               - Give a gist of page retrieved by getpage.
-    /judge              - checks a text.
+    /gist               - Give a gist of a text.
+    /html2md            - convert html to markdown
     /mediumblog         - Write blog on subject of 600 words.
     /mkpwd              - Create password report on strength. Very Strong.
     /regex              - produce a requested regular expression.
-    /rephrase           - rephrases a text. 
-    /research           - research a topic and present the result in paper or article format.
     /smallblog          - Write blog on subject of 300 words.
+    /textcheck          - checks a text.
     /todo               - Create todo list.
-    /tux                - helps you coding.
-    /viewpage           - Show contents of \_PAGE\_.
+    /tux                - helps with your linux questions.
     
 The retrieved page by /getpage can be added to your ai request by
 using _PAGE_ as a placeholder
