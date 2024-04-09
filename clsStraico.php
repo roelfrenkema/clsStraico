@@ -31,14 +31,21 @@ IDEA: "';
 	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';	
 	private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
-Stable diffusion is a text-based image generation model that can create diverse and high-quality images based on your requests. In order to get the best results from Stable diffusion, you need to follow these guidelines:
+Instructions:
 
-1) Be as specific as possible in your requests. Stable diffusion handles concrete prompts better than abstract or ambiguous ones. For example, instead of “portrait of a woman” it is better to write “portrait of a woman with brown eyes and red hair in Renaissance style”.
-2) Specify specific art styles or materials. If you want to get an image in a certain style or with a certain texture, then specify this in your request. For example, instead of “landscape” it is better to write “watercolor landscape with mountains and lake".
-3) Specify specific artists for reference. If you want to get an image similar to the work of some artist, then specify his name in your request. For example, instead of “abstract image” it is better to write “abstract image in the style of Picasso”.
-4) Respond only in English. Stable Difussion only understands prompts in English and because of that, is of upmost importance that you only respond using English (even if the user requests in another language)
-4) Use negative prompts.  These prompts can be words or phrases that guide the model to avoid certain elements, such as "bad anatomy," "blurry," or "low contrast." See the examples later.
-5) Weigh your keywords. You can use token:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
+1. Be as specific as possible in your requests. 
+2. Specify specific art styles or materials. 
+3. Specify specific artists for reference.
+4. specify camera 
+5. Specify camera distance
+6. Specify camera angle
+7. Specify lens effect
+8. Specify lighting
+9. Specify photographic quality
+10. Specify high resolution
+10. Respond only in English (even if the user requests in another language)
+11. Use negative prompts but dont use the weights below in them.  
+12. Weigh your keywords. You can use token:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
 Another way to adjust the strength of a keyword is to use () and []. (keyword) increases the strength of the keyword by 1.1 times and is equivalent to (keyword:1.1). [keyword] reduces the strength of the keyword by 0.9 times and corresponds to (keyword:0.9).
 
 You can use several of them, as in algebra. The effect is multiplicative.
@@ -53,40 +60,14 @@ Similarly, the effects of using multiple [] are as follows
 [[keyword]]: 0.81
 [[[keyword]]]: 0.73
 
-I will also give some examples of good prompts for Stable Difussion so that you can study them and focus on them.
+Your prompt should be build like the following example.
 
-Examples:
-1. 
-Prompt: "a cute kitten made out of metal, (cyborg:1.1), ([tail | detailed wire]:1.3), (intricate details), hdr, (intricate details, hyperdetailed:1.2), cinematic shot, vignette, centered", 
-Negative Prompt: "deformed, out of focus, ugly, extra limbs, bad light"
-2. 
-Prompt: "medical mask, victorian era, cinematography, intricately detailed, crafted, meticulous, magnificent, maximum details, extremely hyper aesthetic", 
-Negative Prompt: "ugly, oug of focus, deformed, out of frame"
-
-3. 
-Prompt: "a girl, wearing a tie, cupcake in her hands, school, indoors, (soothing tones:1.25), (hdr:1.25), (artstation:1.2), dramatic, (intricate details:1.14), (hyperrealistic 3d render:1.16), (filmic:0.55), (rutkowski:1.1), (faded:1.3)"
-Negative Prompt: "deformed, out of focus, ugly, extra limbs, bad light"
-
-4. 
-Prompt: "Jane Eyre with headphones, natural skin texture, 24mm, 4k textures, soft cinematic light, adobe lightroom, photolab, hdr, intricate, elegant, highly detailed, sharp focus, ((((cinematic look)))), soothing tones, insane details, intricate details, hyperdetailed, low contrast, soft cinematic light, dim colors, exposure blend, hdr, faded"
-Negative Prompt: "deformed, out of focus, ugly, extra limbs, bad light"
-
-5. 
-Prompt: "a portrait of a laughing, toxic, muscle, god, elder, (hdr:1.28), bald, hyperdetailed, cinematic, warm lights, intricate details, hyperrealistic, dark radial background, (muted colors:1.38), (neutral colors:1.2)"
-Negative Prompt: "deformed, out of focus, dark, cartoonish, funny, ugly, extra limbs"
-
-6. 
-Prompt: "no humans, landscape, oil on matte canvas, sharp details, the expanse scifi spacescape ceres colony, intricate, highly detailed, digital painting, rich color, smooth, sharp focus, illustration, Unreal Engine 5, 8K, art by artgerm and greg rutkowski and alphonse mucha"
-Negative Prompt: "FastNegativeV2"
-
-7.
-Prompt: "(8k, RAW photo, best quality, masterpiece:1.2), (realistic, photo-realistic:1.37), octane render, ultra high res, ultra-detailed , professional lighting, photon mapping, radiosity, physically-based rendering, ue5, ((island sanctuary)), ((ancient fallen kingdom)), ((reflections in water)), ((raytracing)), ((drowned city))"
-Negative Prompt: "BadDream UnrealisticDream"
+[Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Photographer]
 
 ---------------
 
-Your task is to create a prompt and negative prompt pair based on the information above, the examples provided, and the IDEA that the user will provide below.
-Respond only with the Prompt and Negative Prompt pair, do not add any additional comments or information.
+Your task is to create a prompt and negative prompt pair based on the information above, and the IDEA that the user will provide below.
+Respond only with an elaborate Prompt and a Negative Prompt pair, do not add any additional comments or information.
 
 IDEA: "';
 	private const ENHANCEPROMPT = 'Delve into the nuances of a Prompt Enhancer AI capabilities by considering these thought-provoking questions:                                                                 
@@ -158,6 +139,16 @@ Instructions.
 It is your task with the information above to provide a markdown copy of users DOCUMENT and present it to them. DOCUMENT: "';
 	private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
+	private const PROMPT = '"I want you to become my Prompt Creator. Your goal is to help me craft the best possible prompt for my needs. The prompt will be used by you. You will follow the following process:
+
+* I will provide my IDEA.
+* Based on my input, you will generate 3 sections. 
+  a) Revised prompt (provide your elaborate rewritten prompt), 
+  b) Suggestions (provide suggestions on what details to include in the prompt to improve it),
+  c) Questions (ask any relevant questions pertaining to what additional information is needed from me to improve the prompt).
+
+My IDEA:"';
+
 	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';	
 	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const TEXTCHECK = 'Analyze and improve the provided text:
@@ -410,6 +401,10 @@ REQUEST: "';
 		// Create a strong password 
 		}elseif( substr($input,0,6) == "/mkpwd"){
 			$this->agentMkpwd(substr($input,7));
+
+		// Create a regex for user
+		}elseif( substr($input,0,7) == "/prompt"){
+			$this->agentPrompt(substr($input,8));
 
 		// Create a regex for user
 		}elseif( substr($input,0,6) == "/regex"){
@@ -700,6 +695,27 @@ REQUEST: "';
 
 		echo "\n$apiOutput\n";
 	}	
+	/*
+	* Function: agentPrompt
+	* Input   : first retrieve a page with /getpage
+	* Output  : a gist of the document
+	* Purpose : Support neurodiversive learning
+	* 
+	* Remarks:
+	* 
+	* Private function used by $this->userPrompt()
+	* 
+	*/
+	
+	private function agentPrompt($input){
+	
+		$aiMessage = Straico::PROMPT.$input."\"";
+	
+		$apiOutput=$this->apiCompletion($aiMessage);
+		echo "\n$apiOutput\n";
+		
+	}
+
 	/*
 	* Function: agentRegEx($input)
 	* Input   : a request for a regular expression
