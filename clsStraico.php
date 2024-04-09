@@ -258,7 +258,8 @@ REQUEST: "';
 	$this->clsDebug = false;
 	$this->aiInput = '';
 	$this->aiOutput = '';
-		$this->aiLog = false;
+	$this->aiLog = false;
+	echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
 	}
  	/*
 	* Function: $userPrompt()

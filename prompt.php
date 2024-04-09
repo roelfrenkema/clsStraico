@@ -19,12 +19,6 @@ $aiMessage = "";
 $straico = new Straico;
 
 
-/* 
-    Welcome message with model info.
-*/
-echo "Welcome ".$straico->arUser['data']['first_name']." to ".$straico->aiModel.". Please ask your questions.\nFor help enter /gethelp.\nWhen done finish with /exit.\n\n";
-
-
 /*
     Start looping till finished with /exit
 */
