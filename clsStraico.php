@@ -209,6 +209,7 @@ REQUEST: "';
 	private $aiOutput;    //complete ai output
 	private $aiSkipper;    //used by some functions
 	private $aiLog;       //log convo to file
+	private $usrPrompt;    //userprompt preserved for logfile
 
 	/*
 	* Function: __construct
@@ -279,7 +280,7 @@ REQUEST: "';
 	
 		
 	
-		//We want to stop
+		$this->usrPrompt = $input;
 
 		// Debug routine
 		if ( substr($input,0,6) == "/debug"){
@@ -517,7 +518,7 @@ REQUEST: "';
 
 		if($this->aiLog){
 			$file="clsStraico.txt";
-			file_put_contents($file, "ME:\n".$aiMessage."\n\n", FILE_APPEND);
+			file_put_contents($file, "ME:\n".$this->usrPrompt."\n\n", FILE_APPEND);
 			file_put_contents($file, $this->aiModel.":\n".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n\n", FILE_APPEND);
 		}
 	
