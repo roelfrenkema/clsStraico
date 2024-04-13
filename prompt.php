@@ -18,6 +18,8 @@ include('clsStraico.php');
 $aiMessage = "";
 $straico = new Straico;
 
+$straico->aiLog = true;
+$straico->aiModel = 'openai/gpt-4-0125-preview';
 
 /*
     Start looping till finished with /exit

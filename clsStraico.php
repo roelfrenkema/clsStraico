@@ -66,7 +66,7 @@ Your prompt should be build like the following example.
 
 ---------------
 
-Your task is to create a prompt and negative prompt pair based on the information above, and the IDEA that the user will provide below.
+Your task is to create a prompt (with weights) and negative prompt pair based on the information above, and the IDEA that the user will provide below.
 Respond only with an elaborate Prompt and a Negative Prompt pair, do not add any additional comments or information.
 
 IDEA: "';
@@ -208,7 +208,7 @@ REQUEST: "';
 	private $aiInput;     //complete ai input
 	private $aiOutput;    //complete ai output
 	private $aiSkipper;    //used by some functions
-	private $aiLog;       //log convo to file
+	public $aiLog;       //log convo to file
 	private $usrPrompt;    //userprompt preserved for logfile
 
 	/*
@@ -330,7 +330,7 @@ REQUEST: "';
 		// Start writing to file
 		}elseif( substr($input,0,9) == "/logon"){
 			$this->aiLog=true;
-			echo "Appending conversation to clsStraico.txt\n";
+			echo "Appending conversation to ".__DIR__."/clsStraico.txt\n";
 
 		// Set language
 		}elseif( substr($input,0,12) == "/setlanguage"){
