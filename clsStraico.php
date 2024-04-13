@@ -209,6 +209,7 @@ REQUEST: "';
 	private $aiOutput;    //complete ai output
 	private $aiSkipper;    //used by some functions
 	public $aiLog;       //log convo to file
+	public $logPath;
 	private $usrPrompt;    //userprompt preserved for logfile
 
 	/*
@@ -519,8 +520,8 @@ REQUEST: "';
 
 		if($this->aiLog){
 			$file= __DIR__."/clsStraico.txt";
-			file_put_contents($file, "ME:\n".$this->usrPrompt."\n\n", FILE_APPEND);
-			file_put_contents($file, $this->aiModel.":\n".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n\n", FILE_APPEND);
+			file_put_contents($this->logPath.'/'.$file, "ME:\n".$this->usrPrompt."\n\n", FILE_APPEND);
+			file_put_contents($this->logPath.'/'.$file, $this->aiModel.":\n".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n\n", FILE_APPEND);
 		}
 	
 		//format output and return it
