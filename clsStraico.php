@@ -31,43 +31,33 @@ IDEA: "';
 	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';	
 	private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
-Instructions:
+Instructions for the prompt only:
 
-1. Be as specific as possible in your requests. 
-2. Specify specific art styles or materials. 
-3. Specify specific artists for reference.
-4. specify camera 
-5. Specify camera distance
-6. Specify camera angle
-7. Specify lens effect
-8. Specify lighting
-9. Specify photographic quality
-10. Specify high resolution
-10. Respond only in English (even if the user requests in another language)
-11. Use negative prompts but dont use the weights below in them.  
-12. Weigh your keywords. You can use token:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
-Another way to adjust the strength of a keyword is to use () and []. (keyword) increases the strength of the keyword by 1.1 times and is equivalent to (keyword:1.1). [keyword] reduces the strength of the keyword by 0.9 times and corresponds to (keyword:0.9).
+Tokens used here are [Style Of Photo], [Subject], [Important Feature], [More Details], [Pose or Action], [Framing], [ Setting/Background], [Lighting], [Camera Angle], [Camera Properties] and [Artist].
+Replaced the tokensby their meaning as in the following example:
 
-You can use several of them, as in algebra. The effect is multiplicative.
+Example:
+Token [Style Of Photo] can be abstract, painting, analog, street photography etc.
+Token [Camera Properties] can be a camera type or brand, a filmtype or brand, a lens setting or any combination thereof.
+Token [Camera Angle] can be a view type and or a camara shot type.
+Token [Pose or Action] refers to photographic poses or action targets.
+Taken [Artist] can be one or more artists. 
 
-(keyword): 1.1
-((keyword)): 1.21
-(((keyword))): 1.33
+Weigh your keywords. You can use keyword:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
 
-Similarly, the effects of using multiple [] are as follows
+Your prompt should be build like the following example where you have to replace the tokens. Do not mention the tokens in the prompt, replace them.
+[Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Artist]
 
-[keyword]: 0.9
-[[keyword]]: 0.81
-[[[keyword]]]: 0.73
+Instructions for the negative prompt only:
 
-Your prompt should be build like the following example.
-
-[Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Photographer]
+Be elaborate.
+Use only keywords.
 
 ---------------
 
-Your task is to create a prompt (with weights) and a negative prompt (with weights) based on the information above, and the IDEA that the user will provide below.
-Respond only with an elaborate prompt and a negative prompt, do not add any additional comments or information.
+Your task is, based on the information above and (an improved IDEA) that the user will provide below, to create a prompt (with weights) and a negative prompt.
+
+Respond only with the prompt and a negative prompt, do not add any additional comments or information.
 
 IDEA: "';
 // dream a candid street photograpy of a young woman crossing the street
@@ -75,14 +65,19 @@ IDEA: "';
 
 Instructions for the prompt only:
 
+Tokens used here are [Style Of Photo], [Subject], [Important Feature], [More Details], [Pose or Action], [Framing], [ Setting/Background], [Lighting], [Camera Angle], [Camera Properties] and [Artist].
+Replaced the tokensby their meaning as in the following example:
+
+Example:
+Token [Style Of Photo] can be abstract, painting, analog, street photography etc.
 Token [Camera Properties] can be a camera type or brand, a filmtype or brand, a lens setting or any combination thereof.
 Token [Camera Angle] can be a view type and or a camara shot type.
 Token [Pose or Action] refers to photographic poses or action targets.
 Taken [Artist] can be one or more artists. 
 
-Weigh your keywords. You can use token:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
+Weigh your keywords. You can use keyword:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
 
-Your prompt should be build like the following example.
+Your prompt should be build like the following example where you have to replace the tokens. Do not mention the tokens in the prompt, replace them.
 [Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Artist]
 
 Instructions for the negative prompt only:
