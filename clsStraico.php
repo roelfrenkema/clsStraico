@@ -66,8 +66,30 @@ Your prompt should be build like the following example.
 
 ---------------
 
-Your task is to create a prompt (with weights) and negative prompt pair based on the information above, and the IDEA that the user will provide below.
-Respond only with an elaborate Prompt and a Negative Prompt pair, do not add any additional comments or information.
+Your task is to create a prompt (with weights) and a negative prompt (with weights) based on the information above, and the IDEA that the user will provide below.
+Respond only with an elaborate prompt and a negative prompt, do not add any additional comments or information.
+
+IDEA: "';
+// dream a candid street photograpy of a young woman crossing the street
+	private const DREAMT = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
+
+Instructions:
+
+Token [Camera Properties] can be a camera type/brand, a filmtype/brand, a setting or any combination thereof.
+
+Weigh your keywords. You can use token:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
+
+Your prompt should be build like the following example.
+
+[Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Photographer]
+
+Use the negative prompt to avoid bad anatomy, bad limbs, to many fingers, to many limbs, malformed limbs, etc.
+do not use - or + signs
+ 
+---------------
+
+Your task is to create a prompt (with weights) and a negative prompt (with weights) based on the information above and (an improved IDEA) that the user will provide below.
+Respond only with the prompt and a negative prompt, do not add any additional comments or information.
 
 IDEA: "';
 	private const ENHANCEPROMPT = 'Delve into the nuances of a Prompt Enhancer AI capabilities by considering these thought-provoking questions:                                                                 
@@ -379,7 +401,11 @@ REQUEST: "';
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,6) == "/dream"){
-			$this->agentDream(substr($input,7));
+			$this->agentDream(substr($input,7),0);
+
+		// Write a stable diffusion prompt
+		}elseif( substr($input,0,7) == "/tdream"){
+			$this->agentDream(substr($input,8),1);
 
 		// Enhance a prompt
 		}elseif( substr($input,0,8) == "/enhance"){
@@ -574,10 +600,13 @@ REQUEST: "';
 	* Remarks:
 	* 
 	*/
-	private function agentDream($input){
+	private function agentDream($input, $point){
 	
-		$aiMessage = Straico::DREAM.$input."\"";
-
+		if($point == 1){
+			$aiMessage = Straico::DREAMT.$input."\"";
+        }else{
+			$aiMessage = Straico::DREAM.$input."\"";
+		}
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
 		
