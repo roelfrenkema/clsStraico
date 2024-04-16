@@ -75,20 +75,22 @@ IDEA: "';
 
 Instructions:
 
-Token [Camera Properties] can be a camera type/brand, a filmtype/brand, a setting or any combination thereof.
+Token [Camera Properties] can be a camera type or brand, a filmtype or brand, a lens setting or any combination thereof.
+Token [Camera Angle] can be a view type and or a camara shot type.
+Token [Pose or Action] refers to photographic poses or action targets.
+Taken [Artist] can be one or more artists. 
 
 Weigh your keywords. You can use token:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
 
 Your prompt should be build like the following example.
+[Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Artist]
 
-[Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Photographer]
+Do not use - or + signs
 
-Use the negative prompt to avoid bad anatomy, bad limbs, to many fingers, to many limbs, malformed limbs, etc.
-do not use - or + signs
- 
 ---------------
 
-Your task is to create a prompt (with weights) and a negative prompt (with weights) based on the information above and (an improved IDEA) that the user will provide below.
+Your task is, based on the information above and (an improved IDEA) that the user will provide below, to create a prompt (with weights) and an elaborate negative prompt (no weights) with detailed keywords.
+
 Respond only with the prompt and a negative prompt, do not add any additional comments or information.
 
 IDEA: "';
@@ -242,9 +244,6 @@ REQUEST: "';
 	* 
 	* Remarks:
 	* 
-	* This is a great place to set your initial values like your
-	* own language or the model to work with.
-	* TODO: check for module tidy
 	*/
 
 	function __construct(){
