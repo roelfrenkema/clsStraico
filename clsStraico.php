@@ -73,7 +73,7 @@ IDEA: "';
 // dream a candid street photograpy of a young woman crossing the street
 	private const DREAMT = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
-Instructions:
+Instructions for the prompt only:
 
 Token [Camera Properties] can be a camera type or brand, a filmtype or brand, a lens setting or any combination thereof.
 Token [Camera Angle] can be a view type and or a camara shot type.
@@ -85,11 +85,14 @@ Weigh your keywords. You can use token:1.3 to specify the weight of keywords in 
 Your prompt should be build like the following example.
 [Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Artist]
 
-Do not use - or + signs
+Instructions for the negative prompt only:
+
+Be elaborate.
+Use only keywords.
 
 ---------------
 
-Your task is, based on the information above and (an improved IDEA) that the user will provide below, to create a prompt (with weights) and an elaborate negative prompt (no weights) with detailed keywords.
+Your task is, based on the information above and (an improved IDEA) that the user will provide below, to create a prompt (with weights) and a negative prompt.
 
 Respond only with the prompt and a negative prompt, do not add any additional comments or information.
 
@@ -255,6 +258,10 @@ REQUEST: "';
 		}
 		if (! extension_loaded('readline')) {
 		  echo "PHP module readline is needed to run clsStraico. Please install it. Exiting!\n";
+		  exit;
+		}
+		if (! extension_loaded('openssl')) {
+		  echo "PHP module openssl is needed to run clsStraico. Please install it. Exiting!\n";
 		  exit;
 		}
 		if ( getenv("STRAICO_APIKEY") ){
