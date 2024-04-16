@@ -260,7 +260,7 @@ REQUEST: "';
 		if ( getenv("STRAICO_APIKEY") ){
 			$this->apiKey = getenv('STRAICO_APIKEY');
 		}else{
-			echo "Could not find the API key. Exiting!";
+			echo "Could not find environment variable STRAICO_APIKEY with the API key. Exiting!";
 			exit(-1);
 		} 
 	$this->arUser = $this->apiUser();
