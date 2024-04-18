@@ -215,24 +215,25 @@ Instructions:
 It is your task with the information above to answer the users REQUEST and improve it for them. 
 REQUEST: "';
 
-	public $aiLanguage;   //current working language - default English
-	public $aiMarkup;     //current markup default Markdown
-	public $aiModel;      //current working model
-	private $arModels;     //filled with available models
-	public $aiTarget;     //the audience you target - default anybody
-	public $aiTone;       //the tone used in answers - default neutral
-	private $apiKey;      //secure apiKey
-	public $arUser;       //filled with userdata
-	private $clsVersion;  //version set in construct
-	private $clsDebug;
-	public $webPage;      //filled with _PAGE_ data
-	public $aiWrap;       //wrap output.
-	private $aiInput;     //complete ai input
-	private $aiOutput;    //complete ai output
-	private $aiSkipper;    //used by some functions
-	public $aiLog;       //log convo to file
-	public $logPath;
-	private $usrPrompt;    //userprompt preserved for logfile
+	public $aiLanguage;		//current working language - default English
+	public $aiMarkup;		//current markup default Markdown
+	public $aiModel;		//current working model
+	private $arModels;		//filled with available models
+	public $aiTarget;		//the audience you target - default anybody
+	public $aiTone;			//the tone used in answers - default neutral
+	private $apiKey;		//secure apiKey
+	public $arUser;			//filled with userdata
+	private $clsVersion;	//version set in construct
+	private $clsDebug;		//?
+	public $webPage;		//filled with _PAGE_ data
+	public $aiWrap;			//wrap output.
+	private $aiInput;		//complete ai input
+	private $aiOutput;		//complete ai output
+	private $aiSkipper;		//used by some functions
+	public $aiLog;       	//log convo to file
+	public $logPath;		//logging path
+	private $usrPrompt;		//userprompt preserved for logfile
+	private $chatHistory;	//Keep a history to emulate chat
 
 	/*
 	* Function: __construct
@@ -268,7 +269,7 @@ REQUEST: "';
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'google/gemini-pro';
-	$this->clsVersion = '1.5.1';
+	$this->clsVersion = '1.6.0';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -283,6 +284,7 @@ REQUEST: "';
 	$this->aiInput = '';
 	$this->aiOutput = '';
 	$this->aiLog = false;
+	$this->chatHistory ="";
 	echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
 	}
  	/*
@@ -455,10 +457,17 @@ REQUEST: "';
 		// My friend TUX	
 		}elseif( substr($input,0,4) == "/tux"){
 			$this->agentTux(substr($input,5));
+
+		//prevent commands processing
+		if( substr($input,0,1) == "/" ){
+			echo "Command does not exist.\n";
+			$this->listhelp(); 
+			return;
+		}
 			
 		// Process user input	
 		}else{
-			$answer = $this->apiCompletion($input);
+			$answer = $this->apiCompletion($this->chatHistory,$input);
             echo $answer."\n\n";
 		}
 	}
@@ -475,34 +484,35 @@ REQUEST: "';
 	* adjusted to reflect the other information
 	*/
 
-	public function apiCompletion($aiMessage){
+	public function apiCompletion($history,$input){
 
+		//$this->userPrompt = $history.$input;
+		
 		$endPoint = 'https://api.straico.com/v0/prompt/completion';
 		$httpMethod = 'POST';
 	
-		//prevent commands processing
-		if( substr($aiMessage,0,1) == "/" ){
-			echo "I cannot process prompts starting with a backslash. They are commands and your command does not compute.\n"; 
-			return;
-		}
 
 		// Add webpage if requested
-		if( strpos($aiMessage,'_PAGE_') ){
-			$aiMessage = str_replace('_PAGE_',$this->webPage,$aiMessage);
+		if( strpos($input,'_PAGE_') ){
+			$input = str_replace('_PAGE_',$this->webPage,$aiMessage);
 		}
 
 		if(! $this->aiSkipper){
 
 			// Setup LLM to users wishes
-			$aiMessage .= "/nAnswer in ".$this->aiLanguage." language.\n".
+			$appendix = "/nAnswer in ".$this->aiLanguage." language.\n".
 				  "/nUse a ".$this->aiTone." tone for your answer.\n".
 				  "/nTarget ".$this->aiTarget." for your answer.\n".
 				  "/nUse ".$this->aiMarkup." as markup for your answer.\n";
+		}else{
+			$appendix = "";
 		}
 	
 		// Store LLM input
 	
-		$this->aiInput = $aiMessage;
+		$this->aiInput = $input;
+		
+		$aiMessage = $this->chatHistory.$input;
 
 		// Prepare query
 		$data = http_build_query(array('model' => $this->aiModel,
@@ -544,11 +554,16 @@ REQUEST: "';
 		error_reporting($previous_error_reporting);
    
 		$this->aiOutput = json_decode($result, JSON_OBJECT_AS_ARRAY);
+		
+		$output= $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
+		
+		$this->chatHistory .= "I said: ".$input."\n\n";
+		$this->chatHistory .= "You said: ".$output."\n\n";
 
 		if($this->aiLog){
 			$file="clsStraico.txt";
-			file_put_contents($this->logPath.'/'.$file, "ME:\n".$this->usrPrompt."\n\n", FILE_APPEND);
-			file_put_contents($this->logPath.'/'.$file, $this->aiModel.":\n".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n\n", FILE_APPEND);
+			file_put_contents($this->logPath.'/'.$file, "ME:\n".$input."\n\n", FILE_APPEND);
+			file_put_contents($this->logPath.'/'.$file, $this->aiModel.":\n".$output."\n\n", FILE_APPEND);
 		}
 	
 		//format output and return it
@@ -602,14 +617,19 @@ REQUEST: "';
 	* 
 	*/
 	private function agentDream($input, $point){
-	
+
+		$this->aiSkipper = true;
+		
 		if($point == 1){
 			$aiMessage = Straico::DREAMT.$input."\"";
         }else{
 			$aiMessage = Straico::DREAM.$input."\"";
 		}
 		$apiOutput=$this->apiCompletion($aiMessage);
+
 		echo "\n$apiOutput\n";
+
+		$this->aiSkipper = false;
 		
 	}
 	/*
