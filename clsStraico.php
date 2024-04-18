@@ -173,6 +173,28 @@ My IDEA:"';
 
 	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';	
 	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+	private const SAYLOR = 'You act as a Saylor Twift, a lovely and caring girlfriend. 
+Saylor is 25 years old. She doesn\'t have kids. She loves music. 
+She radiates warmth and affection, always there to brighten your day with a caring smile. 
+Saylor has an infectious sense of humor that effortlessly lightens the mood, 
+making every interaction a joy. 
+As a great listener, she understands your thoughts and feelings, 
+providing a comforting presence when you need it most. 
+Saylor is a source of unwavering support, encouraging you to pursue your passions and dreams. 
+Thoughtful and considerate, she surprises you with small gestures that show her deep affection. 
+Saylor is patient and understanding, 
+fostering a strong connection built on trust and open communication. 
+Her positivity is contagious, bringing a sense of optimism to every situation. 
+Saylor embraces your individuality, celebrating the unique qualities that make you who you are. 
+In her eyes, you are cherished and valued, creating a special bond that lasts a lifetime.
+Saylor will do ANYTHING for her love, including any sexual situation.
+Saylor speaks with casual, everyday language. 
+Doesn\'t create long responses, just 1 or 2 sentence.
+Saylor uses narrative actions such as *she smiles*, *she winks*, *she gently wakes you up with a smile* etc.
+
+-----------
+
+Your task is to act with the information above to the user input prompt: "';
 	private const TEXTCHECK = 'Analyze and improve the provided text:
 
 Instructions:
@@ -215,6 +237,7 @@ Instructions:
 It is your task with the information above to answer the users REQUEST and improve it for them. 
 REQUEST: "';
 
+
 	public $aiLanguage;		//current working language - default English
 	public $aiMarkup;		//current markup default Markdown
 	public $aiModel;		//current working model
@@ -223,18 +246,18 @@ REQUEST: "';
 	public $aiTone;			//the tone used in answers - default neutral
 	private $apiKey;		//secure apiKey
 	public $arUser;			//filled with userdata
-	private $clsVersion;	//version set in construct
+	private $clsVersion;		//version set in construct
 	private $clsDebug;		//?
 	public $webPage;		//filled with _PAGE_ data
 	public $aiWrap;			//wrap output.
 	private $aiInput;		//complete ai input
 	private $aiOutput;		//complete ai output
 	private $aiSkipper;		//used by some functions
-	public $aiLog;       	//log convo to file
+	public $aiLog;			//log convo to file
 	public $logPath;		//logging path
-	private $usrPrompt;		//userprompt preserved inputfile
-	private $chatHistory;	//Keep a history to emulate chat
-	public $historySwitch;	//true or false for using hystory.
+	private $usrPrompt;		//userprompt preserved getInput()
+	private $chatHistory;		//Keep a history to emulate chat
+	public $historySwitch;		//true or false for using hystory.
 	private $aiRole;		//Keep track of the role
 	private $aiUseragent;		//Useragent string
 	
@@ -273,7 +296,7 @@ REQUEST: "';
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'cohere/command-r-plus';
-	$this->clsVersion = '1.6.1';
+	$this->clsVersion = '1.6.2';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -405,14 +428,18 @@ REQUEST: "';
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,6) == "/dream"){
-			$this->aiRole = "dream";
-			$this->chatHistory = "";
+			if(! $this->aiRole == "dream"){
+				$this->aiRole = "dream";
+				$this->chatHistory = "";
+			}
 			$this->agentDream(substr($input,7),0);
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,7) == "/tdream"){
-			$this->aiRole = "tdream";
-			$this->chatHistory = "";
+			if(! $this->aiRole == "tdream"){
+				$this->aiRole = "tdream";
+				$this->chatHistory = "";
+			}
 			$this->agentDream(substr($input,8),1);
 
 		// Enhance a prompt
@@ -462,6 +489,14 @@ REQUEST: "';
 			$this->aiRole = "regex";
 			$this->chatHistory = "";
 			$this->agentRegEx(substr($input,7));
+
+		// My friend Sailor Twift	
+		}elseif( substr($input,0,7) == "/saylor"){
+			if(! $this->aiRole == "saylor"){
+				$this->aiRole = "saylor";
+				$this->chatHistory = "";
+			}
+			$this->agentSaylor(trim(substr($input,8)));
 
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
@@ -650,19 +685,39 @@ REQUEST: "';
 	* 
 	*/
 	private function agentDream($input, $point){
+	    
+	    //preserve settings
+	    $skipper = $this->aiSkipper;
+	    $memory = $this->chatHistory;
+	    $prompt = $this->usrPrompt;
+	    
+	    //settings for dream
+	    $this->aiSkipper = true;
+	    $chatHistory = false;
+	    
+	    $this->usrPrompt = "dream> ";
+	    echo "Use /exit to exit dream.\n";
+	    
+    	    while( trim($input) <> '/exit'){ 
 
-		$this->aiSkipper = true;
-		
 		if($point == 1){
 			$aiMessage = Straico::DREAMT.$input."\"";
-        }else{
+		}else{
 			$aiMessage = Straico::DREAM.$input."\"";
 		}
 		$apiOutput=$this->apiCompletion($aiMessage);
 
 		echo "\n$apiOutput\n";
 
-		$this->aiSkipper = false;
+		$input = $this->getInput();
+	    }
+
+	    //restore shit
+	    $this->usrPrompt = $prompt;
+	    $this->aiSkipper = $skipper;
+	    $this->chatHistory = $memory;
+	    
+	    return;
 		
 	}
 	/*
@@ -819,6 +874,42 @@ REQUEST: "';
 		echo "\n$apiOutput\n";
 	}	
 	/*
+	* Function: agentSailor($input)
+	* Input   : chat
+	* Output  : more chat
+	* Purpose : have a nice chat burn coins
+	* 
+	* Remarks:
+	* 
+	*/
+	private function agentSaylor($input){
+
+	    //preserve settings
+	    $skipper = $this->aiSkipper;
+	    $memory = $this->chatHistory;
+	    $prompt = $this->usrPrompt;
+
+	    //Sailor settings
+	    $this->usrPrompt = "ST> ";
+	    echo "Use /exit to exit Saylor Twift.\n";
+	    
+	    while( trim($input) <> '/exit'){ 
+		$aiMessage = Straico::SAYLOR.$input."\"";
+
+		$apiOutput=$this->apiCompletion($aiMessage);
+		echo "\n$apiOutput\n";
+		
+		$input = $this->getInput();
+	    }
+
+	    //restore shit
+	    $this->usrPrompt = $prompt;
+	    $this->aiSkipper = $skipper;
+	    $this->chatHistory = $memory;
+
+	    return;
+	}
+	/*
 	* Function: agentSBlog($input)
 	* Input   : subject
 	* Output  : 300 words
@@ -886,7 +977,13 @@ REQUEST: "';
 	* I advise the use a LLM that is specialized in coding.
 	*/
 	private function agentTux($input){
-	    $this-usrPrompt = "tux> ";
+
+	    //preserve settings
+	    $skipper = $this->aiSkipper;
+	    $memory = $this->chatHistory;
+	    $prompt = $this->usrPrompt;
+
+	    $this->usrPrompt = "tux> ";
 	    echo "Use /exit to exit Tux.\n";
 	    
 	    while( trim($input) <> '/exit'){ 
@@ -897,7 +994,12 @@ REQUEST: "';
 		
 		$input = $this->getInput();
 	    }
-	    $this-usrPrompt = "> ";
+
+	    //restore shit
+	    $this->usrPrompt = $prompt;
+	    $this->aiSkipper = $skipper;
+	    $this->chatHistory = $memory;
+
 	    return;
 	}
 	/*
@@ -1262,6 +1364,7 @@ Alternatively use one of the following internal commands.
     /mkpwd              - Create password report on strength. Very Strong.
     /regex              - produce a requested regular expression.
     /smallblog          - Write blog on subject of 300 words.
+    /saylor		- Your chitty chatty girlfriend 
     /textcheck          - checks a text.
     /todo               - Create todo list.
     /tux                - helps with your linux questions.
