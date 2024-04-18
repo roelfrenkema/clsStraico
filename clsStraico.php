@@ -234,6 +234,7 @@ REQUEST: "';
 	public $logPath;		//logging path
 	private $usrPrompt;		//userprompt preserved for logfile
 	private $chatHistory;	//Keep a history to emulate chat
+	private $aiRole;		//Keep track of the role
 
 	/*
 	* Function: __construct
@@ -396,74 +397,109 @@ REQUEST: "';
 
 		// do research and report
 		}elseif( substr($input,0,9) == "/academic"){
+			$this->aiRole = "academic";
+			$this->chatHistory = "";
 			$this->agentAcademic(substr($input,10));
 		
 		// Write a bigblog
 		}elseif( substr($input,0,8) == "/bigblog"){
+			$this->aiRole = "bigblog";
+			$this->chatHistory = "";
 			$this->agentBBlog(substr($input,9));
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,6) == "/dream"){
+			$this->aiRole = "dream";
+			$this->chatHistory = "";
 			$this->agentDream(substr($input,7),0);
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,7) == "/tdream"){
+			$this->aiRole = "tdream";
+			$this->chatHistory = "";
 			$this->agentDream(substr($input,8),1);
 
 		// Enhance a prompt
 		}elseif( substr($input,0,8) == "/enhance"){
+			$this->aiRole = "enhance";
+			$this->chatHistory = "";
 			$this->agentEnhancePrompt(substr($input,9));
 			 
 		// Factcheck information
 		}elseif( substr($input,0,10) == "/factcheck"){
+			$this->aiRole = "factcheck";
+			$this->chatHistory = "";
 			$this->agentFactcheck(substr($input,11));
 
 		// Make a neurodivese gist of information
 		}elseif( substr($input,0,5) == "/gist") {
+			$this->aiRole = "gist";
+			$this->chatHistory = "";
 			 $this->agentGist(substr($input,6));
 
 		// Show _PAGE_ in md format	
 		}elseif( substr($input,0,8) == "/html2md"){
+			$this->aiRole = "html2md";
+			$this->chatHistory = "";
 			$this->agentHtml2md($input,9);
 			 
 		// Write a mediumsize blog
 		}elseif( substr($input,0,11) == "/mediumblog"){
+			$this->aiRole = "mediumblog";
+			$this->chatHistory = "";
 			$this->agentMBlog(substr($input,12));
 
 		// Create a strong password 
 		}elseif( substr($input,0,6) == "/mkpwd"){
+			$this->aiRole = "mkpwd";
+			$this->chatHistory = "";
 			$this->agentMkpwd(substr($input,7));
 
 		// Create a regex for user
 		}elseif( substr($input,0,7) == "/prompt"){
+			$this->aiRole = "prompt";
+			$this->chatHistory = "";
 			$this->agentPrompt(substr($input,8));
 
 		// Create a regex for user
 		}elseif( substr($input,0,6) == "/regex"){
+			$this->aiRole = "regex";
+			$this->chatHistory = "";
 			$this->agentRegEx(substr($input,7));
 
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
+			$this->aiRole = "smallblog";
+			$this->chatHistory = "";
 			$this->agentSBlog(substr($input,11));
 
 		// Judge a text
 		}elseif( substr($input,0,10) == "/textcheck"){
+			$this->aiRole = "textcheck";
+			$this->chatHistory = "";
 			$this->agentTextcheck(substr($input,11));
 
 		// Create a todo list	 
 		}elseif( substr($input,0,5) == "/todo"){
+			$this->aiRole = "todo";
+			$this->chatHistory = "";
 			$this->agentTodo(substr($input,6));
 			
 		// My friend TUX	
 		}elseif( substr($input,0,4) == "/tux"){
+			
+			if(! $this->aiRole == "tux"){
+				$this->aiRole = "tux";
+				$this->chatHistory = "";
+			}
+			
 			$this->agentTux(substr($input,5));
 
 		//prevent commands processing
-		if( substr($input,0,1) == "/" ){
+		}elseif( substr($input,0,1) == "/" ){
 			echo "Command does not exist.\n";
 			$this->listhelp(); 
 			return;
-		}
 			
 		// Process user input	
 		}else{
