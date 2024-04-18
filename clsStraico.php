@@ -503,7 +503,7 @@ REQUEST: "';
 			
 		// Process user input	
 		}else{
-			$answer = $this->apiCompletion($this->chatHistory,$input);
+			$answer = $this->apiCompletion($input);
             echo $answer."\n\n";
 		}
 	}
@@ -520,7 +520,7 @@ REQUEST: "';
 	* adjusted to reflect the other information
 	*/
 
-	public function apiCompletion($history,$input){
+	public function apiCompletion($input){
 
 		//$this->userPrompt = $history.$input;
 		
