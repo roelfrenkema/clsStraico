@@ -19,7 +19,12 @@ $aiMessage = "";
 $straico = new Straico;
 
 $straico->aiLog = true;
-$straico->aiModel = 'openai/gpt-4-0125-preview';
+$straico->logPath = '';
+
+$straico->aiModel = 'cohere/command-r-plus';
+
+//chats not enabled by default
+$this->historySwitch = false;
 
 /*
     Start looping till finished with /exit

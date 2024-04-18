@@ -234,6 +234,7 @@ REQUEST: "';
 	public $logPath;		//logging path
 	private $usrPrompt;		//userprompt preserved for logfile
 	private $chatHistory;	//Keep a history to emulate chat
+	public $historySwitch;	//true or false for using hystory.
 	private $aiRole;		//Keep track of the role
 
 	/*
@@ -286,6 +287,7 @@ REQUEST: "';
 	$this->aiOutput = '';
 	$this->aiLog = false;
 	$this->chatHistory ="";
+	$this->historySwitch = false;
 	echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
 	}
  	/*
@@ -301,37 +303,11 @@ REQUEST: "';
 
 	public function userPrompt() {
 	
-		$input = readline('> ');
-	
-		// Add  to session history
-		readline_add_history($input);
-	
-		
-	
-		$this->usrPrompt = $input;
+		$input = $this->getInput();
 
 		// Debug routine
 		if ( substr($input,0,6) == "/debug"){
-			if ( substr($input,7) == "completion"){
-				$this->debugCompletion();
-			}elseif ( substr($input,7) == "internals"){
-				$this->debugInternals();	
-			}elseif ( substr($input,7) == "price"){
-				$this->debugPrice();
-			}elseif ( substr($input,7) == "user"){
-				$this->debugUser();
-			}elseif ( substr($input,7) == "words"){
-				$this->debugWords();
-			}elseif ( substr($input,7) == "version"){
-				echo "VERSION\n\nclsStraico: ".$this->clsVersion."\n";
-			}else{
-				echo "VERSION\n\nclsStraico: ".$this->clsVersion."\n";
-				$this->debugCompletion();
-				$this->debugInternals();	
-				$this->debugPrice();
-				$this->debugUser();
-				$this->debugWords();
-			}
+			debugHandeling(substr($input,7));
 			
 		// End cls session on cli		
 		}elseif( $input == "/exit"){
@@ -371,8 +347,13 @@ REQUEST: "';
 		
 		// Set model	
 		}elseif( substr($input,0,9) == "/setmodel"){
+			$this->chatHistory ="";
 			 $this->changeModel(substr($input,10));
 			 echo "Model is: $this->aiModel\n";
+
+		// del history	
+		}elseif( substr($input,0,9) == "/delhistory"){
+			$this->chatHistory ="";
 		
 		// Set target audience	 
 		}elseif( substr($input,0,10) == "/settarget"){
@@ -1039,6 +1020,40 @@ REQUEST: "';
 		echo "output          : ".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n";
 	}
  	/*
+	* Function: debugHandeling()
+	* Input   : none
+	* Output  : steers the debug requests
+	* Purpose : display price of request
+	*
+	* Remarks:
+	* 
+	*/
+	private function debugHandeling($input){
+
+		if($input) == "completion"){
+			$this->debugCompletion();
+		}elseif ( $input == "internals"){
+			$this->debugInternals();	
+		}elseif (  $input == "price"){
+			$this->debugPrice();
+		}elseif (  $input == "user"){
+			$this->debugUser();
+		}elseif (  $input == "words"){
+			$this->debugWords();
+		}elseif (  $input == "version"){
+			echo "VERSION\n\nclsStraico: ".$this->clsVersion."\n";
+		}else{
+			echo "VERSION\n\nclsStraico: ".$this->clsVersion."\n";
+			$this->debugCompletion();
+			$this->debugInternals();	
+			$this->debugPrice();
+			$this->debugUser();
+			$this->debugWords();
+		}
+		return;
+	}
+	
+ 	/*
 	* Function: debugPrice()
 	* Input   : none
 	* Output  : Price data
@@ -1283,6 +1298,19 @@ using _PAGE_ as a placeholder
 
 		return $elementsArray;
 	}
+	
+	private function getInput(){
+		
+		if( ! $this->historySwitch ) $this->chatHistory="";
+		
+		$input = readline('> ');
+	
+		// Add  to session history
+		readline_add_history($input);
 
+		$this->usrPrompt = $input;
+		
+		return $input;
+	}
 }
 ?>
