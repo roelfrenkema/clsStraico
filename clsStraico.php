@@ -314,7 +314,7 @@ REQUEST: "';
 			$this->stopPrompt();
 
 		// Show helppage
-		}elseif( substr($input,0,8) == "/gethelp"){
+		}elseif( trim($input) == "/helpme"){
 			$this->listHelp();
 
 		// Get a webpage
@@ -334,6 +334,16 @@ REQUEST: "';
 		}elseif( substr($input,0,9) == "/logon"){
 			$this->aiLog=true;
 			echo "Appending conversation to ".__DIR__."/clsStraico.txt\n";
+
+		// Stop history
+		}elseif( substr($input,0,9) == "/histoff"){
+			$this->historySwitch=false;
+			echo "You have disabled history!\n";
+
+		// Start history
+		}elseif( substr($input,0,9) == "/histon"){
+			$this->historySwitch=true;
+			echo "You have enabled history for chats.\n";
 
 		// Set language
 		}elseif( substr($input,0,12) == "/setlanguage"){
@@ -1183,7 +1193,7 @@ REQUEST: "';
 	* Private function used by $this->userPrompt()
 	*/
 	private function listHelp(){
-	echo '
+	echo "
 Enter your questions for the AI on the prompt and press enter.
 Alternatively use one of the following internal commands.
 
@@ -1197,8 +1207,10 @@ Alternatively use one of the following internal commands.
                          - version
                          - words
                            if options ommited shows all  
-    /gethelp             - this text.
+	/helpme				- this text.
     /getpage <url>       - Retrieve a webpage use full url.
+	/histoff			- Disable history 
+	/histon				- Enable history
     /listmodels          - List available models.
     /setlanguage         - Set prefered language.  
     /setmarkup           - Set prefered markup.
@@ -1235,7 +1247,7 @@ using _PAGE_ as a placeholder
              error handeling yet. Not all models are
              able to read _PAGE_
              
-            ';
+            ";
 	}
 	/*
 	* Function: stopPrompt()
