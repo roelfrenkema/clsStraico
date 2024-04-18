@@ -2,6 +2,8 @@
 
 ![straico](https://github.com/roelfrenkema/clsStraico/blob/main/githubclsstraico.png) 
 
+## Straico's own [API page\(s\)](https://documenter.getpostman.com/view/5900072/2s9YyzddrR) 
+
 ## Download
 
 [zip file](https://github.com/roelfrenkema/clsStraico/archive/refs/heads/main.zip) 
