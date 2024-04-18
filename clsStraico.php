@@ -503,6 +503,10 @@ REQUEST: "';
 			
 		// Process user input	
 		}else{
+			if(! $this->aiRole == "cli"){
+				$this->aiRole = "cli";
+				$this->chatHistory = "";
+			}
 			$answer = $this->apiCompletion($input);
             echo $answer."\n\n";
 		}
