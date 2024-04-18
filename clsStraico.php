@@ -886,7 +886,7 @@ REQUEST: "';
 	* I advise the use a LLM that is specialized in coding.
 	*/
 	private function agentTux($input){
-	    
+	    $this-usrPrompt = "tux> ";
 	    echo "Use /exit to exit Tux.\n";
 	    
 	    while( trim($input) <> '/exit'){ 
@@ -895,8 +895,10 @@ REQUEST: "';
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
 		
-		$input = $this->getInput('tux> ');
+		$input = $this->getInput();
 	    }
+	    $this-usrPrompt = "> ";
+	    return;
 	}
 	/*
 	* Function: apiModels()
