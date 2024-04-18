@@ -236,6 +236,8 @@ REQUEST: "';
 	private $chatHistory;	//Keep a history to emulate chat
 	public $historySwitch;	//true or false for using hystory.
 	private $aiRole;		//Keep track of the role
+	private $aiUseragent;		//Useragent string
+	
 
 	/*
 	* Function: __construct
@@ -288,6 +290,8 @@ REQUEST: "';
 	$this->aiLog = false;
 	$this->chatHistory ="";
 	$this->historySwitch = false;
+	$this->userAgent = 'clsStraico.php v'.$this->clsVersion.' (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
+
 	echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
 	}
  	/*
@@ -303,7 +307,7 @@ REQUEST: "';
 
 	public function userPrompt() {
 	
-		$input = $this->getInput();
+		$input = $this->getInput("> ");
 
 		// Debug routine
 		if ( substr($input,0,6) == "/debug"){
@@ -478,13 +482,12 @@ REQUEST: "';
 			
 		// My friend TUX	
 		}elseif( substr($input,0,4) == "/tux"){
-			
 			if(! $this->aiRole == "tux"){
 				$this->aiRole = "tux";
 				$this->chatHistory = "";
 			}
 			
-			$this->agentTux(substr($input,5));
+			$this->agentTux(trim(substr($input,5)));
 
 		//prevent commands processing
 		}elseif( substr($input,0,1) == "/" ){
@@ -517,43 +520,41 @@ REQUEST: "';
 
 	public function apiCompletion($input){
 
-		//$this->userPrompt = $history.$input;
-		
-		$endPoint = 'https://api.straico.com/v0/prompt/completion';
-		$httpMethod = 'POST';
+	    $endPoint = 'https://api.straico.com/v0/prompt/completion';
+	    $httpMethod = 'POST';
 	
 
-		// Add webpage if requested
-		if( strpos($input,'_PAGE_') ){
-			$input = str_replace('_PAGE_',$this->webPage,$aiMessage);
-		}
+	    // Add webpage if requested
+	    if( strpos($input,'_PAGE_') ){
+		$input = str_replace('_PAGE_',$this->webPage,$input);
+	    }
 
-		if(! $this->aiSkipper){
+	    //add some usersettings
+	    if(! $this->aiSkipper){
 
-			// Setup LLM to users wishes
-			$appendix = "/nAnswer in ".$this->aiLanguage." language.\n".
-				  "/nUse a ".$this->aiTone." tone for your answer.\n".
-				  "/nTarget ".$this->aiTarget." for your answer.\n".
-				  "/nUse ".$this->aiMarkup." as markup for your answer.\n";
-		}else{
-			$appendix = "";
-		}
+		// Setup LLM to users wishes
+		$appendix = "\nAnswer in ".$this->aiLanguage." language.\n".
+			    "\nUse a ".$this->aiTone." tone for your answer.\n".
+			    "\nTarget ".$this->aiTarget." for your answer.\n".
+			    "\nUse ".$this->aiMarkup." as markup for your answer.\n";
+	    }else{
+		$appendix = "";
+	    }
 	
-		// Store LLM input
-	
+		// Store LLM input for debugging routine
 		$this->aiInput = $input;
 		
-		$aiMessage = $this->chatHistory.$input;
+		$aiMessage = $this->chatHistory.$input.$appendix;
 
 		// Prepare query
 		$data = http_build_query(array('model' => $this->aiModel,
-										'message' => $aiMessage));
+						'message' => $aiMessage));
 		// Prepare options
 		$options = array(
 			'http' => array(
 			'header' => "Authorization: Bearer ".$this->apiKey."\r\n" .
-						"Content-Type: application/x-www-form-urlencoded\r\n",
-						"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36\r\n",
+				    "Content-Type: application/x-www-form-urlencoded\r\n",
+				    "User-Agent: ".$this->userAgent." \r\n",
 			'method' => $httpMethod,
 			'content' => $data
 			)
@@ -592,9 +593,9 @@ REQUEST: "';
 		$this->chatHistory .= "You said: ".$output."\n\n";
 
 		if($this->aiLog){
-			$file="clsStraico.txt";
-			file_put_contents($this->logPath.'/'.$file, "ME:\n".$input."\n\n", FILE_APPEND);
-			file_put_contents($this->logPath.'/'.$file, $this->aiModel.":\n".$output."\n\n", FILE_APPEND);
+			$file=$this->logPath."/clsStraico.txt";
+			file_put_contents($file, "ME:\n".$input."\n\n", FILE_APPEND);
+			file_put_contents($file, $this->aiModel.":\n".$output."\n\n", FILE_APPEND);
 		}
 	
 		//format output and return it
@@ -884,12 +885,17 @@ REQUEST: "';
 	* I advise the use a LLM that is specialized in coding.
 	*/
 	private function agentTux($input){
-
+	    
+	    echo "Use /exit to exit Tux.\n";
+	    
+	    while( trim($input) <> '/exit'){ 
 		$aiMessage = Straico::TUX.$input."\"";
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
-
+		
+		$input = $this->getInput('tux> ');
+	    }
 	}
 	/*
 	* Function: apiModels()
@@ -1040,7 +1046,7 @@ REQUEST: "';
 	*/
 	private function debugHandeling($input){
 
-		if($input) == "completion"){
+		if($input == "completion"){
 			$this->debugCompletion();
 		}elseif ( $input == "internals"){
 			$this->debugInternals();	
@@ -1157,6 +1163,25 @@ REQUEST: "';
 
 	}
 	/*
+	* Function	: getInput()
+	* Input   	: none
+	* Output  	: none
+	* Purpose 	: get user input
+	* Return	: $string with catched input 
+	* Remarks:
+	*/
+	private function getInput($prompt){
+		
+	    if( ! $this->historySwitch ) $this->chatHistory="";
+		
+	    $input = readline($prompt);
+	
+	    // Add  to session history
+	    readline_add_history($input);
+
+	    return $input;
+	}
+	/*
 	* Function: listModels()
 	* Input   : none
 	* Output  : print model list
@@ -1199,26 +1224,26 @@ Alternatively use one of the following internal commands.
 
   Available commands:
     
-    /debug {opt}         optional: 
-                         - completion
-                         - internals
-                         - price
-                         - user
-                         - version
-                         - words
-                           if options ommited shows all  
-	/helpme				- this text.
+    /debug {opt}	 {opt} = one of: 
+			    - completion
+			    - internals
+			    - price
+			    - user
+			    - version
+			    - words
+			    - if {opt} is ommited it shows all  
+    /helpme		- this text.
     /getpage <url>       - Retrieve a webpage use full url.
-	/histoff			- Disable history 
-	/histon				- Enable history
+    /histoff		- Disable history 
+    /histon		- Enable history
     /listmodels          - List available models.
     /setlanguage         - Set prefered language.  
     /setmarkup           - Set prefered markup.
     /setmodel <int>      - Set the active model to number of model.
     /settarget           - Set the target audience.
     /settone             - Set prefered tone for answer.
-    /setwrap             - Set line lenght. Default = noformat.
-    /websearch <term>    - Do websearch on a given term.
+    /setwrap		- Set line lenght. Default = noformat.
+    /websearch <term>	- Do websearch on a given term.
     
             
   Assistants:
@@ -1311,18 +1336,5 @@ using _PAGE_ as a placeholder
 		return $elementsArray;
 	}
 	
-	private function getInput(){
-		
-		if( ! $this->historySwitch ) $this->chatHistory="";
-		
-		$input = readline('> ');
-	
-		// Add  to session history
-		readline_add_history($input);
-
-		$this->usrPrompt = $input;
-		
-		return $input;
-	}
 }
 ?>

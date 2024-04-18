@@ -24,7 +24,7 @@ $straico->logPath = '';
 $straico->aiModel = 'cohere/command-r-plus';
 
 //chats not enabled by default
-$this->historySwitch = false;
+$straico->historySwitch = false;
 
 /*
     Start looping till finished with /exit
