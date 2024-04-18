@@ -232,7 +232,7 @@ REQUEST: "';
 	private $aiSkipper;		//used by some functions
 	public $aiLog;       	//log convo to file
 	public $logPath;		//logging path
-	private $usrPrompt;		//userprompt preserved for logfile
+	private $usrPrompt;		//userprompt preserved inputfile
 	private $chatHistory;	//Keep a history to emulate chat
 	public $historySwitch;	//true or false for using hystory.
 	private $aiRole;		//Keep track of the role
@@ -272,8 +272,8 @@ REQUEST: "';
 		} 
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
-	$this->aiModel = 'google/gemini-pro';
-	$this->clsVersion = '1.6.0';
+	$this->aiModel = 'cohere/command-r-plus';
+	$this->clsVersion = '1.6.1';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -291,7 +291,7 @@ REQUEST: "';
 	$this->chatHistory ="";
 	$this->historySwitch = false;
 	$this->userAgent = 'clsStraico.php v'.$this->clsVersion.' (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
-
+	$this->usrPrompt = "> ";
 	echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
 	}
  	/*
@@ -307,7 +307,7 @@ REQUEST: "';
 
 	public function userPrompt() {
 	
-		$input = $this->getInput("> ");
+		$input = $this->getInput();
 
 		// Debug routine
 		if ( substr($input,0,6) == "/debug"){
@@ -362,6 +362,7 @@ REQUEST: "';
 		// Set model	
 		}elseif( substr($input,0,9) == "/setmodel"){
 			$this->chatHistory ="";
+			$this->usrPrompt ="> ";
 			 $this->changeModel(substr($input,10));
 			 echo "Model is: $this->aiModel\n";
 
@@ -1170,11 +1171,11 @@ REQUEST: "';
 	* Return	: $string with catched input 
 	* Remarks:
 	*/
-	private function getInput($prompt){
+	private function getInput(){
 		
 	    if( ! $this->historySwitch ) $this->chatHistory="";
 		
-	    $input = readline($prompt);
+	    $input = readline($this->usrPrompt);
 	
 	    // Add  to session history
 	    readline_add_history($input);
