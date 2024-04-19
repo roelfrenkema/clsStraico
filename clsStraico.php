@@ -298,7 +298,7 @@ REQUEST: "';
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'cohere/command-r-plus';
-	$this->clsVersion = '1.7.0';
+	$this->clsVersion = '1.7.1';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -319,6 +319,7 @@ REQUEST: "';
 	$this->historySwitch = false;
 	$this->userAgent = 'clsStraico.php v'.$this->clsVersion.' (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
 	$this->usrPrompt = "> ";
+	$this->initChat();
 	echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
 	}
  	/*
@@ -338,7 +339,7 @@ REQUEST: "';
 
 		// Debug routine
 		if ( substr($input,0,6) == "/debug"){
-			debugHandeling(substr($input,7));
+			$this->debugHandeling(substr($input,7));
 			
 		// End cls session on cli		
 		}elseif( $input == "/exit"){
@@ -550,6 +551,7 @@ REQUEST: "';
 		    if(! $this->aiRole == "cli"){
 			$this->aiRole = "cli";
 			$this->initChat();
+			echo "reset\n";
 		    }
 		    $answer = $this->apiCompletion($input);
 		    echo $answer."\n\n";
@@ -1039,8 +1041,8 @@ REQUEST: "';
 	    
 	    $this->chatHistory[] = array( 'role' => 'user', 'content' => $user);
 	    $this->chatHistory[] = array( 'role' => 'assistant', 'content' => $assistant);
-	    $this->chatRole = "user: $user\n\n";
-	    $this->chatRole = "assistant: $assistant\n\n";
+	    $this->chatRole .= "user: $user\n\n";
+	    $this->chatRole .= "assistant: $assistant\n\n";
 	}
 
 	/*
@@ -1177,9 +1179,9 @@ REQUEST: "';
 		echo "target          : ".$this->aiTarget."\n";
 		echo "tone            : ".$this->aiTone."\n";
 		echo "wrap            : ".$this->aiWrap."\n";
-		if( ! isset($this->aiOutput['data']['completion']['choices'][0]['message']['content'])) return;
-		echo "input           : ".$this->aiInput."\n";
-		echo "output          : ".$this->aiOutput['data']['completion']['choices'][0]['message']['content']."\n";
+		echo "role            : ".$this->aiRole."\n";
+		echo "history role    : \n\n".$this->chatRole."\n";
+		var_dump($this->chatHistory);
 	}
  	/*
 	* Function: debugHandeling()
@@ -1317,8 +1319,10 @@ REQUEST: "';
 	* Remarks:
 	*/
 	private function getInput(){
+	    
 		
 	    if( ! $this->historySwitch ) $this->chatHistory="";
+
 		
 	    $input = readline($this->usrPrompt);
 	
@@ -1326,6 +1330,7 @@ REQUEST: "';
 	    readline_add_history($input);
 
 	    return $input;
+
 	}
 	/*
 	* Function	: initChat()
@@ -1336,10 +1341,11 @@ REQUEST: "';
 	* Remarks:
 	*/
 	private function initChat(){
-
 	    $this->chatHistory = array();
 	    $this->chatRole = "";
-
+	    $input = "Time and date is ".date("Y-m-d H:i:s");
+	    $output = "Noted.";
+	    $this->addHistory($input,$output);
 	}
 	/*
 	* Function: listModels()
