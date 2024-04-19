@@ -808,6 +808,20 @@ It is your task, with the information above, to answer the users prompt.';
 		$intPoint = intval($input);
 		$this->aiModel = $this->arModels['data'][$intPoint - 1]['model'];
 	}
+	/*
+	* Function: chatTime()
+	* Input   : none
+	* Output  : sets current time in chat
+	* Purpose : make llm time aware
+	*
+	* Remarks:
+	* 
+	*/
+	private function chatTime(){
+	    $input = "Time and date is ".date("Y-m-d H:i:s");
+	    $output = "Noted.";
+	    $this->addHistory($input,$output);
+	}	   
  	/*
 	* Function: debugCompletion()
 	* Input   : none
@@ -1154,20 +1168,6 @@ using _PAGE_ as a placeholder
 		echo "Saved your history to $name.\n";
 		return;
 	}
-	/*
-	* Function: chatTime()
-	* Input   : none
-	* Output  : sets current time in chat
-	* Purpose : make llm time aware
-	*
-	* Remarks:
-	* 
-	*/
-	private function chatTime(){
-	    $input = "Time and date is ".date("Y-m-d H:i:s");
-	    $output = "Noted.";
-	    $this->addHistory($input,$output);
-	}	   
 	/*
 	* Function: stopPrompt()
 	* Input   : none
