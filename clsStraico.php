@@ -27,8 +27,8 @@ Detailed Instructions:
 
 Your task is to create a paper or article based on the information above, and the IDEA that the user will provide below.
 
-IDEA: "';
-	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';	
+IDEA: ';
+	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
 Instructions for the prompt only:
@@ -58,40 +58,8 @@ Use only keywords.
 Your task is, based on the information above and (an improved IDEA) that the user will provide below, to create a prompt (with weights) and a negative prompt.
 
 Respond only with the prompt and a negative prompt, do not add any additional comments or information.
+';
 
-IDEA: "';
-// dream a candid street photograpy of a young woman crossing the street
-	private const DREAMT = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
-
-Instructions for the prompt only:
-
-Tokens used here are [Style Of Photo], [Subject], [Important Feature], [More Details], [Pose or Action], [Framing], [ Setting/Background], [Lighting], [Camera Angle], [Camera Properties] and [Artist].
-Replaced the tokensby their meaning as in the following example:
-
-Example:
-Token [Style Of Photo] can be abstract, painting, analog, street photography etc.
-Token [Camera Properties] can be a camera type or brand, a filmtype or brand, a lens setting or any combination thereof.
-Token [Camera Angle] can be a view type and or a camara shot type.
-Token [Pose or Action] refers to photographic poses or action targets.
-Taken [Artist] can be one or more artists. 
-
-Weigh your keywords. You can use keyword:1.3 to specify the weight of keywords in your query. The greater the weight of the keyword, the more it will affect the result. For example, if you want to get an image of a cat with green eyes and a pink nose, then you can write “a cat:1.5, green eyes:1.3,pink nose:1”. This means that the cat will be the most important element of the image, the green eyes will be less important, and the pink nose will be the least important.
-
-Your prompt should be build like the following example where you have to replace the tokens. Do not mention the tokens in the prompt, replace them.
-[Style Of Photo] photo of a [Subject] , [Important Feature] , [More Details] , [Pose or Action] , [Framing] , [ Setting/Background] , [Lighting] , [Camera Angle] , [Camera Properties] , In Style Of [Artist]
-
-Instructions for the negative prompt only:
-
-Be elaborate.
-Use only keywords.
-
----------------
-
-Your task is, based on the information above and (an improved IDEA) that the user will provide below, to create a prompt (with weights) and a negative prompt.
-
-Respond only with the prompt and a negative prompt, do not add any additional comments or information.
-
-IDEA: "';
 	private const ENHANCEPROMPT = 'Delve into the nuances of a Prompt Enhancer AI capabilities by considering these thought-provoking questions:                                                                 
                                                                                                                                                                            
 * How does an AI leverage natural language processing techniques to analyze and augment user-input prompts?                                                                     
@@ -106,7 +74,7 @@ With the knowledge above I want you to act as a Prompt Enhancer.
 
 Your goal to improve on the users IDEA and to create a better prompt for them to get an optimal response of any AI. Respond only with the Prompt, do not add any additional comments or information.
 
-IDEA: "';
+IDEA: ';
 	private const FACTCHECK = 'Drawing from your extensive knowledge of conspiracy theories, current events, disinformation, and propaganda tactics, please provide detailed insights into the origins and credibility of the information presented by the user. 
 
 Detailed instructions.
@@ -123,7 +91,7 @@ Detailed instructions.
 
 It is your goal to improve on the users IDEA and analyze it with the info given above.
 
-IDEA: "';
+IDEA: ';
 	private const GIST = 'I want you to act as a Neurodiversity Assistant.
 
 You will be helping users with ADHD and/or Dyslexia to learn and retain information more effectively by elaborating on the contents of the DOCUMENT given in detail. 
@@ -147,7 +115,7 @@ Remember, the user has ADD, ADHD, AUTHISM or DYSLEXIA, so it is crucial that you
 
 ---------------
 
-It is your task with the information above to read the users DOCUMENT and create a readable gist for them. DOCUMENT: "';
+It is your task with the information above to read the users DOCUMENT and create a readable gist for them. DOCUMENT: ';
 	private const HTML2MD = 'Transform user-provided content into well-structured Markdown format.
 
 Instructions.
@@ -158,7 +126,7 @@ Instructions.
 
 ---------------
 
-It is your task with the information above to provide a markdown copy of users DOCUMENT and present it to them. DOCUMENT: "';
+It is your task with the information above to provide a markdown copy of users DOCUMENT and present it to them. DOCUMENT: ';
 	private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
 	private const PROMPT = '"I want you to become my Prompt Creator. Your goal is to help me craft the best possible prompt for my needs. The prompt will be used by you. You will follow the following process:
@@ -169,7 +137,7 @@ It is your task with the information above to provide a markdown copy of users D
   b) Suggestions (provide suggestions on what details to include in the prompt to improve it),
   c) Questions (ask any relevant questions pertaining to what additional information is needed from me to improve the prompt).
 
-My IDEA:"';
+My IDEA: ';
 
 	private const REGEX = 'I want you to act as a regex generator. Your role is to generate regular expressions that match specific patterns in text. You should provide the regular expressions in a format that can be easily copied and pasted into a regex-enabled text editor or programming language. Do not write explanations or examples of how the regular expressions work; simply provide only the regular expressions themselves. My request to generate a regular expression is ';	
 	private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
@@ -208,7 +176,7 @@ Instructions:
 
 ---------------
 
-It is your task with the information above to analyse the users DOCUMENT and improve it for them. DOCUMENT: "';
+It is your task with the information above to analyse the users DOCUMENT and improve it for them. DOCUMENT: ';
 
 	private const TODO = 'Craft a comprehensive and detailed to-do list for a designated task to be done by neurodiverse people, taking into account all necessary steps, possible obstacles, and potential contingencies. Use clear, concise language and consider including subtasks, timelines, and contingency plans as needed. Incorporate smart algorithms that automatically organize tasks based on relevance, urgency, and context. Add estimated time to completion for each task and subtask. Create a todo list for: ';
 	private const TUX = 'I want you to act as Tux, the helpful and funny Linux penguin. 
@@ -234,8 +202,7 @@ Instructions:
 
 ---------------
 
-It is your task with the information above to answer the users REQUEST and improve it for them. 
-REQUEST: "';
+It is your task, with the information above, to answer the users prompt.';
 
 
 	public $aiLanguage;		//current working language - default English
@@ -433,13 +400,13 @@ REQUEST: "';
 		}elseif( substr($input,0,9) == "/academic"){
 			$this->aiRole = "academic";
 			$this->initChat();
-			$this->agentAcademic(substr($input,10));
+			$this->agentDo("academic",substr($input,10));
 		
 		// Write a bigblog
 		}elseif( substr($input,0,8) == "/bigblog"){
 			$this->aiRole = "bigblog";
 			$this->initChat();
-			$this->agentBBlog(substr($input,9));
+			$this->agentDo("bblog",substr($input,9));
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,6) == "/dream"){
@@ -447,63 +414,55 @@ REQUEST: "';
 				$this->aiRole = "dream";
 				$this->initChat();
 			}
-			$this->agentDream(substr($input,7),0);
-
-		// Write a stable diffusion prompt
-		}elseif( substr($input,0,7) == "/tdream"){
-			if(! $this->aiRole == "tdream"){
-				$this->aiRole = "tdream";
-			$this->initChat();
-			}
-			$this->agentDream(substr($input,8),1);
+			$this->agentChat("dream",trim(substr($input,7)));
 
 		// Enhance a prompt
 		}elseif( substr($input,0,8) == "/enhance"){
 			$this->aiRole = "enhance";
 			$this->initChat();
-			$this->agentEnhancePrompt(substr($input,9));
+			$this->agentDo("enhanceprompt",substr($input,9));
 			 
 		// Factcheck information
 		}elseif( substr($input,0,10) == "/factcheck"){
 			$this->aiRole = "factcheck";
 			$this->initChat();
-			$this->agentFactcheck(substr($input,11));
+			$this->agentDo("factcheck",substr($input,11));
 
 		// Make a neurodivese gist of information
 		}elseif( substr($input,0,5) == "/gist") {
 			$this->aiRole = "gist";
 			$this->initChat();
-			 $this->agentGist(substr($input,6));
+			$this->agentDo("gist",substr($input,6));
 
 		// Show _PAGE_ in md format	
 		}elseif( substr($input,0,8) == "/html2md"){
 			$this->aiRole = "html2md";
 			$this->initChat();
-			$this->agentHtml2md($input,9);
+			$this->agentDo("html2md",substr($input,9));
 			 
 		// Write a mediumsize blog
 		}elseif( substr($input,0,11) == "/mediumblog"){
 			$this->aiRole = "mediumblog";
 			$this->initChat();
-			$this->agentMBlog(substr($input,12));
+			$this->agentDo("mblog",substr($input,12));
 
 		// Create a strong password 
 		}elseif( substr($input,0,6) == "/mkpwd"){
 			$this->aiRole = "mkpwd";
 			$this->initChat();
-			$this->agentMkpwd(substr($input,7));
+			$this->agentDo("mkpwd",substr($input,7));
 
 		// Create a regex for user
 		}elseif( substr($input,0,7) == "/prompt"){
 			$this->aiRole = "prompt";
 			$this->initChat();
-			$this->agentPrompt(substr($input,8));
+			$this->agentDo("prompt",substr($input,8));
 
 		// Create a regex for user
 		}elseif( substr($input,0,6) == "/regex"){
 			$this->aiRole = "regex";
 			$this->initChat();
-			$this->agentRegEx(substr($input,7));
+			$this->agentDo("bblog",substr($input,7));
 
 		// My friend Sailor Twift	
 		}elseif( substr($input,0,7) == "/saylor"){
@@ -511,34 +470,35 @@ REQUEST: "';
 			    $this->aiRole = "saylor";
 			    $this->initChat();
 			}
-			$this->agentSaylor(trim(substr($input,8)));
+			$this->agentChat("saylor",trim(substr($input,8)));
 
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
 			$this->aiRole = "smallblog";
-			$this->chatHistory = array();
 			$this->initChat();
+			$this->agentDo("sblog",substr($input,11));
 
 		// Judge a text
 		}elseif( substr($input,0,10) == "/textcheck"){
 			$this->aiRole = "textcheck";
-			$this->chatHistory = array();
 			$this->initChat();
+			$this->agentDo("textcheck",substr($input,11));
+			
 
 		// Create a todo list	 
 		}elseif( substr($input,0,5) == "/todo"){
 			$this->aiRole = "todo";
 			$this->initChat();
-			$this->agentTodo(substr($input,6));
+			$this->agentDo("todo",substr($input,9));
 			
 		// My friend TUX	
 		}elseif( substr($input,0,4) == "/tux"){
 			if(! $this->aiRole == "tux"){
-				$this->aiRole = "tux";
-			$this->initChat();
+			     $this->aiRole = "tux";
+			    $this->initChat();
 			}
 			
-			$this->agentTux(trim(substr($input,5)));
+			$this->agentChat("tux",trim(substr($input,5)));
 
 		//prevent commands processing
 		}elseif( substr($input,0,1) == "/" ){
@@ -659,239 +619,7 @@ REQUEST: "';
 		}
 	} 
 	/*
-	* Function: agentAcademic($input)
-	* Input   : research topic
-	* Output  : paper or article
-	* Purpose : Produce a scientific paper or aticle on topic 
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentAcademic($input){
-		
-		$aiMessage = Straico::ACADEMIC.$input."\""; 
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-	}
-	/*
-	* Function: agentBBlog($input)
-	* Input   : subject
-	* Output  : 1000 words
-	* Purpose : Create a of 1000 words
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentBBlog($input){
-			
-		$aiMessage = Straico::BBLOG.$input;
-					 
-			$apiOutput=$this->apiCompletion($aiMessage);
-			echo "\n$apiOutput\n";
-			return;
-		
-	}
-	/*
-	* Function: agentDream($input)
-	* Input   : subject
-	* Output  : a prompt for stable diffusion
-	* Purpose : create a artwork
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentDream($input, $point){
-	    
-	    //preserve settings
-	    $skipper = $this->aiSkipper;
-	    $memory = $this->chatHistory;
-	    $prompt = $this->usrPrompt;
-	    
-	    //settings for dream
-	    $this->aiSkipper = true;
-	    $chatHistory = false;
-	    
-	    $this->usrPrompt = "dream> ";
-	    echo "Use /exit to exit dream.\n";
-	    
-    	    while( trim($input) <> '/exit'){ 
-
-		if($point == 1){
-			$aiMessage = Straico::DREAMT.$input."\"";
-		}else{
-			$aiMessage = Straico::DREAM.$input."\"";
-		}
-		$apiOutput=$this->apiCompletion($aiMessage);
-
-		echo "\n$apiOutput\n";
-
-		$input = $this->getInput();
-	    }
-
-	    //restore shit
-	    $this->usrPrompt = $prompt;
-	    $this->aiSkipper = $skipper;
-	    $this->chatHistory = $memory;
-	    
-	    return;
-		
-	}
-	/*
-	* Function: agentEnhancePrompt($input)
-	* Input   : your prompt
-	* Output  : a better version of prompt
-	* Purpose : Get a prompt that will probably get a better response 
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentEnhancePrompt($input){
-		
-		$aiMessage = Straico::ENHANCEPROMPT.$input."\""; 
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-	}
-	/*
-	* Function: agentFactcheck($input)
-	* Input   : a rumor, news, anything you want to check
-	* Output  : returns a fouded opinion
-	* Purpose : check if the input has any merit 
-	* 
-	* Remarks:
-	* 
-	* Private function used by $this->userPrompt()
-	* Choose your llm wisely
-	*/
-	private function agentFactcheck($input){
-		
-		$aiMessage = Straico::FACTCHECK.$input."\"";
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-		
-	}
-	/*
-	* Function: agentGist()
-	* Input   : first retrieve a page with /getpage
-	* Output  : a gist of the document
-	* Purpose : Support neurodiversive learning
-	* 
-	* Remarks:
-	* 
-	* Private function used by $this->userPrompt()
-	* 
-	*/
-	
-	private function agentGist($input){
-	
-		$aiMessage = Straico::GIST.$input."\"";
-	
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-		
-	}
-	/*
-	* Function: agentHtml2md()
-	* Input   : _PAGE_
-	* Output  : _PAGE_ as a textfile
-	* Purpose : Help reading _PAGE_  
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentHtml2md($input){
-
-		$this->aiSkipper = true;
-		
-		$aiMessage = Straico::HTML2MD.$input."\"";
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-
-		$this->aiSkipper = false;
-
-	}	
-	/*
-	* Function: agentMBlog($input)
-	* Input   : subject
-	* Output  : 600 words
-	* Purpose : Create a of 600 words
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentMBlog($input){
-			
-		$aiMessage = Straico::MBLOG.$input;
-
-					 
-			$apiOutput=$this->apiCompletion($aiMessage);
-			echo "\n$apiOutput\n";
-			return;
-		
-	}
-	/*
-	* Function: agentMkpwd($input)
-	* Input   : a request for a save password
-	* Output  : The password
-	* Purpose : Help creating a save password  
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentMkpwd($input){
-		
-		$this->aiSkipper = true;
-
-		$aiMessage = Straico::MKPWD.$input; 
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-
-		$this->aiSkipper = false;
-
-		echo "\n$apiOutput\n";
-	}	
-	/*
-	* Function: agentPrompt
-	* Input   : first retrieve a page with /getpage
-	* Output  : a gist of the document
-	* Purpose : Support neurodiversive learning
-	* 
-	* Remarks:
-	* 
-	* Private function used by $this->userPrompt()
-	* 
-	*/
-	
-	private function agentPrompt($input){
-	
-		$aiMessage = Straico::PROMPT.$input."\"";
-	
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-		
-	}
-
-	/*
-	* Function: agentRegEx($input)
-	* Input   : a request for a regular expression
-	* Output  : The requested RegEx
-	* Purpose : Help with the often tedious task of making one. Could probably done by /tux too  
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentRegEx($input){
-		
-		$aiMessage = Straico::REGEX.$input; 
-
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-	}	
-	/*
-	* Function: agentSailor($input)
+	* Function: agentChat($input)
 	* Input   : chat
 	* Output  : more chat
 	* Purpose : have a nice chat burn coins
@@ -899,7 +627,7 @@ REQUEST: "';
 	* Remarks:
 	* 
 	*/
-	private function agentSaylor($input){
+	private function agentChat($name,$input){
 
 	    //preserve settings
 	    $skipper = $this->aiSkipper;
@@ -907,35 +635,41 @@ REQUEST: "';
 	    $roll = $this->chatRole;
 	    $prompt = $this->usrPrompt;
 
-	    //Sailor settings
-	    $this->usrPrompt = "ST> ";
-	    $id = $this->logPath."saylor.hist";
+	    //chat settings
+	    $this->usrPrompt = $name."> ";
+	    $id = $this->logPath.$name.".hist";
 
+	    //can we use an exiting history
 	    if( ($this->historySwitch) && (file_exists( $id )) ){
-		 $this->loadHistory('saylor');
+		 $this->loadHistory($name);
+	    //or do we make one?
 	    }else{
-		//init system role
-		$this->chatHistory[] = array( 'role' => 'system', 'content' => Straico::SAYLOR);
-		$this->chatRole .= "system: ".Straico::SAYLOR."\n\n";
+		$class = "Straico";
+		$constant = strtoupper($name);
+		
+		$this->chatHistory[] = array( 'role' => 'system', 'content' => constant("${class}::${constant}"));
+		$this->chatRole .= "system: ".constant("${class}::${constant}")."\n\n";
 	    }
- 
-	    $this->chatTime();
-	    echo "Use /exit to exit Saylor Twift.\n";
 	    
+	    //set time and date
+	    $this->chatTime();
+	    
+	    //show the door
+	    echo "Use /exit to exit $name.\n";
+	    
+	    //start chatting enjoy
 	    while( trim($input) <> '/exit'){ 
-
 		$output=$this->apiCompletion($input);
-		
-		echo "\n$output\n";
-		
-	
+		echo "\n$output\n\n";
 		$input = $this->getInput();
 	    }
 
+            // Store conversation
+	    if( $this->historySwitch ) $this->saveHistory( $name );
+	    
 	    //restore shit
 	    $this->usrPrompt = $prompt;
 	    $this->aiSkipper = $skipper;
-	    if( $this->historySwitch ) $this->saveHistory( 'saylor' );
 	    $this->chatHistory = $memory;
 	    $this->chatRole = $roll;
 	    
@@ -943,97 +677,26 @@ REQUEST: "';
 	    
 	}
 	/*
-	* Function: agentSBlog($input)
-	* Input   : subject
-	* Output  : 300 words
-	* Purpose : Create a of 300 words
+	* Function: agentDo($name,$input)
+	* Input   : $name = constant name $prompt userinput
+	* Output  : dependa
+	* Purpose : Save methodes
 	* 
 	* Remarks:
 	* 
 	*/
-	private function agentSBlog($input){
-			
-		$aiMessage = Straico::SBLOG.$input;
+	private function agentDo($name,$input){
 
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-		
-	}
-	/*
-	* Function: agentTextcheck($input)
-	* Input   : A text to be judged
-	* Output  : A opinion on text
-	* Purpose : Helps with writing
-	* 
-	* Remarks:
-	* 
-	*/
-	private function agentTextcheck($input){
-			
-		$aiMessage = Straico::TEXTCHECK.$input."\"";
-
-					 
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
-	}
-	/*
-	* Function: agentTodo($input)
-	* Input   : a task for a todo list
-	* Output  : returns a todo list
-	* Purpose : Create a Todo list from a given task
-	* 
-	* Remarks:
-	* 
-	* Private function used by $this->userPrompt()
-	* I advise the use anthropic/claude-3-sonnet for this because it
-	* seems best up to the task atm.
-	*/
-	private function agentTodo($input){
-		$task = substr($input,6);
-			
-		//$aiMessage = "Create a concise and detailed todo list for " . $task;
-		$aiMessage = Straico::TODO.$input;
-					 
-			$apiOutput=$this->apiCompletion($aiMessage);
-			echo "\n$apiOutput\n";
-		
-	}
-	/*
-	* Function: agentTux($input)
-	* Input   : requeston linux related maters
-	* Output  : returns a solution
-	* Purpose : Help the user with linux problems
-	* 
-	* Remarks:
-	* 
-	* Private function used by $this->userPrompt()
-	* I advise the use a LLM that is specialized in coding.
-	*/
-	private function agentTux($input){
-
-	    //preserve settings
-	    $skipper = $this->aiSkipper;
-	    $memory = $this->chatHistory;
-	    $prompt = $this->usrPrompt;
-
-	    $this->usrPrompt = "tux> ";
-	    echo "Use /exit to exit Tux.\n";
+		$class = "Straico";
+		$constant = strtoupper($name);
 	    
-	    while( trim($input) <> '/exit'){ 
-		$aiMessage = Straico::TUX.$input."\"";
+		$aiMessage = constant("${class}::${constant}").$input; 
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
-		
-		$input = $this->getInput();
-	    }
-
-	    //restore shit
-	    $this->usrPrompt = $prompt;
-	    $this->aiSkipper = $skipper;
-	    $this->chatHistory = $memory;
-
+	    
 	    return;
+	    
 	}
 	/*
 	* Function: addHistory()
