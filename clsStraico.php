@@ -508,8 +508,8 @@ REQUEST: "';
 		// My friend Sailor Twift	
 		}elseif( substr($input,0,7) == "/saylor"){
 			if(! $this->aiRole == "saylor"){
-				$this->aiRole = "saylor";
-			$this->initChat();
+			    $this->aiRole = "saylor";
+			    $this->initChat();
 			}
 			$this->agentSaylor(trim(substr($input,8)));
 
@@ -598,7 +598,6 @@ REQUEST: "';
 		
 		$aiMessage = $this->chatRole.$input.$appendix;
 
-//var_dump($aiMessage);
 
 		// Prepare query
 		$data = http_build_query(array('model' => $this->aiModel,
@@ -914,7 +913,6 @@ REQUEST: "';
 
 	    if( ($this->historySwitch) && (file_exists( $id )) ){
 		 $this->loadHistory('saylor');
-		 echo "Loaded\n";
 	    }else{
 		//init system role
 		$this->chatHistory[] = array( 'role' => 'system', 'content' => Straico::SAYLOR);
@@ -930,8 +928,7 @@ REQUEST: "';
 		
 		echo "\n$output\n";
 		
-		//if( $this->historySwitch ) $this->addHistory($input,$output);
-		
+	
 		$input = $this->getInput();
 	    }
 
@@ -1471,12 +1468,10 @@ using _PAGE_ as a placeholder
 		
 		foreach ($this->chatHistory as $role){
 		    
-		    var_dump($role);
 		    $workArray = get_object_vars($role);
 		    echo $workArray['role']."\n\n";
 		    $this->chatRole .= $workArray['role'].": ".$workArray['content']."\n\n";
 		}
-		var_dump($this->chatRole);
 		echo "Loaded your history from $name.\n";
 		return;
 		
