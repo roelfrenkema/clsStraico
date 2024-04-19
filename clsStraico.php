@@ -228,7 +228,7 @@ It is your task, with the information above, to answer the users prompt.';
 					//till we have a decent api
 	public $historySwitch;		//true or false for using hystory.
 	private $aiRole;		//Keep track of the role
-	private $aiUseragent;		//Useragent string
+	private $userAgent;		//Useragent string
 	
 
 	/*
