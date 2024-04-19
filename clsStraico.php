@@ -257,6 +257,8 @@ REQUEST: "';
 	public $logPath;		//logging path
 	private $usrPrompt;		//userprompt preserved getInput()
 	private $chatHistory;		//Keep a history to emulate chat
+	private $chatRole;		//Keep a history use internal 
+					//till we have a decent api
 	public $historySwitch;		//true or false for using hystory.
 	private $aiRole;		//Keep track of the role
 	private $aiUseragent;		//Useragent string
@@ -296,7 +298,7 @@ REQUEST: "';
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'cohere/command-r-plus';
-	$this->clsVersion = '1.6.2';
+	$this->clsVersion = '1.7.0';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -310,8 +312,10 @@ REQUEST: "';
 	$this->clsDebug = false;
 	$this->aiInput = '';
 	$this->aiOutput = '';
+	$this->aiRole = 'cli';		//start in role cli
 	$this->aiLog = false;
-	$this->chatHistory ="";
+	$this->chatHistory = array();
+	$this->chatRole = "";
 	$this->historySwitch = false;
 	$this->userAgent = 'clsStraico.php v'.$this->clsVersion.' (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
 	$this->usrPrompt = "> ";
@@ -363,14 +367,24 @@ REQUEST: "';
 			echo "Appending conversation to ".__DIR__."/clsStraico.txt\n";
 
 		// Stop history
-		}elseif( substr($input,0,9) == "/histoff"){
+		}elseif( substr($input,0,8) == "/histoff"){
 			$this->historySwitch=false;
+			$this->initChat();
 			echo "You have disabled history!\n";
 
 		// Start history
-		}elseif( substr($input,0,9) == "/histon"){
+		}elseif( substr($input,0,7) == "/histon"){
 			$this->historySwitch=true;
+			$this->initChat();
 			echo "You have enabled history for chats.\n";
+
+		// Save history
+		}elseif( substr($input,0,9) == "/histsave"){
+			$this->saveHistory(trim(substr($input,10)));
+
+		// Start history
+		}elseif( substr($input,0,9) == "/histload"){
+			$this->loadHistory(trim(substr($input,10)));
 
 		// Set language
 		}elseif( substr($input,0,12) == "/setlanguage"){
@@ -384,7 +398,7 @@ REQUEST: "';
 		
 		// Set model	
 		}elseif( substr($input,0,9) == "/setmodel"){
-			$this->chatHistory ="";
+			$this->chatHistory = array();
 			$this->usrPrompt ="> ";
 			 $this->changeModel(substr($input,10));
 			 echo "Model is: $this->aiModel\n";
@@ -417,20 +431,20 @@ REQUEST: "';
 		// do research and report
 		}elseif( substr($input,0,9) == "/academic"){
 			$this->aiRole = "academic";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentAcademic(substr($input,10));
 		
 		// Write a bigblog
 		}elseif( substr($input,0,8) == "/bigblog"){
 			$this->aiRole = "bigblog";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentBBlog(substr($input,9));
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,6) == "/dream"){
 			if(! $this->aiRole == "dream"){
 				$this->aiRole = "dream";
-				$this->chatHistory = "";
+				$this->initChat();
 			}
 			$this->agentDream(substr($input,7),0);
 
@@ -438,89 +452,89 @@ REQUEST: "';
 		}elseif( substr($input,0,7) == "/tdream"){
 			if(! $this->aiRole == "tdream"){
 				$this->aiRole = "tdream";
-				$this->chatHistory = "";
+			$this->initChat();
 			}
 			$this->agentDream(substr($input,8),1);
 
 		// Enhance a prompt
 		}elseif( substr($input,0,8) == "/enhance"){
 			$this->aiRole = "enhance";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentEnhancePrompt(substr($input,9));
 			 
 		// Factcheck information
 		}elseif( substr($input,0,10) == "/factcheck"){
 			$this->aiRole = "factcheck";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentFactcheck(substr($input,11));
 
 		// Make a neurodivese gist of information
 		}elseif( substr($input,0,5) == "/gist") {
 			$this->aiRole = "gist";
-			$this->chatHistory = "";
+			$this->initChat();
 			 $this->agentGist(substr($input,6));
 
 		// Show _PAGE_ in md format	
 		}elseif( substr($input,0,8) == "/html2md"){
 			$this->aiRole = "html2md";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentHtml2md($input,9);
 			 
 		// Write a mediumsize blog
 		}elseif( substr($input,0,11) == "/mediumblog"){
 			$this->aiRole = "mediumblog";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentMBlog(substr($input,12));
 
 		// Create a strong password 
 		}elseif( substr($input,0,6) == "/mkpwd"){
 			$this->aiRole = "mkpwd";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentMkpwd(substr($input,7));
 
 		// Create a regex for user
 		}elseif( substr($input,0,7) == "/prompt"){
 			$this->aiRole = "prompt";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentPrompt(substr($input,8));
 
 		// Create a regex for user
 		}elseif( substr($input,0,6) == "/regex"){
 			$this->aiRole = "regex";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentRegEx(substr($input,7));
 
 		// My friend Sailor Twift	
 		}elseif( substr($input,0,7) == "/saylor"){
 			if(! $this->aiRole == "saylor"){
 				$this->aiRole = "saylor";
-				$this->chatHistory = "";
+			$this->initChat();
 			}
 			$this->agentSaylor(trim(substr($input,8)));
 
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
 			$this->aiRole = "smallblog";
-			$this->chatHistory = "";
-			$this->agentSBlog(substr($input,11));
+			$this->chatHistory = array();
+			$this->initChat();
 
 		// Judge a text
 		}elseif( substr($input,0,10) == "/textcheck"){
 			$this->aiRole = "textcheck";
-			$this->chatHistory = "";
-			$this->agentTextcheck(substr($input,11));
+			$this->chatHistory = array();
+			$this->initChat();
 
 		// Create a todo list	 
 		}elseif( substr($input,0,5) == "/todo"){
 			$this->aiRole = "todo";
-			$this->chatHistory = "";
+			$this->initChat();
 			$this->agentTodo(substr($input,6));
 			
 		// My friend TUX	
 		}elseif( substr($input,0,4) == "/tux"){
 			if(! $this->aiRole == "tux"){
 				$this->aiRole = "tux";
-				$this->chatHistory = "";
+			$this->initChat();
 			}
 			
 			$this->agentTux(trim(substr($input,5)));
@@ -533,12 +547,12 @@ REQUEST: "';
 			
 		// Process user input	
 		}else{
-			if(! $this->aiRole == "cli"){
-				$this->aiRole = "cli";
-				$this->chatHistory = "";
-			}
-			$answer = $this->apiCompletion($input);
-            echo $answer."\n\n";
+		    if(! $this->aiRole == "cli"){
+			$this->aiRole = "cli";
+			$this->initChat();
+		    }
+		    $answer = $this->apiCompletion($input);
+		    echo $answer."\n\n";
 		}
 	}
 
@@ -553,7 +567,6 @@ REQUEST: "';
 	* Returns the response content. At later time this will be
 	* adjusted to reflect the other information
 	*/
-
 	public function apiCompletion($input){
 
 	    $endPoint = 'https://api.straico.com/v0/prompt/completion';
@@ -580,7 +593,9 @@ REQUEST: "';
 		// Store LLM input for debugging routine
 		$this->aiInput = $input;
 		
-		$aiMessage = $this->chatHistory.$input.$appendix;
+		$aiMessage = $this->chatRole.$input.$appendix;
+
+//var_dump($aiMessage);
 
 		// Prepare query
 		$data = http_build_query(array('model' => $this->aiModel,
@@ -625,8 +640,8 @@ REQUEST: "';
 		
 		$output= $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
 		
-		$this->chatHistory .= "I said: ".$input."\n\n";
-		$this->chatHistory .= "You said: ".$output."\n\n";
+		//update History
+		if( $this->historySwitch ) $this->addHistory($input,$output);
 
 		if($this->aiLog){
 			$file=$this->logPath."/clsStraico.txt";
@@ -891,13 +906,20 @@ REQUEST: "';
 
 	    //Sailor settings
 	    $this->usrPrompt = "ST> ";
+	    $id = $this->logPath."/tailor.hist";
+
+	    if( $this->historySwitch && is_file( $id ) ) $this->loadHistory('saylor');
+
 	    echo "Use /exit to exit Saylor Twift.\n";
 	    
 	    while( trim($input) <> '/exit'){ 
 		$aiMessage = Straico::SAYLOR.$input."\"";
 
-		$apiOutput=$this->apiCompletion($aiMessage);
-		echo "\n$apiOutput\n";
+		$output=$this->apiCompletion($aiMessage);
+		
+		echo "\n$output\n";
+		
+		if( $this->historySwitch ) $this->addHistory($input,$output);
 		
 		$input = $this->getInput();
 	    }
@@ -906,8 +928,9 @@ REQUEST: "';
 	    $this->usrPrompt = $prompt;
 	    $this->aiSkipper = $skipper;
 	    $this->chatHistory = $memory;
-
+	    if( $this->historySwitch ) $this->saveHistory( 'taylor' );
 	    return;
+	    
 	}
 	/*
 	* Function: agentSBlog($input)
@@ -1002,6 +1025,24 @@ REQUEST: "';
 
 	    return;
 	}
+	/*
+	* Function: addHistory()
+	* Input   : User,Assistant
+	* Output  : Returns array for conversation
+	* Purpose : Retain memory
+	*
+	* Remarks:
+	* 
+	* Private function used by $this->userPrompt()
+	*/
+	private function addHistory($user,$assistant){
+	    
+	    $this->chatHistory[] = array( 'role' => 'user', 'content' => $user);
+	    $this->chatHistory[] = array( 'role' => 'assistant', 'content' => $assistant);
+	    $this->chatRole = "user: $user\n\n";
+	    $this->chatRole = "assistant: $assistant\n\n";
+	}
+
 	/*
 	* Function: apiModels()
 	* Input   : none
@@ -1287,6 +1328,20 @@ REQUEST: "';
 	    return $input;
 	}
 	/*
+	* Function	: initChat()
+	* Input   	: none
+	* Output  	: none
+	* Purpose 	: reset/initialise chathistory
+	* Return	: clean chat environment 
+	* Remarks:
+	*/
+	private function initChat(){
+
+	    $this->chatHistory = array();
+	    $this->chatRole = "";
+
+	}
+	/*
 	* Function: listModels()
 	* Input   : none
 	* Output  : print model list
@@ -1341,6 +1396,8 @@ Alternatively use one of the following internal commands.
     /getpage <url>       - Retrieve a webpage use full url.
     /histoff		- Disable history 
     /histon		- Enable history
+    /histload		- Load history
+    /histsave		- Save history
     /listmodels          - List available models.
     /setlanguage         - Set prefered language.  
     /setmarkup           - Set prefered markup.
@@ -1380,6 +1437,50 @@ using _PAGE_ as a placeholder
              
             ";
 	}
+	/*
+	* Function: loadHistory($name)
+	* Input   : filename
+	* Output  : none
+	* Purpose : load history 
+	*
+	* Remarks:
+	*/
+	private function loadHistory($name){
+	    
+		$this->initChat();
+		
+		$id = $this->logPath."/".$name.".hist";
+		$this->chatHistory = json_decode(file_get_contents($id));
+
+		//fill chatrole
+		
+		foreach ($this->chatHistory as $role){
+		    
+		    var_dump($role);
+		    $workArray = get_object_vars($role);
+		    echo $workArray['role']."\n\n";
+		    $this->chatRole .= $workArray['role'].": ".$workArray['content']."\n\n";
+		}
+		var_dump($this->chatRole);
+		echo "Loaded your history from $name.\n";
+		return;
+		
+	}	   
+	/*
+	* Function: saveHistory($name)
+	* Input   : filename
+	* Output  : a file with current history
+	* Purpose : save history for later load
+	*
+	* Remarks:
+	*/
+	private function saveHistory($name){
+		$id = $this->logPath."/".$name.".hist";
+		$file = json_encode($this->chatHistory);
+		file_put_contents($id,$file);
+		echo "Saved your history to $name.\n";
+		return;
+	}	   
 	/*
 	* Function: stopPrompt()
 	* Input   : none

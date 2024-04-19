@@ -19,6 +19,14 @@ $aiMessage = "";
 $straico = new Straico;
 
 $straico->aiLog = true;
+
+/*
+ * Logpath now equals a working directory. All files are saved here like
+ * f.i. the history files omitting the need to use a path in their names
+ * logfiles will have extension log and history files will have the
+ * extension hist.
+ */ 
+
 $straico->logPath = '';
 
 $straico->aiModel = 'cohere/command-r-plus';
