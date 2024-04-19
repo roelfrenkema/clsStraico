@@ -648,7 +648,7 @@ It is your task, with the information above, to answer the users prompt.';
 		$constant = strtoupper($name);
 		
 		$this->chatHistory[] = array( 'role' => 'system', 'content' => constant("${class}::${constant}"));
-		$this->chatRole .= "system: ".constant("${class}::${constant}")."\n\n";
+		$this->chatRole .= "system: ".constant("{$class}::{$constant}")."\n\n";
 	    }
 	    
 	    //set time and date
@@ -690,7 +690,7 @@ It is your task, with the information above, to answer the users prompt.';
 		$class = "Straico";
 		$constant = strtoupper($name);
 	    
-		$aiMessage = constant("${class}::${constant}").$input; 
+		$aiMessage = constant("{$class}::{$constant}").$input; 
 
 		$apiOutput=$this->apiCompletion($aiMessage);
 		echo "\n$apiOutput\n";
