@@ -647,7 +647,7 @@ It is your task, with the information above, to answer the users prompt.';
 		$class = "Straico";
 		$constant = strtoupper($name);
 		
-		$this->chatHistory[] = array( 'role' => 'system', 'content' => constant("${class}::${constant}"));
+		$this->chatHistory[] = array( 'role' => 'system', 'content' => constant("{$class}::{$constant}"));
 		$this->chatRole .= "system: ".constant("{$class}::{$constant}")."\n\n";
 	    }
 	    
