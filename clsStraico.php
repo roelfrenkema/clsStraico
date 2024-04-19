@@ -194,7 +194,7 @@ Saylor uses narrative actions such as *she smiles*, *she winks*, *she gently wak
 
 -----------
 
-Your task is to act with the information above to the user input prompt: "';
+Your task is to act with the information above to the user input promp.';
 	private const TEXTCHECK = 'Analyze and improve the provided text:
 
 Instructions:
@@ -551,8 +551,9 @@ REQUEST: "';
 		    if(! $this->aiRole == "cli"){
 			$this->aiRole = "cli";
 			$this->initChat();
-			echo "reset\n";
 		    }
+		    if($this->chatRole= "") $this->chatTime();
+
 		    $answer = $this->apiCompletion($input);
 		    echo $answer."\n\n";
 		}
@@ -904,24 +905,32 @@ REQUEST: "';
 	    //preserve settings
 	    $skipper = $this->aiSkipper;
 	    $memory = $this->chatHistory;
+	    $roll = $this->chatRole;
 	    $prompt = $this->usrPrompt;
 
 	    //Sailor settings
 	    $this->usrPrompt = "ST> ";
-	    $id = $this->logPath."/tailor.hist";
+	    $id = $this->logPath."saylor.hist";
 
-	    if( $this->historySwitch && is_file( $id ) ) $this->loadHistory('saylor');
-
+	    if( ($this->historySwitch) && (file_exists( $id )) ){
+		 $this->loadHistory('saylor');
+		 echo "Loaded\n";
+	    }else{
+		//init system role
+		$this->chatHistory[] = array( 'role' => 'system', 'content' => Straico::SAYLOR);
+		$this->chatRole .= "system: ".Straico::SAYLOR."\n\n";
+	    }
+ 
+	    $this->chatTime();
 	    echo "Use /exit to exit Saylor Twift.\n";
 	    
 	    while( trim($input) <> '/exit'){ 
-		$aiMessage = Straico::SAYLOR.$input."\"";
 
-		$output=$this->apiCompletion($aiMessage);
+		$output=$this->apiCompletion($input);
 		
 		echo "\n$output\n";
 		
-		if( $this->historySwitch ) $this->addHistory($input,$output);
+		//if( $this->historySwitch ) $this->addHistory($input,$output);
 		
 		$input = $this->getInput();
 	    }
@@ -929,8 +938,10 @@ REQUEST: "';
 	    //restore shit
 	    $this->usrPrompt = $prompt;
 	    $this->aiSkipper = $skipper;
+	    if( $this->historySwitch ) $this->saveHistory( 'saylor' );
 	    $this->chatHistory = $memory;
-	    if( $this->historySwitch ) $this->saveHistory( 'taylor' );
+	    $this->chatRole = $roll;
+	    
 	    return;
 	    
 	}
@@ -1180,6 +1191,7 @@ REQUEST: "';
 		echo "tone            : ".$this->aiTone."\n";
 		echo "wrap            : ".$this->aiWrap."\n";
 		echo "role            : ".$this->aiRole."\n";
+		echo "history switch  : ".$this->historySwitch."\n";
 		echo "history role    : \n\n".$this->chatRole."\n";
 		var_dump($this->chatHistory);
 	}
@@ -1343,9 +1355,6 @@ REQUEST: "';
 	private function initChat(){
 	    $this->chatHistory = array();
 	    $this->chatRole = "";
-	    $input = "Time and date is ".date("Y-m-d H:i:s");
-	    $output = "Noted.";
-	    $this->addHistory($input,$output);
 	}
 	/*
 	* Function: listModels()
@@ -1486,6 +1495,20 @@ using _PAGE_ as a placeholder
 		file_put_contents($id,$file);
 		echo "Saved your history to $name.\n";
 		return;
+	}
+	/*
+	* Function: chatTime()
+	* Input   : none
+	* Output  : sets current time in chat
+	* Purpose : make llm time aware
+	*
+	* Remarks:
+	* 
+	*/
+	private function chatTime(){
+	    $input = "Time and date is ".date("Y-m-d H:i:s");
+	    $output = "Noted.";
+	    $this->addHistory($input,$output);
 	}	   
 	/*
 	* Function: stopPrompt()
