@@ -219,6 +219,7 @@ It is your task, with the information above, to answer the users prompt.';
 	public $aiWrap;			//wrap output.
 	private $aiInput;		//complete ai input
 	private $aiOutput;		//complete ai output
+	private $aiAnswer;		//answer of ai
 	private $aiSkipper;		//used by some functions
 	public $aiLog;			//log convo to file
 	public $logPath;		//logging path
@@ -229,6 +230,7 @@ It is your task, with the information above, to answer the users prompt.';
 	public $historySwitch;		//true or false for using hystory.
 	private $aiRole;		//Keep track of the role
 	private $userAgent;		//Useragent string
+	public $userPipe;		//user pipecommand
 	
 
 	/*
@@ -288,6 +290,8 @@ It is your task, with the information above, to answer the users prompt.';
 	$this->userAgent = 'clsStraico.php v1.7.1 (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
 	$this->usrPrompt = "> ";
 	$this->initChat();
+	$this->userPipe ="";
+	$this->aiInput ="";
 	echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
 	}
  	/*
@@ -346,6 +350,17 @@ It is your task, with the information above, to answer the users prompt.';
 			$this->historySwitch=true;
 			$this->initChat();
 			echo "You have enabled history for chats.\n";
+
+		// Set a pipe command
+		}elseif( substr($input,0,8) == "/setpipe"){
+			$this->userPipe = trim(substr($input,9));
+			echo "Your pipe is: ".$this->userPipe."\n";
+
+		// Unset a pipe command
+		}elseif( trim($input) == "/unsetpipe"){
+			$this->userPipe = "";
+			echo "Your pipe has been unset\n";
+
 
 		// Save history
 		}elseif( substr($input,0,9) == "/histsave"){
@@ -520,7 +535,7 @@ It is your task, with the information above, to answer the users prompt.';
 		}
 	}
 
-   /*
+	/*
 	* Function: apiCompletion($aiMessage)
 	* Input   : $aiMessage - is the prompt
 	* Output  : returns response content
@@ -554,7 +569,7 @@ It is your task, with the information above, to answer the users prompt.';
 		$appendix = "";
 	    }
 	
-		// Store LLM input for debugging routine
+		// Store LLM input for debugging and pipe routine
 		$this->aiInput = $input;
 		
 		$aiMessage = $this->chatRole.$input.$appendix;
@@ -600,25 +615,48 @@ It is your task, with the information above, to answer the users prompt.';
 		error_reporting($previous_error_reporting);
    
 		$this->aiOutput = json_decode($result, JSON_OBJECT_AS_ARRAY);
-		
-		$output= $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
+
+		$this->aiAnswer = $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
 		
 		//update History
-		if( $this->historySwitch ) $this->addHistory($input,$output);
+		if( $this->historySwitch ) $this->addHistory($this->aiInput,$this->aiAnswer);
 
 		if($this->aiLog){
 			$file=$this->logPath."/clsStraico.txt";
-			file_put_contents($file, "ME:\n".$input."\n\n", FILE_APPEND);
-			file_put_contents($file, $this->aiModel.":\n".$output."\n\n", FILE_APPEND);
+			file_put_contents($file, "ME:\n".$this->aiInput."\n\n", FILE_APPEND);
+			file_put_contents($file, $this->aiModel.":\n".$this->aiAnswer."\n\n", FILE_APPEND);
 		}
-	
+		
+		if( $this->userPipe ) $this->apiPipe();
+		
 		//format output and return it
 		if ($this->aiWrap > 0 ){
-			return wordwrap($this->aiOutput['data']['completion']['choices'][0]['message']['content'],$this->aiWrap,"\n");
+			return wordwrap($this->aiAnswer,$this->aiWrap,"\n");
 		} else {
-			return $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
+			return $this->aiAnswer;
 		}
 	} 
+	/*
+	* Function: apiPipe()
+	* Input   : none
+	* Output  : a shell pipe
+	* Purpose : Use apiOutput elsewhere
+	*
+	* Remarks:
+	* 
+	*/
+	private function apiPipe(){
+	    
+	    if( ! $this->userPipe ) return;
+	    
+	    //tokenreplacement
+	    $temp = str_ireplace("%prompt%", $this->aiInput, $this->userPipe);
+	    $temp2 = str_ireplace("%answer%", $this->aiAnswer, $temp);
+
+	    `$temp2`;
+	    
+	    return;
+	}
 	/*
 	* Function: agentChat($input)
 	* Input   : chat
