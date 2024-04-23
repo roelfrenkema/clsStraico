@@ -284,7 +284,7 @@ It is your task, with the information above, to answer the users prompt.';
 	$this->chatRole = "";
 	$this->historySwitch = false;
 	$this->clsVersion = '1.7.1';
-	$this->userAgent = 'clsStraico.php v1.7.1 (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
+	$this->userAgent = 'clsStraico.php v1.7.3 (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
 	$this->usrPrompt = "> ";
 	$this->initChat();
 	$this->userPipe ="";
@@ -1127,6 +1127,8 @@ Alternatively use one of the following internal commands.
     /setlanguage         - Set prefered language.  
     /setmarkup           - Set prefered markup.
     /setmodel <int>      - Set the active model to number of model.
+    /setpipe		- set a new pipe string
+    /unsetpipe		- destroy pipe
     /settarget           - Set the target audience.
     /settone             - Set prefered tone for answer.
     /setwrap		- Set line lenght. Default = noformat.
