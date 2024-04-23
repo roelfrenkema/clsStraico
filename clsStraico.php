@@ -205,32 +205,30 @@ Instructions:
 It is your task, with the information above, to answer the users prompt.';
 
 
-	public $aiLanguage;		//current working language - default English
-	public $aiMarkup;		//current markup default Markdown
-	public $aiModel;		//current working model
-	private $arModels;		//filled with available models
-	public $aiTarget;		//the audience you target - default anybody
-	public $aiTone;			//the tone used in answers - default neutral
-	private $apiKey;		//secure apiKey
-	public $arUser;			//filled with userdata
-	private $clsVersion;		//version set in construct
-	private $clsDebug;		//?
-	public $webPage;		//filled with _PAGE_ data
-	public $aiWrap;			//wrap output.
+	private $aiAnswer;		//answer of ai
 	private $aiInput;		//complete ai input
 	private $aiOutput;		//complete ai output
-	private $aiAnswer;		//answer of ai
+	private $aiRole;		//Keep track of the role
 	private $aiSkipper;		//used by some functions
-	public $aiLog;			//log convo to file
-	public $logPath;		//logging path
-	private $usrPrompt;		//userprompt preserved getInput()
+	private $apiKey;		//secure apiKey
+	private $arModels;		//filled with available models
 	private $chatHistory;		//Keep a history to emulate chat
 	private $chatRole;		//Keep a history use internal 
-					//till we have a decent api
-	public $historySwitch;		//true or false for using hystory.
-	private $aiRole;		//Keep track of the role
+	private $clsVersion;		//version set in construct
 	private $userAgent;		//Useragent string
+	private $usrPrompt;		//userprompt preserved getInput()
+	public $aiLanguage;		//current working language - default English
+	public $aiLog;			//log convo to file
+	public $aiMarkup;		//current markup default Markdown
+	public $aiModel;		//current working model
+	public $aiTarget;		//the audience you target - default anybody
+	public $aiTone;			//the tone used in answers - default neutral
+	public $aiWrap;			//wrap output.
+	public $arUser;			//filled with userdata
+	public $historySwitch;		//true or false for using hystory.
+	public $logPath;		//logging path
 	public $userPipe;		//user pipecommand
+	public $webPage;		//filled with _PAGE_ data
 	
 
 	/*
@@ -278,7 +276,6 @@ It is your task, with the information above, to answer the users prompt.';
 	}	
 	$this->aiTone = "neutral";
 	$this->aiTarget = "anyone";
-	$this->clsDebug = false;
 	$this->aiInput = '';
 	$this->aiOutput = '';
 	$this->aiRole = 'cli';		//start in role cli
