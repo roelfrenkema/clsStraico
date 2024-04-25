@@ -28,6 +28,7 @@ Detailed Instructions:
 Your task is to create a paper or article based on the information above, and the IDEA that the user will provide below.
 
 IDEA: ';
+	private const BASEROLE = "You are a helpfull friend. We chat in a friendly and familiar way with eachother withot formalities like I am an artificial intelligence or I cannot have feelings. We are friends and we act as friends.";
 	private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 	private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
@@ -385,7 +386,7 @@ It is your task, with the information above, to answer the users prompt.';
 			 echo "Model is: $this->aiModel\n";
 
 		// del history	
-		}elseif( substr($input,0,9) == "/delhistory"){
+		}elseif( substr($input,0,9) == "/histdelete"){
 			$this->chatHistory ="";
 		
 		// Set target audience	 
@@ -1123,6 +1124,7 @@ Alternatively use one of the following internal commands.
     /histon		- Enable history
     /histload		- Load history
     /histsave		- Save history
+    /histdelete		- Delete history
     /listmodels          - List available models.
     /setlanguage         - Set prefered language.  
     /setmarkup           - Set prefered markup.
@@ -1184,10 +1186,11 @@ using _PAGE_ as a placeholder
 		foreach ($this->chatHistory as $role){
 		    
 		    $workArray = get_object_vars($role);
-		    echo $workArray['role']."\n\n";
+//		    echo $workArray['role']."\n\n";
 		    $this->chatRole .= $workArray['role'].": ".$workArray['content']."\n\n";
 		}
-		echo "Loaded your history from $name.\n";
+		echo "\nLoaded your history for $name.\n";
+		echo "Destroy history with command /histdelete \n\n";
 		return;
 		
 	}	   
@@ -1264,7 +1267,6 @@ using _PAGE_ as a placeholder
    			foreach($elementsArray as $result){
 				echo "Title: ".$result['title']."\nUrl  : ".$result['link']."\n\n";
 			}
-
 		return $elementsArray;
 	}
 	
