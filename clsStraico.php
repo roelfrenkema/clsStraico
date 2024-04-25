@@ -266,7 +266,7 @@ It is your task, with the information above, to answer the users prompt.';
 	$this->arUser = $this->apiUser();
 	$this->arModels = $this->apiModels();
 	$this->aiModel = 'cohere/command-r-plus';
-	$this->clsVersion = '1.7.1';
+	$this->clsVersion = '1.8.0';
 	$this->aiMarkup = "text/plain";
 	$this->aiLanguage = "English";
 	$this->aiWrap = "0";
@@ -336,6 +336,10 @@ It is your task, with the information above, to answer the users prompt.';
 		}elseif( substr($input,0,9) == "/logon"){
 			$this->aiLog=true;
 			echo "Appending conversation to ".__DIR__."/clsStraico.txt\n";
+
+		// Start looping
+		}elseif( substr( $input,0,5 ) == "/loop" ){
+			$this->loopModels( substr( $input,6 ) );
 
 		// Stop history
 		}elseif( substr($input,0,8) == "/histoff"){
@@ -424,11 +428,9 @@ It is your task, with the information above, to answer the users prompt.';
 
 		// Write a stable diffusion prompt
 		}elseif( substr($input,0,6) == "/dream"){
-			if(! $this->aiRole == "dream"){
-				$this->aiRole = "dream";
-				$this->initChat();
-			}
-			$this->agentChat("dream",trim(substr($input,7)));
+			$this->aiRole = "dream";
+			$this->initChat();
+			$this->agentDo("dream",trim(substr($input,7)));
 
 		// Enhance a prompt
 		}elseif( substr($input,0,8) == "/enhance"){
@@ -480,11 +482,11 @@ It is your task, with the information above, to answer the users prompt.';
 
 		// My friend Sailor Twift	
 		}elseif( substr($input,0,7) == "/saylor"){
-			if(! $this->aiRole == "saylor"){
+			if( $this->aiRole !== "saylor"){
 			    $this->aiRole = "saylor";
-			    $this->initChat();
-			}
-			$this->agentChat("saylor",trim(substr($input,8)));
+			    $this->usrPrompt = "ST> ";
+			};
+			$this->agentChat(Straico::SAYLOR,trim(substr($input,8)));
 
 		// Write a small blog
 		}elseif( substr($input,0,10) == "/smallblog"){
@@ -507,12 +509,11 @@ It is your task, with the information above, to answer the users prompt.';
 			
 		// My friend TUX	
 		}elseif( substr($input,0,4) == "/tux"){
-			if(! $this->aiRole == "tux"){
+			if( $this->aiRole !== "tux"){
 			     $this->aiRole = "tux";
-			    $this->initChat();
+			    $this->usrPrompt = "Tux> ";
 			}
-			
-			$this->agentChat("tux",trim(substr($input,5)));
+			$this->agentChat(Straico::TUX,trim(substr($input,5)));
 
 		//prevent commands processing
 		}elseif( substr($input,0,1) == "/" ){
@@ -547,8 +548,6 @@ It is your task, with the information above, to answer the users prompt.';
 	public function apiCompletion($input){
 
 	    $endPoint = 'https://api.straico.com/v0/prompt/completion';
-	    $httpMethod = 'POST';
-	
 
 	    // Add webpage if requested
 	    if( strpos($input,'_PAGE_') ){
@@ -582,7 +581,7 @@ It is your task, with the information above, to answer the users prompt.';
 			'header' => "Authorization: Bearer ".$this->apiKey."\r\n" .
 				    "Content-Type: application/x-www-form-urlencoded\r\n",
 				    "User-Agent: ".$this->userAgent." \r\n",
-			'method' => $httpMethod,
+			'method' => "POST",
 			'content' => $data
 			)
 		);
@@ -618,13 +617,9 @@ It is your task, with the information above, to answer the users prompt.';
 		
 		//update History
 		if( $this->historySwitch ) $this->addHistory($this->aiInput,$this->aiAnswer);
-
-		if($this->aiLog){
-			$file=$this->logPath."/clsStraico.txt";
-			file_put_contents($file, "ME:\n".$this->aiInput."\n\n", FILE_APPEND);
-			file_put_contents($file, $this->aiModel.":\n".$this->aiAnswer."\n\n", FILE_APPEND);
-		}
-		
+		//write to log
+		if($this->aiLog) $this->addLog($this->aiInput,$this->aiAnswer);
+		//do pipe
 		if( $this->userPipe ) $this->apiPipe();
 		
 		//format output and return it
@@ -664,48 +659,49 @@ It is your task, with the information above, to answer the users prompt.';
 	* Remarks:
 	* 
 	*/
-	private function agentChat($name,$input){
+	private function agentChat($sysRole,$userInput){
 
 	    //preserve settings
 	    $skipper = $this->aiSkipper;
 	    $memory = $this->chatHistory;
 	    $roll = $this->chatRole;
-	    $prompt = $this->usrPrompt;
 
+	    //schoon beginnen.
+	    $this->initChat();
+	    
 	    //chat settings
-	    $this->usrPrompt = $name."> ";
-	    $id = $this->logPath.$name.".hist";
+	    $id = $this->logPath.$this->aiRole.".hist";
 
 	    //can we use an exiting history
 	    if( ($this->historySwitch) && (file_exists( $id )) ){
-		 $this->loadHistory($name);
+		 $this->loadHistory($this->aiRole);
 	    //or do we make one?
 	    }else{
-		$class = "Straico";
-		$constant = strtoupper($name);
-		$this->initChat();
-		$this->chatHistory[] = array( 'role' => 'system', 'content' => constant("{$class}::{$constant}"));
-		$this->chatRole .= "system: ".constant("{$class}::{$constant}")."\n\n";
+		$this->chatHistory[] = ['role' => 'system', 'content' => $sysRole];
+		$this->chatRole = "system: ".$sysRole."\n\n";
 	    }
 	    
 	    //set time and date
 	    $this->chatTime();
 	    
 	    //show the door
-	    echo "Use /exit to exit $name.\n";
+	    echo "Use /exit to exit $this->aiRole.\n";
 	    
 	    //start chatting enjoy
-	    while( trim($input) <> '/exit'){ 
-		$output=$this->apiCompletion($input);
+	    while( trim( $userInput ) <> '/exit'){ 
+
+		$output = $this->apiCompletion( $userInput );
+		
 		echo "\n$output\n\n";
-		$input = $this->getInput();
+
+		$userInput = $this->getInput();
 	    }
 
             // Store conversation
-	    if( $this->historySwitch ) $this->saveHistory( $name );
+	    if( $this->historySwitch ) $this->saveHistory( $this->aiRole );
 	    
 	    //restore shit
-	    $this->usrPrompt = $prompt;
+	    $this->usrPrompt = "> ";
 	    $this->aiSkipper = $skipper;
 	    $this->chatHistory = $memory;
 	    $this->chatRole = $roll;
@@ -730,6 +726,7 @@ It is your task, with the information above, to answer the users prompt.';
 		$aiMessage = constant("{$class}::{$constant}").$input; 
 
 		$apiOutput=$this->apiCompletion($aiMessage);
+
 		echo "\n$apiOutput\n";
 	    
 	    return;
@@ -751,6 +748,21 @@ It is your task, with the information above, to answer the users prompt.';
 	    $this->chatHistory[] = array( 'role' => 'assistant', 'content' => $assistant);
 	    $this->chatRole .= "user: $user\n\n";
 	    $this->chatRole .= "assistant: $assistant\n\n";
+	}
+
+	/*
+	* Function: addlog()
+	* Input   : User,Assistant
+	* Output  : Returns array for conversation
+	* Purpose : Retain memory
+	*
+	* Remarks:
+	*/ 
+	private function addLog($user,$assistant){
+	    
+	    $file=$this->logPath."/clsStraico.log";
+	    file_put_contents($file, "ME:\n".$user."\n\n", FILE_APPEND);
+	    file_put_contents($file, $this->aiModel.":\n".$assistant."\n\n", FILE_APPEND);
 	}
 
 	/*
@@ -1193,7 +1205,42 @@ using _PAGE_ as a placeholder
 		echo "Destroy history with command /histdelete \n\n";
 		return;
 		
+	/*
+	* Function: LoopModels($prompt)
+	* Input   : userprompt
+	* Output  : model answer
+	* Purpose : try prompt on all models available
+	*
+	* Remarks:
+	*/
 	}	   
+	function loopModels($userInput){
+	    
+	    if( substr($userInput,0,1) == "/" ){
+			echo "Do not use commands in the loop prompt!\n";
+			return;
+		}
+		
+		//store current model.
+		$storeSname = $this->aiModel;
+		$this->aiSkipper = true;
+		//$this->userPrompt = $prompt;
+		
+		foreach( $this->arModels['data'] as $model ) {
+			$response="";
+			echo "\n\nModel:".$model['name']."\n\n";
+			//set endpoint
+			$this->aiModel = $model['model'];
+			
+			$response = $this->apiCompletion($userInput);
+			
+			echo "$response\n";
+		}
+		
+		// restore endPoint
+		$this->aiModel($storeSname);
+		
+	}
 	/*
 	* Function: saveHistory($name)
 	* Input   : filename
