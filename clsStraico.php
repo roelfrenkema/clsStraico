@@ -540,16 +540,17 @@ using _PAGE_ as a placeholder
                 $this->pubRole = 'saylor';
 		$input = substr($input,8);
             }
-            $answer = $this->apiCompletion(Straico::SAYLOR, substr($input));
+            $answer = $this->apiCompletion(Straico::SAYLOR, $input);
 
             // My friend TUX
         } elseif (substr($input, 0, 4) == '/tux' || $this->aiRole == 'tux') {
             if ($this->aiRole !== 'tux') {
+                $this->initChat();
                 $this->aiRole = 'tux';
                 $this->pubRole = 'tux';
-		$input = substr($input,8);
+		$input = substr($input,5);
             }
-            $answer = $this->apiCompletion(Straico::TUX, substr($input,5));
+            $answer = $this->apiCompletion(Straico::TUX, $input,5);
 
             //prevent commands processing with typos
         } elseif (substr($input, 0, 1) == '/') {
