@@ -286,7 +286,7 @@ using _PAGE_ as a placeholder
     private $aiOutput = "";		//complete ai output
 
     private $aiRole = "cli";		//Keep track of the role
-    public $pubRole = "cli"		//publicly exposed
+    public $pubRole = "cli";		//publicly exposed
     
     private $apiKey = "";		//secure apiKey
 
@@ -312,7 +312,7 @@ using _PAGE_ as a placeholder
 
     public $historySwitch = false;		//true or false for using hystory.
 
-    public $logPath "";		//logging path
+    public $logPath = "";		//logging path
 
     public $userPipe = "";		//user pipecommand
 
