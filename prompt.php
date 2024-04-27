@@ -95,8 +95,8 @@ while( $aiMessage !== "/exit" ){
     // native answer
     //echo $aiMessage."\n\n";
     
-    //lavarel answer
-    info($aiMessage);
+     //lavarel answer
+    info('<fg=cyan>'.$aiMessage.'</>');
 
 }
 ?>
