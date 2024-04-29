@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'ff8a37fe1546db5571a88f99f3d51e9303c214e8',
+        'reference' => '0852cf58bdb5d91b257ba3ff287acd7419aa9626',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'ff8a37fe1546db5571a88f99f3d51e9303c214e8',
+            'reference' => '0852cf58bdb5d91b257ba3ff287acd7419aa9626',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -62,7 +62,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../laravel/pint',
             'aliases' => array(),
-            'dev_requirement' => true,
+            'dev_requirement' => false,
         ),
         'laravel/prompts' => array(
             'pretty_version' => 'v0.1.20',

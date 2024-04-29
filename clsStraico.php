@@ -35,7 +35,7 @@ IDEA: ';
 
     private const BASEROLE = 'You are a helpfull friend. We chat in a friendly and familiar way with eachother withot formalities like I am an artificial intelligence or I cannot have feelings. We are friends and we act as friends.';
 
-    private const BBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+    private const BIGBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 
     private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
@@ -201,7 +201,7 @@ Instructions.
 
 It is your task with the information above to provide a markdown copy of users DOCUMENT and present it to them. DOCUMENT: ';
 
-    private const MBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+    private const MIDDLEBLOG = 'Craft a captivating and engaging 600-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 
     private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
 
@@ -240,7 +240,7 @@ Saylor uses narrative actions such as *she smiles*, *she winks*, *she gently wak
 
 Your task is to act with the information above to the user input promp.';
 
-    private const SBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+    private const SMALLBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 
     private const TEXTCHECK = 'Analyze and improve the provided text:
 
@@ -478,7 +478,7 @@ It is your task, with the information above, to answer the users prompt.';
             // Write a bigblog
         } elseif (substr($input, 0, 8) == '/bigblog') {
             $this->initChat();
-            $answer = $this->agentDo(Straico::BBLOG, trim(substr($input, 9)));
+            $answer = $this->agentDo(Straico::BIGBLOG, trim(substr($input, 9)));
 
             // Write a stable diffusion prompt
         } elseif (substr($input, 0, 6) == '/dream') {
@@ -508,7 +508,7 @@ It is your task, with the information above, to answer the users prompt.';
             // Write a mediumsize blog
         } elseif (substr($input, 0, 11) == '/mediumblog') {
             $this->initChat();
-            $answer = $this->agentDo(Straico::MBLOG, trim(substr($input, 12)));
+            $answer = $this->agentDo(Straico::MEDIUMBLOG, trim(substr($input, 12)));
 
             // Create a strong password
         } elseif (substr($input, 0, 6) == '/mkpwd') {
@@ -528,7 +528,7 @@ It is your task, with the information above, to answer the users prompt.';
             // Write a small blog
         } elseif (substr($input, 0, 10) == '/smallblog') {
             $this->initChat();
-            $answer = $this->agentDo(Straico::SBLOG, trim(substr($input, 11)));
+            $answer = $this->agentDo(Straico::SMALLBLOG, trim(substr($input, 11)));
 
             // Judge a text
         } elseif (substr($input, 0, 10) == '/textcheck') {
@@ -1027,10 +1027,35 @@ It is your task, with the information above, to answer the users prompt.';
     {
 
         if (substr($userInput, 0, 1) == '/') {
-            $answer = "Do not use commands in the loop prompt!\n";
 
-            return $answer;
+            $findNeedle = explode(' ', $userInput);
+
+            if (count($findNeedle) < 2) {
+                return "Input invalid to small\n";
+            }
+
+            $command = substr($findNeedle[0], 1);
+            $prompt = $findNeedle[1];
+
+            if ($command == 'academic' || $command == 'bigblog' ||
+                 $command == 'dream' || $command == 'enhance' ||
+                 $command == 'factcheck' || $command == 'gist' ||
+                 $command == 'html2md' || $command == 'mediumblog' ||
+                 $command == 'mkpwd' || $command == 'regex' ||
+                 $command == 'smallblog' || $command == 'textcheck' ||
+                 $command == 'todo') {
+                $modName = strtoupper($command);
+            } else {
+                return "$command is not a valid command name.\n";
+            }
+        } else {
+            $modName = 'BASEROLE';
         }
+
+        $sysModel = constant('Straico::'.$modName);
+
+        //prevent history
+        $this->initChat();
 
         //store current model.
         $storeSname = $this->aiModel;
@@ -1043,7 +1068,7 @@ It is your task, with the information above, to answer the users prompt.';
             //set endpoint
             $this->aiModel = $model['model'];
 
-            $response = $this->apiCompletion($userInput);
+            $response = $this->apiCompletion($sysModel, $userInput);
 
             echo "$response\n";
         }

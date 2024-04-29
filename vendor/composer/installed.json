@@ -1048,7 +1048,5 @@
         }
     ],
     "dev": true,
-    "dev-package-names": [
-        "laravel/pint"
-    ]
+    "dev-package-names": []
 }

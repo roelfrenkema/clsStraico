@@ -17,7 +17,7 @@ trait DrawsBoxes
         string $title,
         string $body,
         string $footer = '',
-        string $color = 'gray',
+        string $color = 'white',
         string $info = '',
     ): self {
         $this->minWidth = min($this->minWidth, Prompt::terminal()->cols() - 6);
