@@ -7,6 +7,10 @@
  * visit Straico https://platform.straico.com/signup?fpr=roelf14
  */
 
+/*
+ * Error codes
+ */
+
 class Straico
 {
     private const ACADEMIC = 'Act as an academic researcher. Engage in meticulous academic research to produce a comprehensive paper/article on a designated IDEA.
@@ -184,6 +188,7 @@ using _PAGE_ as a placeholder
              able to read _PAGE_
              
             ';
+
     private const HTML2MD = 'Transform user-provided content into well-structured Markdown format.
 
 Instructions.
@@ -281,24 +286,25 @@ It is your task, with the information above, to answer the users prompt.';
 
     private $aiAnswer;		//answer of ai
 
-    private $aiInput = "";		//complete ai input
+    private $aiInput = '';		//complete ai input
 
-    private $aiOutput = "";		//complete ai output
+    private $aiOutput = '';		//complete ai output
 
-    private $aiRole = "cli";		//Keep track of the role
-    public $pubRole = "cli";		//publicly exposed
-    
-    private $apiKey = "";		//secure apiKey
+    private $aiRole = 'cli';		//Keep track of the role
 
-    private $arModels = array();		//filled with available models
+    public $pubRole = 'cli';		//publicly exposed
+
+    private $apiKey = '';		//secure apiKey
+
+    private $arModels = [];		//filled with available models
 
     private $chatHistory;		//Keep a history to emulate chat
 
     private $chatRoll = '';		//Keep a history use internal
 
-    private $clsVersion = '1.10.0';	//version 
+    private $clsVersion = '1.10.0';	//version
 
-    private $userAgent ="";		//Useragent string
+    private $userAgent = '';		//Useragent string
 
     private $usrPrompt = '> ';		//userprompt preserved getInput()
 
@@ -308,15 +314,15 @@ It is your task, with the information above, to answer the users prompt.';
 
     public $aiWrap = 0;			//wrap output.
 
-    public $arUser = array();			//filled with userdata
+    public $arUser = [];			//filled with userdata
 
     public $historySwitch = false;		//true or false for using hystory.
 
-    public $logPath = "";		//logging path
+    public $logPath = '';		//logging path
 
-    public $userPipe = "";		//user pipecommand
+    public $userPipe = '';		//user pipecommand
 
-    public $webPage = "";		//filled with _PAGE_ data
+    public $webPage = '';		//filled with _PAGE_ data
 
     /*
     * Function: __construct
@@ -331,31 +337,28 @@ It is your task, with the information above, to answer the users prompt.';
     public function __construct()
     {
 
-        //check for module tidy
+        //check for needed modules
         if (! extension_loaded('tidy')) {
-            echo "PHP module tidy is needed to run clsStraico. Please install it. Exiting!\n";
-            exit;
+            exit("PHP module tidy is needed to run clsStraico. Please install it. Exiting!\n");
         }
         if (! extension_loaded('readline')) {
-            echo "PHP module readline is needed to run clsStraico. Please install it. Exiting!\n";
-            exit;
+            exit("PHP module readline is needed to run clsStraico. Please install it. Exiting!\n");
         }
         if (! extension_loaded('openssl')) {
-            echo "PHP module openssl is needed to run clsStraico. Please install it. Exiting!\n";
-            exit;
+            exit("PHP module openssl is needed to run clsStraico. Please install it. Exiting!\n");
         }
         if (getenv('STRAICO_APIKEY')) {
             $this->apiKey = getenv('STRAICO_APIKEY');
         } else {
-            echo 'Could not find environment variable STRAICO_APIKEY with the API key. Exiting!';
-            exit(-1);
+            exit("Could not find environment variable STRAICO_APIKEY with the API key. Exiting!\n");
         }
         $this->arUser = $this->apiUser();
         $this->arModels = $this->apiModels();
-        if (getenv('WORD_WRAP')) $this->aiWrap = getenv('WORD_WRAP');
+        if (getenv('WORD_WRAP')) {
+            $this->aiWrap = getenv('WORD_WRAP');
+        }
         $this->userAgent = 'clsStraico.php v1.7.3 (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
         $this->initChat();
-        echo "Welcome to clsStraico $this->clsVersion - enjoy!\n\n";
     }
     /*
     * Function: $userPrompt()
@@ -370,22 +373,23 @@ It is your task, with the information above, to answer the users prompt.';
 
     public function userPrompt($input)
     {
-	
-	if ( trim ( $input )  == '/exit') {
+        $input = trim($input);
+
+        if ($input == '/exit') {
             $this->stopPrompt();
- 
+
             // Show helppage
-        } elseif (trim($input) == '/helpme') {
+        } elseif ($input == '/helpme') {
             $answer = Straico::HELP;
 
             // return to baserole
-        } elseif (trim($input) == '/baserole') {
+        } elseif ($input == '/baserole') {
             if ($this->aiRole !== 'cli') {
                 $this->aiRole = 'cli';
                 $this->pubRole = 'cli';
                 $this->initChat();
             }
-	    $answer = 'Returned to baserole';
+            $answer = 'Returned to baserole';
 
             // Get a webpage
         } elseif (substr($input, 0, 8) == '/getpage') {
@@ -398,12 +402,12 @@ It is your task, with the information above, to answer the users prompt.';
             // Stop writing to file
         } elseif (substr($input, 0, 9) == '/logoff') {
             $this->aiLog = false;
-            $answer = "Stopt logging!";
+            $answer = 'Stopt logging!';
 
             // Start writing to file
         } elseif (substr($input, 0, 9) == '/logon') {
             $this->aiLog = true;
-            $answer = 'Appending conversation to '.$logPath."clsStraico.txt";
+            $answer = 'Appending conversation to '.$logPath.'clsStraico.txt';
 
             // Start looping
         } elseif (substr($input, 0, 5) == '/loop') {
@@ -427,7 +431,7 @@ It is your task, with the information above, to answer the users prompt.';
             $answer = 'Your pipe is: '.$this->userPipe."\n";
 
             // Unset a pipe command
-        } elseif (trim($input) == '/unsetpipe') {
+        } elseif ($input == '/unsetpipe') {
             $this->userPipe = '';
             $answer = "Your pipe has been unset\n";
 
@@ -449,7 +453,11 @@ It is your task, with the information above, to answer the users prompt.';
             // del history
         } elseif (substr($input, 0, 9) == '/histdelete') {
             $this->chatHistory = '';
-	    $answer = "History has been deleted.";
+            $answer = 'History has been deleted.';
+
+            // return version
+        } elseif ($input == '/version') {
+            $answer = "Welcome to clsStraico $this->clsVersion - enjoy!\n";
 
             // Set page wrap
         } elseif (substr($input, 0, 8) == '/setwrap') {
@@ -533,12 +541,12 @@ It is your task, with the information above, to answer the users prompt.';
             $answer = $this->agentDo(Straico::TODO, trim(substr($input, 6)));
 
             // My friend Sailor Twift
-        } elseif (substr($input, 0, 7) == '/saylor' || $this->aiRole == 'saylor' ) {
+        } elseif (substr($input, 0, 7) == '/saylor' || $this->aiRole == 'saylor') {
             if ($this->aiRole !== 'saylor') {
                 $this->initChat();
                 $this->aiRole = 'saylor';
                 $this->pubRole = 'saylor';
-		$input = substr($input,8);
+                $input = substr($input, 8);
             }
             $answer = $this->apiCompletion(Straico::SAYLOR, $input);
 
@@ -548,14 +556,14 @@ It is your task, with the information above, to answer the users prompt.';
                 $this->initChat();
                 $this->aiRole = 'tux';
                 $this->pubRole = 'tux';
-		$input = substr($input,5);
+                $input = substr($input, 5);
             }
-            $answer = $this->apiCompletion(Straico::TUX, $input,5);
+            $answer = $this->apiCompletion(Straico::TUX, $input, 5);
 
             //prevent commands processing with typos
         } elseif (substr($input, 0, 1) == '/') {
             $answer = Straico::HELP;
-	    $answer .= "\n\nCommand does not exist.\n";
+            $answer .= "\n\nCommand does not exist.\n";
 
             // Process user input
         } else {
@@ -602,7 +610,7 @@ It is your task, with the information above, to answer the users prompt.';
             $this->chatHistory[] = ['role' => 'user', 'content' => $userInput];
             $this->chatRoll = 'system: '.$sysRole."\n\n"."user: $userInput\n\n";
         }
-	
+
         $aiMessage = $this->chatRoll;
 
         // Prepare query
@@ -674,31 +682,6 @@ It is your task, with the information above, to answer the users prompt.';
             return $this->aiAnswer;
         }
     }
-
-    /*
-    * Function: apiPipe()
-    * Input   : none
-    * Output  : a shell pipe
-    * Purpose : Use apiOutput elsewhere
-    *
-    * Remarks:
-    *
-    */
-    private function apiPipe()
-    {
-
-        if (! $this->userPipe) {
-            return;
-        }
-
-        //tokenreplacement
-        $temp = str_ireplace('%prompt%', $this->aiInput, $this->userPipe);
-        $temp2 = str_ireplace('%answer%', $this->aiAnswer, $temp);
-
-        `$temp2`;
-
-    }
-
 
     /*
     * Function: agentDo($name,$input)
@@ -793,6 +776,30 @@ It is your task, with the information above, to answer the users prompt.';
     }
 
     /*
+    * Function: apiPipe()
+    * Input   : none
+    * Output  : a shell pipe
+    * Purpose : Use apiOutput elsewhere
+    *
+    * Remarks:
+    *
+    */
+    private function apiPipe()
+    {
+
+        if (! $this->userPipe) {
+            return;
+        }
+
+        //tokenreplacement
+        $temp = str_ireplace('%prompt%', $this->aiInput, $this->userPipe);
+        $temp2 = str_ireplace('%answer%', $this->aiAnswer, $temp);
+
+        `$temp2`;
+
+    }
+
+    /*
     * Function: apiUser()
     * Input   : none
     * Output  : Returns array of userinfo
@@ -827,11 +834,9 @@ It is your task, with the information above, to answer the users prompt.';
             $error = error_get_last();
             if ($error !== null) {
                 $message = explode(':', $error['message']);
-                echo "Error: {$message[3]} Check your API key!\n";
-                exit(-1);
+                exit("Error: {$message[3]} Check your API key!\n");
             } else {
-                echo "An unknown error occurred while fetching the webpage.\n";
-                exit(-1);
+                exit("An unknown error occurred while fetching the webpage.\n");
             }
         }
 
@@ -875,6 +880,23 @@ It is your task, with the information above, to answer the users prompt.';
     }
 
     /*
+    * Function	: getInput()
+    * Input   	: none
+    * Output  	: none
+    * Purpose 	: get user input
+    * Return	: $string with catched input
+    * Remarks:
+    */
+    public function getInput()
+    {
+
+        $input = readline($this->usrPrompt);
+
+        return $input;
+
+    }
+
+    /*
     * Function: getWebpage($url)
     * Input   : url of page
     * Output  : Stores retrieved page as string in $this->webPage
@@ -915,32 +937,7 @@ It is your task, with the information above, to answer the users prompt.';
         // Restore the previous error reporting level
         error_reporting($previous_error_reporting);
 
-	return $answer;
-    }
-
-    /*
-    * Function	: getInput()
-    * Input   	: none
-    * Output  	: none
-    * Purpose 	: get user input
-    * Return	: $string with catched input
-    * Remarks:
-    */
-    public function getInput()
-    {
-
-        if (! $this->historySwitch) {
-            $this->chatHistory = '';
-        }
-
-        echo 'Model:'.$this->aiModel.' Role: '.$this->aiRole."\n\n";
-        $input = readline($this->usrPrompt);
-
-        // Add  to session history
-        readline_add_history($input);
-
-        return $input;
-
+        return $answer;
     }
 
     /*
@@ -970,7 +967,7 @@ It is your task, with the information above, to answer the users prompt.';
 
     private function listModels()
     {
-	$list = "";
+        $list = '';
         $point = 0;
         foreach ($this->arModels['data'] as $arModel) {
             $point++;
@@ -984,11 +981,10 @@ It is your task, with the information above, to answer the users prompt.';
             $list .= 'Words: '.$arModel['pricing']['words']."\n";
             $list .= "\n";
         }
-	$list .= "You can choose a model with command /setmodel and the number in front of the model.";
+        $list .= 'You can choose a model with command /setmodel and the number in front of the model.';
 
-	return $list;
+        return $list;
     }
-
 
     /*
     * Function: loadHistory($name)
@@ -1014,18 +1010,18 @@ It is your task, with the information above, to answer the users prompt.';
             $this->chatRoll .= $workArray['role'].': '.$workArray['content']."\n\n";
         }
         $answer = "\nLoaded your history for $name.\n";
-        $answer .= "Destroy history with command /histdelete";
+        $answer .= 'Destroy history with command /histdelete';
 
-    return $answer;
+        return $answer;
     }
-        /*
-        * Function: LoopModels($prompt)
-        * Input   : userprompt
-        * Output  : model answer
-        * Purpose : try prompt on all models available
-        *
-        * Remarks:
-        */
+    /*
+    * Function: LoopModels($prompt)
+    * Input   : userprompt
+    * Output  : model answer
+    * Purpose : try prompt on all models available
+    *
+    * Remarks:
+    */
 
     public function loopModels($userInput)
     {
@@ -1055,8 +1051,9 @@ It is your task, with the information above, to answer the users prompt.';
         // restore endPoint
         $this->aiModel($storeSname);
 
-	return "Loop done!";
+        return 'Loop done!';
     }
+
     /*
     * Function: saveHistory($name)
     * Input   : filename
@@ -1070,6 +1067,7 @@ It is your task, with the information above, to answer the users prompt.';
         $id = $this->logPath.'/'.$name.'.hist';
         $file = json_encode($this->chatHistory);
         file_put_contents($id, $file);
+
         return "Saved your history to $name.";
 
     }
@@ -1086,10 +1084,7 @@ It is your task, with the information above, to answer the users prompt.';
     */
     private function stopPrompt()
     {
-        echo 'Join Straico via https://platform.straico.com/signup?fpr=roelf14'."\n";
-        echo "Thank you and have a nice day.\n";
-        $input = '';
-        exit(0);
+        exit("Join Straico via https://platform.straico.com/signup?fpr=roelf14\nThank you and have a nice day.\n");
     }
 
     /*
@@ -1132,12 +1127,11 @@ It is your task, with the information above, to answer the users prompt.';
 
             $elementsArray[] = $arPart;
         }
-	$answer="";
+        $answer = '';
         foreach ($elementsArray as $result) {
-	     $answer .= 'Title: '.$result['title']."\nUrl  : ".$result['link']."\n\n";
+            $answer .= 'Title: '.$result['title']."\nUrl  : ".$result['link']."\n\n";
         }
 
         return $results;
     }
-    
 }
