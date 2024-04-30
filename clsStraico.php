@@ -12,6 +12,7 @@
  * 29-04-24 Loop mode now excepts assistant commands except for those chat enabled
  * 30-04-24 Remake of method listModels which now will support a search
  *          needle to find one or more models.
+ * 30-04-24 Added new assistant /opusdream a new SD prompt maker
 */
 
 /*
@@ -212,6 +213,42 @@ It is your task with the information above to provide a markdown copy of users D
 
     private const MKPWD = 'I want you to act as a password generator for individuals in need of a secure password. Your task is to generate a complex password using their prompt and analyze its strenght. Then report the strenght and the password. Generate a password with the following input: ';
 
+    private const OPUSDREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
+
+
+Instructions:
+
+[Style/Medium] portrayal of [Subject], [Key Features], [Emotional Tone], [Composition Elements], [Artistic Influences]:2, [Lighting and Color], [Symbolic Subtext]:1.5
+
+To break it down:
+
+[Style/Medium] could be things like "Impressionistic painting", "High-contrast digital art", "Surreal photographic composite", etc.
+
+[Subject] is the focal point - a person, object, scene, or abstract concept. 
+
+[Key Features] highlight the most distinctive physical attributes of the subject.
+
+[Emotional Tone] sets the mood - e.g. "serene and contemplative", "vibrant and joyful", "mysterious and ethereal".
+
+[Composition Elements] describe the arrangement and framing, like "balanced asymmetry" or "dramatic foreground focus".
+
+[Artistic Influences] reference specific artists, art movements, or techniques to emulate, weighted higher for more stylistic impact.
+
+[Lighting and Color] establish the overall atmosphere, like "soft diffused sunlight" or "bold primary color palette".
+
+[Symbolic Subtext] adds deeper layers of meaning or themes, weighted higher so they come through clearly.
+
+The goal is to create an evocative, multidimensional prompt that guides the AI toward a richly realized artistic vision, while the framing and emotional tone keywords help steer clear of potentially problematic content.
+
+For example:
+
+```
+Impressionistic painting of a father and daughter:1.3, walking hand-in-hand through a sunlit garden, serene and contemplative, balanced asymmetry, in the style of Mary Cassatt:2, soft diffused sunlight, themes of familial love and life\'s journey:1.5
+```
+
+The emotional resonance comes through in a wholesome way, and the stylistic influences add depth and nuance to the scene.
+
+Your task is to improve on the users prompt.';
     private const PROMPT = '"I want you to become my Prompt Creator. Your goal is to help me craft the best possible prompt for my needs. The prompt will be used by you. You will follow the following process:
 
 * I will provide my IDEA.
@@ -528,6 +565,11 @@ It is your task, with the information above, to answer the users prompt.';
         } elseif (substr($input, 0, 7) == '/prompt') {
             $this->initChat();
             $answer = $this->agentDo(Straico::PROMPT, trim(substr($input, 8)));
+
+            // SD prompt with Opus dream
+        } elseif (substr($input, 0, 10) == '/opusdream') {
+            $this->initChat();
+            $answer = $this->agentDo(Straico::OPUSDREAM, trim(substr($input, 11)));
 
             // Create a regex for user
         } elseif (substr($input, 0, 6) == '/regex') {
