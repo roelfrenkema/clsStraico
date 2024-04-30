@@ -8,6 +8,13 @@
  */
 
 /*
+ * Updates:
+ * 29-04-24 Loop mode now excepts assistant commands except for those chat enabled
+ * 30-04-24 Remake of method listModels which now will support a search
+ *          needle to find one or more models.
+*/
+
+/*
  * Error codes
  */
 
@@ -296,7 +303,7 @@ It is your task, with the information above, to answer the users prompt.';
 
     private $apiKey = '';		//secure apiKey
 
-    private $arModels = [];		//filled with available models
+    private $useModels = [];		//filled with available models
 
     private $chatHistory;		//Keep a history to emulate chat
 
@@ -353,7 +360,7 @@ It is your task, with the information above, to answer the users prompt.';
             exit("Could not find environment variable STRAICO_APIKEY with the API key. Exiting!\n");
         }
         $this->arUser = $this->apiUser();
-        $this->arModels = $this->apiModels();
+        $this->apiModels();
         if (getenv('WORD_WRAP')) {
             $this->aiWrap = getenv('WORD_WRAP');
         }
@@ -396,8 +403,9 @@ It is your task, with the information above, to answer the users prompt.';
             $answer = $this->getWebpage(substr($input, 9));
 
             // List available models
-        } elseif ($input == '/listmodels') {
-            $answer = $this->listModels();
+        } elseif (substr($input, 0, 11) == '/listmodels') {
+            $this->listModels(substr($input, 12));
+            $answer = '';
 
             // Stop writing to file
         } elseif (substr($input, 0, 9) == '/logoff') {
@@ -467,6 +475,7 @@ It is your task, with the information above, to answer the users prompt.';
             // Do a websearch
         } elseif (substr($input, 0, 10) == '/websearch') {
             $answer = $this->webSearch(substr($input, 11));
+            // Do a websearch
 
             // ASSISTANTS
 
@@ -771,7 +780,7 @@ It is your task, with the information above, to answer the users prompt.';
 
         $result = file_get_contents($endPoint, false, $context);
 
-        return json_decode($result, JSON_OBJECT_AS_ARRAY);
+        $this->useModels = json_decode($result, true);
 
     }
 
@@ -860,7 +869,7 @@ It is your task, with the information above, to answer the users prompt.';
     {
 
         $intPoint = intval($input);
-        $this->aiModel = $this->arModels['data'][$intPoint - 1]['model'];
+        $this->aiModel = $this->useModels['data'][$intPoint - 1]['model'];
     }
 
     /*
@@ -965,25 +974,42 @@ It is your task, with the information above, to answer the users prompt.';
     * Private function used by $this->userPrompt()
     */
 
-    private function listModels()
+    private function listModels($searchString = null)
     {
-        $list = '';
+        $modelsFound = [];
         $point = 0;
-        foreach ($this->arModels['data'] as $arModel) {
-            $point++;
-            $list .= "Model $point\n";
-            if ($arModel['model'] == $this->aiModel) {
-                $list .= '* ';
-            }
-            $list .= 'Name: '.$arModel['name']."\n";
-            $list .= 'Model: '.$arModel['model']."\n";
-            $list .= 'Coins: '.$arModel['pricing']['coins'].' - ';
-            $list .= 'Words: '.$arModel['pricing']['words']."\n";
-            $list .= "\n";
-        }
-        $list .= 'You can choose a model with command /setmodel and the number in front of the model.';
 
-        return $list;
+        // Iterate over models and check if they match the search string (case-insensitive)
+        foreach ($this->useModels['data'] as $arModel) {
+            $point++;
+
+            // If no search string is provided or if the current model matches the search string, proceed to display it
+            if (! $searchString || stripos($arModel['model'], $searchString) !== false) {
+
+                $granate = explode('/', $arModel['model']);
+
+                // Add the current model to the found models array
+                $modelsFound[] = [
+                    'counter' => $point,
+                    'name' => $granate[1],
+                    'model' => $arModel['model'],
+                ];
+
+                // Display the model information
+                echo "Model $point:\n";
+                if ($arModel['model'] === $this->aiModel) {
+                    echo '* ';
+                }
+
+                echo "- Name: {$granate[1]}\n";
+                echo "- Model: {$arModel['model']}\n";
+                echo "- Coins: {$arModel['pricing']['coins']}\n";
+                echo "- Words: {$arModel['pricing']['words']}\n";
+                echo "---\n";
+            }
+        }
+
+        return $modelsFound;
     }
 
     /*
@@ -1062,7 +1088,7 @@ It is your task, with the information above, to answer the users prompt.';
         $this->aiSkipper = true;
         //$this->userPrompt = $prompt;
 
-        foreach ($this->arModels['data'] as $model) {
+        foreach ($this->useModels['data'] as $model) {
             $response = '';
             echo "\n\nModel:".$model['name']."\n\n";
             //set endpoint
