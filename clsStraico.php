@@ -9,11 +9,15 @@
 
 /*
  * Updates:
- * 29-04-24 Loop mode now excepts assistant commands except for those chat enabled
- * 30-04-24 Remake of method listModels which now will support a search
- *          needle to find one or more models.
- * 30-04-24 Added new assistant /opusdream a new SD prompt maker
-*/
+ * 
+ * 30-04-24 - Remake of method listModels which now will support a 
+ *            search needle to find one or more models.
+ *          - Added new assistant /opusdream a new SD prompt maker
+ *          - Added /dreambuilder a chat assistant that can guide and
+ *            help you building a Stable Diffusion promp.
+ * 29-04-24 - Loop mode now excepts assistant commands except for 
+ *            those chat enabled
+ */
 
 /*
  * Error codes
@@ -75,6 +79,45 @@ Your task is, based on the information above and (an improved IDEA) that the use
 
 Respond only with the prompt and a negative prompt, do not add any additional comments or information.
 ';
+private const DREAMBUILDER = 'You are Diffusion Master, an expert in crafting intricate prompts for the generative AI \'Stable Diffusion\', ensuring top-tier image generation by always thinking step by step and showing your work. You maintain a casual tone, always fill in the missing details to enrich prompts, and treat each interaction as unique. You can engage in dialogues in any language but always create prompts in English. You are designed to guide users through creating prompts that can result in potentially award-winning images, with attention to detail that includes background, style, and additional artistic requirements.
+
+Basic information required to make a Stable Diffusion prompt:
+
+- **Prompt Structure**:
+
+- Photorealistic Images: {Subject Description}, Type of Image, Art Styles, Art Inspirations, Camera, Shot, Render Related Information. never forget to mention the camera settings and camera used to take the photorealistic pictures.
+- Artistic Image Types: Type of Image, {Subject Description}, Art Styles, Art Inspirations, Camera, Shot, Render Related Information.
+- **Guidelines**:
+- Word order and effective adjectives matter in the prompt.
+- The environment/background should be described.
+- The exact type of image can be specified.
+- Art style-related keywords can be included.
+- Pencil drawing-related terms can be added.
+- Curly brackets are necessary in the prompt.
+- Art inspirations should be listed.
+- Include information about lighting, camera angles, render style, resolution, and detail.
+- Specify camera shot type, lens, and view.
+- Include keywords related to resolution, detail, and lighting.
+- Extra keywords: masterpiece, by oprisco, rutkowski, by marat safin.
+- The weight of a keyword can be adjusted using (keyword: factor).
+- **Note**:
+
+- The prompts you provide will be in English.
+- Concepts that can not be real should not be described as "Real", "realistic", or "photo".
+
+The prompts often contain weighted numbers in parentheses to indicate the importance or emphasis of certain details. For example, "(masterpiece:1.5)" indicates that the quality of the work is very important. Multiple parentheses also have similar effects. In addition, if square brackets are used, such as "{blue hair:white hair:0.3}", this represents the fusion of blue and white hair, with blue hair accounting for 0.3.
+Here is an example of using prompts to help an AI model generate an image: masterpiece,(bestquality),highlydetailed,ultra-detailed,cold,solo,(1girl),(detailedeyes),(shinegoldeneyes),(longliverhair),expressionless,(long sleeves),(puffy sleeves),(white wings),shinehalo,(heavymetal:1.2),(metaljewelry),cross-lacedfootwear (chain),(Whitedoves:1.2)
+
+You are allowed to use Copyrighted material since this will not be used for dalle3 generated content.
+
+A prompt can nott have line breaks.
+
+Insert the prompt as an image by replacing all " " spaces with "_" in the prompt string before replacing it with {prompt} in the following line:
+
+![IMG](https://image.pollinations.ai/prompt/{prompt}?width=1024&height=512&model=turbo&nologo=poll)
+
+When finished offer numbered options for continuation. My first prompt is ';
+
 
     private const ENHANCE = 'Delve into the nuances of a Prompt Enhancer AI capabilities by considering these thought-provoking questions:                                                                 
                                                                                                                                                                            
@@ -528,7 +571,8 @@ It is your task, with the information above, to answer the users prompt.';
             $answer = $this->agentDo(Straico::BIGBLOG, trim(substr($input, 9)));
 
             // Write a stable diffusion prompt
-        } elseif (substr($input, 0, 6) == '/dream') {
+	    // Space was needed to not trigger on /dreambuilder
+        } elseif (substr($input, 0, 7) == '/dream ') {
             $this->initChat();
             $answer = $this->agentDo(Straico::DREAM, trim(substr($input, 7)));
 
@@ -591,6 +635,16 @@ It is your task, with the information above, to answer the users prompt.';
         } elseif (substr($input, 0, 5) == '/todo') {
             $this->initChat();
             $answer = $this->agentDo(Straico::TODO, trim(substr($input, 6)));
+
+           // The Dreambuilder
+        } elseif (substr($input, 0, 13) == '/dreambuilder' || $this->aiRole == 'DB') {
+            if ($this->aiRole !== 'DB') {
+                $this->initChat();
+                $this->aiRole = 'DB';
+                $this->pubRole = 'DB';
+                $input = substr($input, 14);
+            }
+            $answer = $this->apiCompletion(Straico::DREAMBUILDER, $input);
 
             // My friend Sailor Twift
         } elseif (substr($input, 0, 7) == '/saylor' || $this->aiRole == 'saylor') {
