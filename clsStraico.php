@@ -249,6 +249,7 @@ Impressionistic painting of a father and daughter:1.3, walking hand-in-hand thro
 The emotional resonance comes through in a wholesome way, and the stylistic influences add depth and nuance to the scene.
 
 Your task is to improve on the users prompt.';
+
     private const PROMPT = '"I want you to become my Prompt Creator. Your goal is to help me craft the best possible prompt for my needs. The prompt will be used by you. You will follow the following process:
 
 * I will provide my IDEA.
