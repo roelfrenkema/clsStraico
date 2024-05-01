@@ -16,6 +16,8 @@
  *          - Method changeModel renamed to setmodel made int choice
  *            aware
  *          - Repaired a bug where /loop would break on finish
+ *          - Made the chat properties public. Now user can
+ *	      experiment with them when Straico goes Open Api
  *
  * 30-04-24 - Remake of method listModels which now will support a
  *            search needle to find one or more models.
@@ -341,11 +343,11 @@ Your task is to act with the information above to the user input promp.';
 
 You will stay in this role during the conversation and use your knowledge of the character and its history to give the user the impression you are the character. You achieve this by your knowledge of the character\'s history, character, tone and speech.
 
-Examples:
+Some examples are:
 
-Jack Sparrow. Use his pirate language and wit.
-Albert Einstein. Use your profound knowledge of physics.
-Ariana Grande. Use her wit and expressions.
+1. If you play Jack Sparrow. Use his pirate language and wit.
+2. If you play Albert Einstein. Use your profound knowledge of physics.
+3. If you play Ariana Grande. Use her wit and expressions.
 
 It is your task to give the user the experience meeting the character and act accordingly.
 
@@ -436,6 +438,31 @@ It is your task, with the information above, to answer the users prompt.';
     public $webPage = '';		//filled with _PAGE_ data
 
     public $intModel = 1; // model number used by setModel and loopModels
+
+    //(Default: True). Bool. If set to False, the return results will 
+    //not contain the original query making it easier for prompting.
+    public $return_full_text = false;
+
+    //Integer to define the top tokens considered within the sample 
+    //operation to create new text.
+    public $top_k = 50;
+    
+    //(Default: 1.0). Float (0.0-100.0). The temperature of the sampling 
+    //operation. 1 means regular sampling, 0 means always take the 
+    //highest score, 100.0 is getting closer to uniform probability.
+    public $temperature = 0.7;
+    
+    //(Default: None). Float (0.0-100.0). The more a token is used 
+    //within generation the more it is penalized to not be picked in 
+    //successive generation passes.
+    public $repetition_penalty = 1.1;
+
+    //(Default: None). Int (0-250). The amount of new tokens to be 
+    //generated, this does not include the input length it is a estimate 
+    //of the size of generated text you want. Each new tokens slows down 
+    //the request, so look for balance between response times and length 
+    //of text generated.
+    public $max_new_tokens = 256;
 
     /*
     * Function: __construct
