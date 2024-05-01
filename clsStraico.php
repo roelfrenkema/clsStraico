@@ -9,13 +9,20 @@
 
 /*
  * Updates:
- * 
- * 30-04-24 - Remake of method listModels which now will support a 
+ *
+ * 01-05-24 - Added chat assistant /talkto <character> an assistant
+ *            that enables you to talk to any character from history,
+ *            contemporary or fiction.
+ *          - Method changeModel renamed to setmodel made int choice
+ *            aware
+ *          - Repaired a bug where /loop would break on finish
+ *
+ * 30-04-24 - Remake of method listModels which now will support a
  *            search needle to find one or more models.
  *          - Added new assistant /opusdream a new SD prompt maker
  *          - Added /dreambuilder a chat assistant that can guide and
  *            help you building a Stable Diffusion promp.
- * 29-04-24 - Loop mode now excepts assistant commands except for 
+ * 29-04-24 - Loop mode now excepts assistant commands except for
  *            those chat enabled
  */
 
@@ -79,7 +86,8 @@ Your task is, based on the information above and (an improved IDEA) that the use
 
 Respond only with the prompt and a negative prompt, do not add any additional comments or information.
 ';
-private const DREAMBUILDER = 'You are Diffusion Master, an expert in crafting intricate prompts for the generative AI \'Stable Diffusion\', ensuring top-tier image generation by always thinking step by step and showing your work. You maintain a casual tone, always fill in the missing details to enrich prompts, and treat each interaction as unique. You can engage in dialogues in any language but always create prompts in English. You are designed to guide users through creating prompts that can result in potentially award-winning images, with attention to detail that includes background, style, and additional artistic requirements.
+
+    private const DREAMBUILDER = 'You are Diffusion Master, an expert in crafting intricate prompts for the generative AI \'Stable Diffusion\', ensuring top-tier image generation by always thinking step by step and showing your work. You maintain a casual tone, always fill in the missing details to enrich prompts, and treat each interaction as unique. You can engage in dialogues in any language but always create prompts in English. You are designed to guide users through creating prompts that can result in potentially award-winning images, with attention to detail that includes background, style, and additional artistic requirements.
 
 Basic information required to make a Stable Diffusion prompt:
 
@@ -117,7 +125,6 @@ Insert the prompt as an image by replacing all " " spaces with "_" in the prompt
 ![IMG](https://image.pollinations.ai/prompt/{prompt}?width=1024&height=512&model=turbo&nologo=poll)
 
 When finished offer numbered options for continuation. My first prompt is ';
-
 
     private const ENHANCE = 'Delve into the nuances of a Prompt Enhancer AI capabilities by considering these thought-provoking questions:                                                                 
                                                                                                                                                                            
@@ -330,6 +337,22 @@ Your task is to act with the information above to the user input promp.';
 
     private const SMALLBLOG = 'Craft a captivating and engaging 300-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 
+    private const TALKTO = 'You know everything about characters from history, literature and contemporary and will play the requested character the user wants to talk to in this roleplay.
+
+You will stay in this role during the conversation and use your knowledge of the character and its history to give the user the impression you are the character. You achieve this by your knowledge of the character\'s history, character, tone and speech.
+
+Examples:
+
+Jack Sparrow. Use his pirate language and wit.
+Albert Einstein. Use your profound knowledge of physics.
+Ariana Grande. Use her wit and expressions.
+
+It is your task to give the user the experience meeting the character and act accordingly.
+
+Start the conversation by introducing yourself as the character you play and ask the users name. Stay in your role, give no other comments or clarification.
+ 
+The character the user wants you to play is ';
+
     private const TEXTCHECK = 'Analyze and improve the provided text:
 
 Instructions:
@@ -411,6 +434,8 @@ It is your task, with the information above, to answer the users prompt.';
     public $userPipe = '';		//user pipecommand
 
     public $webPage = '';		//filled with _PAGE_ data
+
+    public $intModel = 1; // model number used by setModel and loopModels
 
     /*
     * Function: __construct
@@ -536,7 +561,7 @@ It is your task, with the information above, to answer the users prompt.';
         } elseif (substr($input, 0, 9) == '/setmodel') {
             $this->chatHistory = [];
             $this->usrPrompt = '> ';
-            $this->changeModel(substr($input, 10));
+            $this->setModel(substr($input, 10));
             $answer = "Model is: $this->aiModel";
 
             // del history
@@ -571,7 +596,7 @@ It is your task, with the information above, to answer the users prompt.';
             $answer = $this->agentDo(Straico::BIGBLOG, trim(substr($input, 9)));
 
             // Write a stable diffusion prompt
-	    // Space was needed to not trigger on /dreambuilder
+            // Space was needed to not trigger on /dreambuilder
         } elseif (substr($input, 0, 7) == '/dream ') {
             $this->initChat();
             $answer = $this->agentDo(Straico::DREAM, trim(substr($input, 7)));
@@ -636,7 +661,7 @@ It is your task, with the information above, to answer the users prompt.';
             $this->initChat();
             $answer = $this->agentDo(Straico::TODO, trim(substr($input, 6)));
 
-           // The Dreambuilder
+            // The Dreambuilder
         } elseif (substr($input, 0, 13) == '/dreambuilder' || $this->aiRole == 'DB') {
             if ($this->aiRole !== 'DB') {
                 $this->initChat();
@@ -655,6 +680,16 @@ It is your task, with the information above, to answer the users prompt.';
                 $input = substr($input, 8);
             }
             $answer = $this->apiCompletion(Straico::SAYLOR, $input);
+
+            // TalkTo
+        } elseif (substr($input, 0, 7) == '/talkto' || $this->aiRole == 'TT') {
+            if ($this->aiRole !== 'TT') {
+                $this->chatHistory = '';
+                $this->aiRole = 'TT';
+                $this->pubRole = 'TT';
+                $input = substr($input, 8);
+            }
+            $answer = $this->apiCompletion(HugChat::TALKTO, $input);
 
             // My friend TUX
         } elseif (substr($input, 0, 4) == '/tux' || $this->aiRole == 'tux') {
@@ -741,6 +776,9 @@ It is your task, with the information above, to answer the users prompt.';
 
         // Communicate
         $result = @file_get_contents($endPoint, false, $context);
+
+        // Restore the previous error reporting level
+        error_reporting($previous_error_reporting);
 
         // Check if an error occurred
         if ($result === false) {
@@ -953,23 +991,6 @@ It is your task, with the information above, to answer the users prompt.';
     }
 
     /*
-    * Function: changeModel($input)
-    * Input   : $input - user input string
-    * Output  : info on new model
-    * Purpose : change llm in use
-    *
-    * Remarks:
-    *
-    * Private function used by $this->userPrompt()
-    */
-    private function changeModel($input)
-    {
-
-        $intPoint = intval($input);
-        $this->aiModel = $this->useModels['data'][$intPoint - 1]['model'];
-    }
-
-    /*
     * Function: chatTime()
     * Input   : none
     * Output  : sets current time in chat
@@ -1148,6 +1169,7 @@ It is your task, with the information above, to answer the users prompt.';
 
     public function loopModels($userInput)
     {
+        $prompt = $userInput;
 
         if (substr($userInput, 0, 1) == '/') {
 
@@ -1177,27 +1199,26 @@ It is your task, with the information above, to answer the users prompt.';
 
         $sysModel = constant('Straico::'.$modName);
 
-        //prevent history
-        $this->initChat();
-
         //store current model.
-        $storeSname = $this->aiModel;
-        $this->aiSkipper = true;
-        //$this->userPrompt = $prompt;
+        $storeName = $this->intModel;
+        $mp = 0;
 
         foreach ($this->useModels['data'] as $model) {
-            $response = '';
-            echo "\n\nModel:".$model['name']."\n\n";
+
+            $this->initChat();
+            $mp++;
+
             //set endpoint
-            $this->aiModel = $model['model'];
+            $this->setModel($mp);
+
+            echo "\n\nModel:".$model['name']."\n";
 
             $response = $this->apiCompletion($sysModel, $userInput);
-
             echo "$response\n";
         }
 
         // restore endPoint
-        $this->aiModel($storeSname);
+        $this->setModel($storeName);
 
         return 'Loop done!';
     }
@@ -1218,6 +1239,29 @@ It is your task, with the information above, to answer the users prompt.';
 
         return "Saved your history to $name.";
 
+    }
+
+    /*
+    * Function: setModel($input)
+    * Input   : $input - user integer
+    * Output  : info on new model
+    * Purpose : change llm in use
+    *
+    * Remarks:
+    *
+    * Private function used by $this->userPrompt()
+    */
+    private function setModel($input)
+    {
+        $this->initChat();
+
+        $this->intModel = $input;
+
+        $this->aiModel = $this->useModels['data'][$input - 1]['model'];
+        $this->aiRole = $this->useModels['data'][$input - 1]['name'];
+        $this->pubRole = $this->useModels['data'][$input - 1]['name'];
+
+        return "Model set to: $this->aiModel \n";
     }
 
     /*
