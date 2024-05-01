@@ -462,7 +462,7 @@ It is your task, with the information above, to answer the users prompt.';
     //of the size of generated text you want. Each new tokens slows down 
     //the request, so look for balance between response times and length 
     //of text generated.
-    public $max_new_tokens = 256;
+    public $max_new_tokens = 250;
 
     /*
     * Function: __construct
