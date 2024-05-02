@@ -845,23 +845,21 @@ It is your task, with the information above, to answer the users prompt.';
         $this->aiOutput = json_decode($result, JSON_OBJECT_AS_ARRAY);
 
         $this->aiAnswer = $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
-
+	$answer = $this->aiAnswer;
         //update History
 
         if ($this->historySwitch) {
-            $this->chatHistory[] = ['role' => 'assistant', 'content' => $this->aiAnswer];
-            $this->chatRoll .= 'assistant: '.$this->aiAnswer."\n\n";
+            $this->chatHistory[] = ['role' => 'assistant', 'content' => $answer];
+            $this->chatRoll .= 'assistant: '.$answer."\n\n";
         }
 
         //write to log
         if ($this->aiLog) {
-            $this->addLog($this->aiInput, $this->aiAnswer);
+            $this->addLog($this->aiInput, $answer);
         }
 
         //do pipe
-        if ($this->userPipe) {
-            $this->apiPipe();
-        }
+        if ($this->userPipe) $this->apiPipe();
 
         //format output and return it
 
@@ -1193,6 +1191,7 @@ It is your task, with the information above, to answer the users prompt.';
         $id = $this->logPath.'/'.$name.'.hist';
         $this->chatHistory = json_decode(file_get_contents($id));
 
+
         //fill chatrole
 
         foreach ($this->chatHistory as $role) {
@@ -1217,6 +1216,14 @@ It is your task, with the information above, to answer the users prompt.';
     public function loopModels($userInput)
     {
         $prompt = $userInput;
+
+        //store current model.
+        $storeName = $this->intModel;
+
+	//prevent repetitious pipe
+        if ($this->userPipe) $this->apiPipe();
+	$storePipe = $this->userPipe;
+	$this->userPipe ='';
 
         if (substr($userInput, 0, 1) == '/') {
 
@@ -1246,8 +1253,6 @@ It is your task, with the information above, to answer the users prompt.';
 
         $sysModel = constant('Straico::'.$modName);
 
-        //store current model.
-        $storeName = $this->intModel;
         $mp = 0;
 
         foreach ($this->useModels['data'] as $model) {
@@ -1266,6 +1271,9 @@ It is your task, with the information above, to answer the users prompt.';
 
         // restore endPoint
         $this->setModel($storeName);
+
+	// restore pipe
+	$this->userPipe = $storePipe;
 
         return 'Loop done!';
     }
