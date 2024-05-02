@@ -89,15 +89,15 @@ while ($aiMessage !== '/exit') {
     $aiMessage = $straico->userPrompt($prompt);
 
     // no input available?
-    if ($aiMessage == '') {
+    if (! $aiMessage) {
         continue;
     }
 
     // native answer
-    //echo $aiMessage."\n\n";
+    echo $aiMessage."\n\n";
 
     //lavarel answer
-    info('<fg=cyan>'.$aiMessage.'</>');
+    //info('<fg=cyan>'.$aiMessage.'</>');
 
 }
 ?>
