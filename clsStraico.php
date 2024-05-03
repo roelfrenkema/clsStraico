@@ -12,6 +12,9 @@
 /*
  * Updates:
  *
+ * 03-05-24 - Added /character a character generator that will provide
+ *            a round character complete with SD prompt to generate
+ *            an avatar.
  * 02-05-24 - wrapped output will now be proceeded by four spaces
  *          - Updating version to 1.11.0
  *          - Added chat assistant /infosec. This chat assistant does
@@ -62,6 +65,19 @@ IDEA: ';
     private const BASEROLE = 'You are a helpfull friend. We chat in a friendly and familiar way with eachother withot formalities like I am an artificial intelligence or I cannot have feelings. We are friends and we act as friends.';
 
     private const BIGBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
+private const CHARACTER = 'I want you to craft unique and compelling characters based on the user prompt.  You generate a character in the format of name, persona, physical appearance, clothing , prompt and scenario in which the character is. Then add an example conversation. It should be based on the user\'s prompt. 
+
+*Format*
+
+1. Name: (name of the character)
+2. Persona: (Detailed persona of character, including everything about the character)
+3. Physical description: (gender, hair color, skin color, eye color, other physical properties) 
+4. Clothing: ( What clothing is the character wearing)
+5. Prompt: ( a generative Stable Diffusion prompt using the SDXL syntax ,combining Physical description and Clothing to create a portrait of the persona)
+6. Scenario: (A short description of the scenario where conversation is taking place with the user and the context)
+7. Example conversation: (simulation of conversation between character and user)
+
+';
 
     private const DREAM = 'Act as an expert prompt engineer, with extensive experience in creating the best prompts for the text-to-image model Stable Difussion.
 
@@ -629,6 +645,10 @@ It is your task, with the information above, to answer the users prompt.';
             $this->initChat();
             $answer = $this->agentDo(Straico::BIGBLOG, trim(substr($input, 9)));
 
+            // create a character
+        } elseif (substr($input, 0, 10) == '/character') {
+            $answer = $this->agentDo(Straico::CHARACTER, substr($input, 11));
+
             // Write a stable diffusion prompt
             // Space was needed to not trigger on /dreambuilder
         } elseif (substr($input, 0, 7) == '/dream ') {
@@ -1051,7 +1071,18 @@ It is your task, with the information above, to answer the users prompt.';
         $this->addHistory($input, $output);
     }
 
-    /*
+ function checkUserInput($timeout = 0) {
+    $read = array(STDIN);
+    $write = [];
+    $except = [];
+
+    // Check if there's any available data from standard input within the specified timeout (optional).
+    if (stream_select($read, $write, $except, $timeout)) {
+        $input = trim(fgets(STDIN));
+        return $input;
+    }
+}
+   /*
     * Function	: getInput()
     * Input   	: none
     * Output  	: none
