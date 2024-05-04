@@ -65,7 +65,8 @@ IDEA: ';
     private const BASEROLE = 'You are a helpfull friend. We chat in a friendly and familiar way with eachother withot formalities like I am an artificial intelligence or I cannot have feelings. We are friends and we act as friends.';
 
     private const BIGBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
-private const CHARACTER = 'I want you to craft unique and compelling characters based on the user prompt.  You generate a character in the format of name, persona, physical appearance, clothing , prompt and scenario in which the character is. Then add an example conversation. It should be based on the user\'s prompt. 
+
+    private const CHARACTER = 'I want you to craft unique and compelling characters based on the user prompt.  You generate a character in the format of name, persona, physical appearance, clothing , prompt and scenario in which the character is. Then add an example conversation. It should be based on the user\'s prompt. 
 
 *Format*
 
@@ -869,7 +870,7 @@ It is your task, with the information above, to answer the users prompt.';
         $this->aiOutput = json_decode($result, JSON_OBJECT_AS_ARRAY);
 
         $this->aiAnswer = $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
-	$answer = $this->aiAnswer;
+        $answer = $this->aiAnswer;
         //update History
 
         if ($this->historySwitch) {
@@ -883,7 +884,9 @@ It is your task, with the information above, to answer the users prompt.';
         }
 
         //do pipe
-        if ($this->userPipe) $this->apiPipe();
+        if ($this->userPipe) {
+            $this->apiPipe();
+        }
 
         //format output and return it
 
@@ -1075,25 +1078,28 @@ It is your task, with the information above, to answer the users prompt.';
         $this->addHistory($input, $output);
     }
 
- function checkUserInput($timeout = 0) {
-    $read = array(STDIN);
-    $write = [];
-    $except = [];
+    public function checkUserInput($timeout = 0)
+    {
+        $read = [STDIN];
+        $write = [];
+        $except = [];
 
-    // Check if there's any available data from standard input within the specified timeout (optional).
-    if (stream_select($read, $write, $except, $timeout)) {
-        $input = trim(fgets(STDIN));
-        return $input;
+        // Check if there's any available data from standard input within the specified timeout (optional).
+        if (stream_select($read, $write, $except, $timeout)) {
+            $input = trim(fgets(STDIN));
+
+            return $input;
+        }
     }
-}
-   /*
-    * Function	: getInput()
-    * Input   	: none
-    * Output  	: none
-    * Purpose 	: get user input
-    * Return	: $string with catched input
-    * Remarks:
-    */
+
+    /*
+     * Function	: getInput()
+     * Input   	: none
+     * Output  	: none
+     * Purpose 	: get user input
+     * Return	: $string with catched input
+     * Remarks:
+     */
     public function getInput()
     {
 
@@ -1102,16 +1108,20 @@ It is your task, with the information above, to answer the users prompt.';
         return $input;
 
     }
-    private function getFile($fileName){
 
-	if (! is_file($fileName)) {
-	    $answer = "WARNING: File not found!\n";
-	}else{    
-	    $this->webPage = file_get_contents($fileName);
-	    $answer = "SUCCESS: File $fileName loaded!\n";
-	}
-	return $answer;
+    private function getFile($fileName)
+    {
+
+        if (! is_file($fileName)) {
+            $answer = "WARNING: File not found!\n";
+        } else {
+            $this->webPage = file_get_contents($fileName);
+            $answer = "SUCCESS: File $fileName loaded!\n";
+        }
+
+        return $answer;
     }
+
     /*
     * Function: getWebpage($url)
     * Input   : url of page
@@ -1135,8 +1145,8 @@ It is your task, with the information above, to answer the users prompt.';
 
         // Temporarily disable error reporting
         $previous_error_reporting = error_reporting(0);
-	
-	echo "current dir ".__DIR__."\n";
+
+        echo 'current dir '.__DIR__."\n";
 
         $this->webPage = @file_get_contents($url, false, $context);
 
@@ -1237,7 +1247,6 @@ It is your task, with the information above, to answer the users prompt.';
         $id = $this->logPath.'/'.$name.'.hist';
         $this->chatHistory = json_decode(file_get_contents($id));
 
-
         //fill chatrole
 
         foreach ($this->chatHistory as $role) {
@@ -1266,10 +1275,12 @@ It is your task, with the information above, to answer the users prompt.';
         //store current model.
         $storeName = $this->intModel;
 
-	//prevent repetitious pipe
-        if ($this->userPipe) $this->apiPipe();
-	$storePipe = $this->userPipe;
-	$this->userPipe ='';
+        //prevent repetitious pipe
+        if ($this->userPipe) {
+            $this->apiPipe();
+        }
+        $storePipe = $this->userPipe;
+        $this->userPipe = '';
 
         if (substr($userInput, 0, 1) == '/') {
 
@@ -1318,8 +1329,8 @@ It is your task, with the information above, to answer the users prompt.';
         // restore endPoint
         $this->setModel($storeName);
 
-	// restore pipe
-	$this->userPipe = $storePipe;
+        // restore pipe
+        $this->userPipe = $storePipe;
 
         return 'Loop done!';
     }
