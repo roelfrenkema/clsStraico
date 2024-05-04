@@ -554,6 +554,10 @@ It is your task, with the information above, to answer the users prompt.';
             }
             $answer = 'Returned to baserole';
 
+            // Get a file
+        } elseif (substr($input, 0, 8) == '/getfile') {
+            $answer = $this->getFile(substr($input, 9));
+
             // Get a webpage
         } elseif (substr($input, 0, 8) == '/getpage') {
             $answer = $this->getWebpage(substr($input, 9));
@@ -1098,7 +1102,16 @@ It is your task, with the information above, to answer the users prompt.';
         return $input;
 
     }
+    private function getFile($fileName){
 
+	if (! is_file($fileName)) {
+	    $answer = "WARNING: File not found!\n";
+	}else{    
+	    $this->webPage = file_get_contents($fileName);
+	    $answer = "SUCCESS: File $fileName loaded!\n";
+	}
+	return $answer;
+    }
     /*
     * Function: getWebpage($url)
     * Input   : url of page
@@ -1122,6 +1135,8 @@ It is your task, with the information above, to answer the users prompt.';
 
         // Temporarily disable error reporting
         $previous_error_reporting = error_reporting(0);
+	
+	echo "current dir ".__DIR__."\n";
 
         $this->webPage = @file_get_contents($url, false, $context);
 
