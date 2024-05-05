@@ -32,8 +32,9 @@ use function Laravel\Prompts\info;
 use function Laravel\Prompts\textarea;
 
 include 'clsStraico.php';
+include 'clsStraicoCli.php';
 
-$straico = new Straico;
+$straico = new clsStraicoCli;
 
 /*
  * Logpath now equals a working directory. All files are saved here like
@@ -86,7 +87,7 @@ while ($aiMessage !== '/exit') {
     $prompt = textarea('<fg=white>Prompting: '.$straico->aiModel.' in Role: '.$straico->pubRole.'</>');
 
     // process prompt
-    $aiMessage = $straico->userPrompt($prompt);
+    $aiMessage = $straico->sPrompt($prompt);
 
     // no input available?
     if (! $aiMessage) {
