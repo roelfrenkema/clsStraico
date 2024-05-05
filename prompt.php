@@ -26,13 +26,14 @@ $home = $_ENV['HOME'];
 
 // setting paths and including what we need
 
-set_include_path($home.'/git/clsStraico');
+set_include_path(get_include_path() . PATH_SEPARATOR . $home.'/git/clsStraico');
+
+require_once('clsStraico.php');
+require_once('clsStraicoCli.php');
+
 require_once $home.'/git/clsStraico/vendor/autoload.php';
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\textarea;
-
-include 'clsStraico.php';
-include 'clsStraicoCli.php';
 
 $straico = new clsStraicoCli;
 
@@ -77,28 +78,23 @@ $straico->aiModel = 'cohere/command-r-plus';
 
 $aiMessage = '';
 
-while ($aiMessage !== '/exit') {
+while( $aiMessage !== "/exit" ){
 
     //  native input input routine
     //$prompt = $straico->getInput();
     //echo "\n";
-
+    
     // lavarel input box
     $prompt = textarea('<fg=white>Prompting: '.$straico->aiModel.' in Role: '.$straico->pubRole.'</>');
-
+    
     // process prompt
-    $aiMessage = $straico->sPrompt($prompt);
-
+    $aiMessage = $straico->userPrompt($prompt);
+  
     // no input available?
-    if (! $aiMessage) {
-        continue;
-    }
-
+    if (! $aiMessage) continue;
+   
     // native answer
-    echo $aiMessage."\n\n";
-
-    //lavarel answer
-    //info('<fg=cyan>'.$aiMessage.'</>');
+    echo $aiMessage."\n";
 
 }
 ?>

@@ -494,6 +494,8 @@ It is your task, with the information above, to answer the users prompt.';
     //the request, so look for balance between response times and length
     //of text generated.
     public $max_new_tokens = 250;
+    
+    public $userHome = ''; //userHome dir
 
     /*
     * Function: __construct
@@ -528,6 +530,7 @@ It is your task, with the information above, to answer the users prompt.';
         if (getenv('WORD_WRAP')) {
             $this->aiWrap = getenv('WORD_WRAP');
         }
+	$this->userHome = $_ENV['HOME'];
         $this->userAgent = 'clsStraico.php v1.7.3 (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
         $this->initChat();
     }
@@ -736,20 +739,70 @@ It is your task, with the information above, to answer the users prompt.';
 	    }else{
 		$tag = str_replace(" ", "_", trim($tranform['name']));
 	    }
-	    $this->useModels[] = [ 'tag' => $tag, 'model' => $tranform['model']]; 
+	    $this->useModels[] = [ 'tag' => $tag, 
+	                           'model' => $tranform['model'],
+				   'pre' => '',
+                                   'past' => '',
+                                 ]; 
 	}
     }
+    /*
+    * Function: hugModels()
+    * Input   : none
+    * Output  : none
+    * Purpose : Retrieve huggingface text models
+    *
+    * Remarks:
+    */
 
-    protected function apiGet($endpoint)
+    protected function hugModels()
     {
+        try {
+            // Set up endpoint URL and API key
+            $endpoint = 'https://api-inference.huggingface.co/framework/text-generation-inference';
+	    $result = $this->apiGet($endpoint);
+	    
+/*            // Configure request options (headers and method)
+            $options = [
+                'http' => [
+                    'header' => "Content-Type: application/json\r\n",
+                    'method' => 'GET',
+                ],
+            ];
 
-        $endPoint = 'https://api.straico.com/v0/models';
-        $httpMethod = 'GET';
+            // Send HTTP GET request using configured context
+            $context = stream_context_create($options);
+            $result = file_get_contents($endpoint, false, $context);
+*/
+            // Decode JSON response into array
+            $answer = json_decode($result, true);
+
+            // Process models from the response
+            $this->useModels = [];
+            foreach ($answer as $model) {
+                $fname = $model['model_id'];
+                $nameParts = explode('/', $fname);
+                $tag = isset($nameParts[1]) ? $nameParts[1] : '';
+
+                $this->useModels[] = [
+                    'tag' => $tag,
+                    'model' => $fname,
+                    'pre' => '',
+                    'past' => '',
+                ];
+            }
+        } catch (\Exception $e) {
+            echo 'Error: '.$e->getMessage();
+        }
+    }
+
+    protected function apiGet($endPoint)
+    {
 
         $options = [
             'http' => [
                 'header' => 'Authorization: Bearer '.$this->apiKey."\r\n",
-                'method' => $httpMethod,
+                'method' => 'GET',
             ],
         ];
 
@@ -1025,6 +1078,24 @@ It is your task, with the information above, to answer the users prompt.';
         return $answer;
     }
     /*
+    * Function: loadModels()
+    * Input   : none
+    * Output  : print model list
+    * Purpose : printing a nicely formated model list with info and
+    *           pointer to use for /setmodel
+    *
+    * Remarks:
+    *
+    * Private function used by $this->userPrompt()
+    */
+
+    public function loadModels($name)
+    {
+        $this->useModels = [];
+        include $this->userHome.$name;
+    }
+
+    /*
     * Function: LoopModels($prompt)
     * Input   : userprompt
     * Output  : model answer
@@ -1127,15 +1198,15 @@ It is your task, with the information above, to answer the users prompt.';
     *
     * Private function used by $this->userPrompt()
     */
-    protected function setModel($input)
+    public function setModel($input)
     {
         $this->initChat();
 
         $this->intModel = $input;
 
         $this->aiModel = $this->useModels[$input - 1]['model'];
-        $this->aiRole = "> ";
-        $this->pubRole = "> ";
+        $this->aiRole = "cli ";
+        $this->pubRole = "cli ";
 
         return "Model set to: ".$this->aiModel." \n";
     }
