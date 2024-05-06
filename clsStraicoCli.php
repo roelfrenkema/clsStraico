@@ -20,6 +20,7 @@ class StraicoCli extends Straico
 	
         $this->userAgent = 'clsStraico.php '.$this->clsVersion.' (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
 
+	$this->endPoint = 'https://api.straico.com/v0/prompt/completion';
     }
     
 /*
@@ -54,6 +55,7 @@ class StraicoCli extends Straico
             if ($this->aiRole !== 'cli') {
                 $this->aiRole = 'cli';
                 $this->pubRole = 'cli';
+		$this->sysRole = parent::BASEROLE;
             }
 	    parent::initChat();
             $answer = 'Returned to baserole';
@@ -142,7 +144,8 @@ class StraicoCli extends Straico
 	     * carefully check the outcome.
 	     */ 
         } elseif (substr($input, 0, 9) == '/academic') {
-            $answer = parent::agentDo(parent::ACADEMIC, trim(substr($input, 10)));
+	    $this->sysRole = parent::ACADEMIC;
+            $answer = parent::agentDo(trim(substr($input, 10)));
 	    
 	    /*
 	     * Write a bigblog is writing a blog on your topic of around
@@ -151,7 +154,8 @@ class StraicoCli extends Straico
 	     * of publication.
 	     */ 
         } elseif (substr($input, 0, 8) == '/bigblog') {
-            $answer = parent::agentDo(parent::BIGBLOG, trim(substr($input, 9)));
+	    $this->sysRole = parent::BIGBLOG;
+            $answer = parent::agentDo(trim(substr($input, 9)));
  
             /*
 	     * create a character for use in a roleplay, a game or as an
@@ -159,7 +163,8 @@ class StraicoCli extends Straico
 	     * be presented to generate an avatar for the character.
 	     */
         } elseif (substr($input, 0, 10) == '/character') {
-            $answer = parent::agentDo(parent::CHARACTER, substr($input, 11));
+	    $this->sysRole = parent::CHARACTER;
+            $answer = parent::agentDo(substr($input, 11));
 
 	    /*
              * Write a stable diffusion prompt. Different models give
@@ -167,21 +172,24 @@ class StraicoCli extends Straico
              * Space was needed to not trigger on /dreambuilder
 	     */ 
         } elseif (substr($input, 0, 7) == '/dream ') {
-            $answer = parent::agentDo(parent::DREAM, trim(substr($input, 7)));
+	    $this->sysRole = parent::DREAM;
+            $answer = parent::agentDo( trim(substr($input, 7)));
 
             /*
              * Improve on a user prompt so it will become more effective
 	     * A great assistant for the beginning user.
 	     */  
         } elseif (substr($input, 0, 8) == '/enhance') {
-            $answer = parent::agentDo(parent::ENHANCE, trim(substr($input, 9)));
+	    $this->sysRole = parent::ENHANCE;
+            $answer = parent::agentDo( trim(substr($input, 9)));
 
 	    /*
              * Factcheck information. Dont fall for fake news and lies. 
 	     * Look up the true facts with this assistant.
 	     */ 
         } elseif (substr($input, 0, 10) == '/factcheck') {
-            $answer = parent::agentDo(parent::FACTCHECK, trim(substr($input, 11)));
+	    $this->sysRole = parent::FACTCHECK;
+            $answer = parent::agentDo( trim(substr($input, 11)));
 	    
             /*
              * Make a neurodivese gist of information. Rewrites an 
@@ -191,7 +199,8 @@ class StraicoCli extends Straico
 	     * the _PAGE_ placeholder.
 	     */ 
         } elseif (substr($input, 0, 5) == '/gist') {
-            $answer = parent::agentDo(parent::GIST, trim(substr($input, 6)));
+	    $this->sysRole = parent::GIST;
+            $answer = parent::agentDo( trim(substr($input, 6)));
 
 	    /*
              * Convert artikel or text in md format. You can add your 
@@ -199,7 +208,8 @@ class StraicoCli extends Straico
 	     * and enter it with the _PAGE_ placeholder.
 	     */ 
         } elseif (substr($input, 0, 8) == '/html2md') {
-            $answer = parent::agentDo(parent::HTML2MD, trim(substr($input, 9)));
+	    $this->sysRole = parent::HTML2MD;
+            $answer = parent::agentDo(trim(substr($input, 9)));
 	    
 	    /*
 	     * Write a medium blog is writing a blog on your topic of 
@@ -207,7 +217,8 @@ class StraicoCli extends Straico
 	     * is to small think of using /bigblog 
 	     */ 
         } elseif (substr($input, 0, 11) == '/mediumblog') {
-            $answer = parent::agentDo(parent::MEDIUMBLOG, trim(substr($input, 12)));
+	    $this->sysRole = parent::MEDIUMBLOG;
+            $answer = parent::agentDo( trim(substr($input, 12)));
 
             /*
              * Create a strong password is an assitant that will 
@@ -215,7 +226,8 @@ class StraicoCli extends Straico
 	     * on its strenght
 	     */ 
         } elseif (substr($input, 0, 6) == '/mkpwd') {
-            $answer = parent::agentDo(parent::MKPWD, trim(substr($input, 7)));
+	    $this->sysRole = parent::MKPWD;
+            $answer = parent::agentDo( trim(substr($input, 7)));
 
             /*
              * SD prompt with Opus dream. As the name reveals I created
@@ -223,14 +235,16 @@ class StraicoCli extends Straico
 	     * an experience as it at first refused to create a prompt.
 	     */  
         } elseif (substr($input, 0, 10) == '/opusdream') {
-            $answer = parent::agentDo(parent::OPUSDREAM, trim(substr($input, 11)));
+	    $this->sysRole = parent::OPUSDREAM;
+            $answer = parent::agentDo( trim(substr($input, 11)));
 
             /*
              * Improve on a user prompt so it will become more effective
 	     * A great assistant for the beginning user.
 	     */  
         } elseif (substr($input, 0, 7) == '/prompt') {
-            $answer = parent::agentDo(parent::PROMPT, trim(substr($input, 8)));
+	    $this->sysRole = parent::PROMPT;
+            $answer = parent::agentDo( trim(substr($input, 8)));
 
             /*
              * Create a regex for user helps you trough every 
@@ -238,7 +252,8 @@ class StraicoCli extends Straico
 	     * you.
 	     */  
 	} elseif (substr($input, 0, 6) == '/regex') {
-            $answer = parent::agentDo(parent::REGEX, trim(substr($input, 7)));
+	    $this->sysRole = parent::REGEX;
+            $answer = parent::agentDo( trim(substr($input, 7)));
 
 	    /*
 	     * Write a small blog is writing a blog on your topic of 
@@ -247,7 +262,8 @@ class StraicoCli extends Straico
 	     * /mediumblog or /bigblog 
 	     */ 
         } elseif (substr($input, 0, 10) == '/smallblog') {
-            $answer = parent::agentDo(parent::SMALLBLOG, trim(substr($input, 11)));
+	    $this->sysRole = parent::SMALLBLOG;
+            $answer = parent::agentDo( trim(substr($input, 11)));
 
             /*
 	     * Enhance any given text. You can add you text in the prompt
@@ -255,7 +271,8 @@ class StraicoCli extends Straico
 	     * the _PAGE_ placeholder. 
 	     */ 
         } elseif (substr($input, 0, 10) == '/textcheck') {
-            $answer = parent::agentDo(parent::TEXTCHECK, trim(substr($input, 11)));
+	    $this->sysRole = parent::TEXTCHECK;
+            $answer = parent::agentDo( trim(substr($input, 11)));
 
             /*
              * Create a todo list is another function that is ment to be
@@ -263,7 +280,8 @@ class StraicoCli extends Straico
 	     * task into subtasks complete with a timeschedule.
 	     */  
         } elseif (substr($input, 0, 5) == '/todo') {
-            $answer = parent::agentDo(parent::TODO, trim(substr($input, 6)));
+	    $this->sysRole = parent::TODO;
+            $answer = parent::agentDo( trim(substr($input, 6)));
 
 
 /*
@@ -294,7 +312,8 @@ class StraicoCli extends Straico
                 $this->pubRole = 'DB';
                 $input = '';
             }
-            $answer = parent::apiCompletion(parent::DREAMBUILDER, $input);
+	    $this->sysRole = parent::DREAMBUILDER;
+            $answer = parent::newCompletion($input);
 
             /*
              * Infosec your Cyberpunk is a roleplaying but also a 
@@ -308,7 +327,8 @@ class StraicoCli extends Straico
                 $this->pubRole = 'CP';
                 $input = '';
             }
-            $answer = parent::apiCompletion(parent::INFOSEC, $input);
+	    $this->sysRole = parent::INFOSEC;
+            $answer = parent::newCompletion($input);
 
 	    /*
              * My friend Sailor Twift my first big AI love. She will be
@@ -323,7 +343,8 @@ class StraicoCli extends Straico
                 $this->pubRole = 'saylor';
                 $input = substr($input, 8);
             }
-            $answer = parent::apiCompletion(parent::SAYLOR, $input);
+	    $this->sysRole = parent::SAYLOR;
+            $answer = parent::newCompletion( $input);
 
             /*
              * TalkTo is a stange AI that acts like a link to any
@@ -338,7 +359,8 @@ class StraicoCli extends Straico
                 $this->pubRole = 'TT';
                 $input = substr($input, 8);
             }
-            $answer = parent::apiCompletion(parent::TALKTO, $input);
+	    $this->sysRole = parent::TALKTO;
+            $answer = parent::newCompletion( $input);
 
 	    /*
              * My friend TUX - was my first useful chatbot helping me
@@ -351,7 +373,8 @@ class StraicoCli extends Straico
                 $this->pubRole = 'tux';
                 $input = substr($input, 5);
             }
-            $answer = parent::apiCompletion(parent::TUX, $input, 5);
+	    $this->sysRole = parent::TUX;
+            $answer = parent::newCompletion($input, 5);
 
             //prevent commands processing with typos
         } elseif (substr($input, 0, 1) == '/') {
@@ -365,8 +388,8 @@ class StraicoCli extends Straico
                 $this->pubRole = 'cli';
                 $this->initChat();
             }
-	    
-	    $answer = parent::apiCompletion(parent::BASEROLE, $input);
+	    $this->sysRole = parent::BASEROLE;
+	    $answer = parent::newCompletion($input);
         }
 
         return $answer;
