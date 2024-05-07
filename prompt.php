@@ -67,9 +67,8 @@ $straico->logPath = $home.'/git/clsStraico/';
  */
 $straico->historySwitch = false;
 
-// your model to start with
-
-$straico->aiModel = 'cohere/command-r-plus';
+//'13' being llama atm check model number by listmodels
+$straico->setModel(13);
 
 /*
     Start looping till finished with /exit
