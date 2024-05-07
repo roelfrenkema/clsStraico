@@ -14,9 +14,9 @@
  * 05-05-25 - starting extendinding class
  *          - Method userPrompt has left the room and is now a class
  *            extending this one.
- * 
+ *
  * 04-05-25 - Added /getfile methode
- * 
+ *
  * 03-05-24 - Added /character a character generator that will provide
  *            a round character complete with SD prompt to generate
  *            an avatar.
@@ -495,20 +495,20 @@ It is your task, with the information above, to answer the users prompt.';
     //of text generated.
     public $max_new_tokens = 250;
 
-    //if set to True, this parameter enables decoding strategies such as 
-    //multinomial sampling, beam-search multinomial sampling, Top-K 
-    //sampling and Top-p sampling. All these strategies select the next 
-    //token from the probability distribution over the entire vocabulary 
-    //with various strategy-specific adjustments.    
+    //if set to True, this parameter enables decoding strategies such as
+    //multinomial sampling, beam-search multinomial sampling, Top-K
+    //sampling and Top-p sampling. All these strategies select the next
+    //token from the probability distribution over the entire vocabulary
+    //with various strategy-specific adjustments.
     public $do_sample = true;
-    
+
     public $userHome = ''; //userHome dir
 
-    public $sysRole = ""; //system prompt
-    
+    public $sysRole = ''; //system prompt
+
     // endpoint that should be called. Best place to set is is probably
-    // Cli routine. Then in setmodels add model for huggingface 
-    public $endPoint = ""; //endpoint that needs to be called 
+    // Cli routine. Then in setmodels add model for huggingface
+    public $endPoint = ''; //endpoint that needs to be called
 
     /*
     * Function: __construct
@@ -533,27 +533,28 @@ It is your task, with the information above, to answer the users prompt.';
         if (! extension_loaded('openssl')) {
             exit("PHP module openssl is needed to run clsStraico. Please install it. Exiting!\n");
         }
-/* 
- * Should not be set here but in the extension.
- * 
- *        if (getenv('STRAICO_APIKEY')) {
-            $this->apiKey = getenv('STRAICO_APIKEY');
-        } else {
-            exit("Could not find environment variable STRAICO_APIKEY with the API key. Exiting!\n");
-        }
-*/
+        /*
+         * Should not be set here but in the extension.
+         *
+         *        if (getenv('STRAICO_APIKEY')) {
+                    $this->apiKey = getenv('STRAICO_APIKEY');
+                } else {
+                    exit("Could not find environment variable STRAICO_APIKEY with the API key. Exiting!\n");
+                }
+        */
         $this->arUser = $this->apiUser();
         $this->straicoModels();
         if (getenv('WORD_WRAP')) {
             $this->aiWrap = getenv('WORD_WRAP');
         }
-	$this->userHome = $_ENV['HOME'];
+        $this->userHome = $_ENV['HOME'];
         $this->userAgent = 'clsStraico.php v1.7.3 (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
         $this->initChat();
     }
 
-// works
-    protected function apiPost($context){
+    // works
+    protected function apiPost($context)
+    {
 
         // Temporarily disable error reporting
         $previous_error_reporting = error_reporting(0);
@@ -579,9 +580,9 @@ It is your task, with the information above, to answer the users prompt.';
             }
         }
 
-	return $result;
+        return $result;
     }
-    
+
     /*
     * Function: apiCompletion($aiMessage)
     * Input   : $aiMessage - is the prompt
@@ -598,7 +599,6 @@ It is your task, with the information above, to answer the users prompt.';
 
         $endPoint = 'https://api.straico.com/v0/prompt/completion';
 
-
         // Add webpage if requested
         if (strpos($userInput, '_PAGE_')) {
             $userInput = str_replace('_PAGE_', $this->webPage, $userInput);
@@ -609,16 +609,16 @@ It is your task, with the information above, to answer the users prompt.';
 
         if ($this->chatRoll) {
             $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll .= "user: ".$this->aiInput."\n\n";
+            $this->chatRoll .= 'user: '.$this->aiInput."\n\n";
         } else {
             $this->chatHistory[] = ['role' => 'system', 'content' => $this->sysRole];
             $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll = 'system: '.$this->sysRole."\n\n"."user: ".$this->aiInput."\n\n";
+            $this->chatRoll = 'system: '.$this->sysRole."\n\n".'user: '.$this->aiInput."\n\n";
         }
 
         $aiMessage = $this->chatRoll;
-//var_dump($aiMessage);
-//exit("EXITING aicompletion\n");
+        //var_dump($aiMessage);
+        //exit("EXITING aicompletion\n");
 
         // Prepare query
         $data = http_build_query(['model' => $this->aiModel,
@@ -633,8 +633,8 @@ It is your task, with the information above, to answer the users prompt.';
                 'content' => $data,
             ],
         ];
-var_dump($options);
-exit("EXIT: ApiCompletion\n");
+        var_dump($options);
+        exit("EXIT: ApiCompletion\n");
 
         // Create stream
         $context = stream_context_create($options);
@@ -697,100 +697,144 @@ exit("EXIT: ApiCompletion\n");
 
         return $answer;
     }
+
     /*
-    * Function: apiCompletion($sysRole,$userInput)
-    * Input   : $sysRole - the task for system
+    * Function: newCompletion($userInput)
     * Input   : $userInput - is the prompt
     * Output  : returns response content
     * Purpose : Complete an API call with the prompt info
     *
     * Remarks:
     *
-    * Returns the response content. At later time this will be
-    * adjusted to reflect the other information
     */
-    public function hugCompletion($sysRole, $userInput)
+    public function newCompletion($userInput)
     {
 
-        $endPoint = 'https://api-inference.huggingface.co/models/'.$this->aiModel;
-
-        // Store LLM input for debugging routine
-        $this->aiInput = $userInput;
-
-        if (! $this->chatHistory) {
-            // For the first conversation turn, only include the system prompt and user input
-            $this->chatHistory = "<|system|>\n".$this->sysRole."<|end|>\n";
-            $this->chatHistory .= "<|user|>\n".$this->aiInput."<|end|>\n";
-            $this->chatHistory .= "<|assistant|>\n";
-        } else {
-            //build converstation
-            $this->chatHistory .= "<|user|>\n".$this->aiInput."<|end|>\n";
-            $this->chatHistory .= "<|assistant|>\n";
+        // Add webpage if requested
+        if (strpos($userInput, '_PAGE_')) {
+            $userInput = str_replace('_PAGE_', $this->webPage, $userInput);
         }
 
-        //are userdefined too
+        // Store LLM input for debugging and pipe routine
+        $this->aiInput = $userInput;
+
+        if (substr($this->apiKey, 0, 2) === 'hf') {
+            $this->hugAddUserInput();
+            $aiMessage = $this->chatHistory;
+            $contype = 'Content-Type: application/json';
+        } else {
+            $this->straicoAddUserInput();
+            $aiMessage = $this->chatRoll;
+            $contype = 'Content-Type: application/x-www-form-urlencoded';
+        }
+        $parameters = $this->setParameters();
+
+        //Prepare payload
+
+        //prepare payload for huggingface
+        if (substr($this->apiKey, 0, 2) === 'hf') {
+            $payload = json_encode([
+                'model' => $this->aiModel,
+                'inputs' => $aiMessage,
+                'parameters' => $parameters,
+            ]);
+        } else {
+            // Prepare query Straico
+            $payload = http_build_query([
+                'model' => $this->aiModel,
+                'message' => $aiMessage,
+            ]);
+        }
+
+        // Prepare options
+        $options = $this->setOptions($payload, $contype);
+
+        // Create stream
+        $context = stream_context_create($options);
+
+        // Call api
+        $result = $this->apiPost($context);
+
+        $this->aiOutput = json_decode($result, true);
+
+        //Handoff to hf or straico proccessing from here
+        if (substr($this->apiKey, 0, 2) === 'hf') {
+            $answer = $this->hugProcessAnswer();
+        } else {
+            $answer = $this->straicoProcessAnswer();
+        }
+
+        //write to log
+        if ($this->aiLog) {
+            $this->addLog($this->aiInput, $answer);
+        }
+
+        //do pipe
+        if ($this->userPipe) {
+            $this->apiPipe();
+        }
+
+        //format output and return it
+        if ($this->aiWrap > 0) {
+            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
+            $temp = str_replace("\n", "\n    ", $answer);
+            $answer = '    '.$temp."\n";
+        }
+        //reset history if we dont want it.
+        if (! $this->historySwitch) {
+            $this->initChat();
+        }
+
+        return $answer;
+    }
+
+    protected function setParameters()
+    {
         $parameters = [
-            'do_sample' => false,
-            'return_full_text' => false,
-            'top_k' => 50,
-            'temperature' => 0.7,
-            'repetition_penalty' => 1.1,
-            'max_new_tokens' => 1024,
+            'do_sample' => $this->do_sample,
+            'return_full_text' => $this->return_full_text,
+            'top_k' => $this->top_k,
+            'temperature' => $this->temperature,
+            'repetition_penalty' => $this->repetition_penalty,
+            'max_new_tokens' => $this->max_new_tokens,
         ];
 
-        // Prepare query
-        $payload = json_encode([
-            'inputs' => $this->chatHistory,
-            'parameters' => $parameters,
-        ]);
+        return $parameters;
+    }
 
+    protected function setOptions($payload, $contype)
+    {
         // Prepare options
         $options = [
             'http' => [
                 'header' => 'Authorization: Bearer '.$this->apiKey."\r\n".
-                    "Content-Type: application/json\r\n".
+                    $contype."\r\n".
                     'User-Agent: '.$this->userAgent." \r\n",
                 'method' => 'POST',
                 'content' => $payload,
             ],
         ];
-var_dump($options);
-exit("EXIT hugCompletion \n
-");
-        // Create stream
-        $context = stream_context_create($options);
-	
-	$result = $this->apiPost($context);
-/*
-        // Temporarily disable error reporting
-        $previous_error_reporting = error_reporting(0);
 
-        // Communicate
-        $result = @file_get_contents($endPoint, false, $context);
+        return $options;
+    }
 
-        // Restore the previous error reporting level
-        error_reporting($previous_error_reporting);
+    protected function straicoProcessAnswer()
+    {
 
-        // Check if an error occurred
-        if ($result === false) {
-            $error = error_get_last();
-            if ($error !== null) {
-                $message = explode(':', $error['message']);
-                echo "Error: {$message[3]} This can be a temporary API failure, try again later!\n";
+        $this->aiAnswer = $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
+        $answer = $this->aiAnswer;
+        //update History
 
-                return;
-            } else {
-                echo "An unknown error occurred while fetching your answer. Please try again!\n";
-
-                return;
-            }
+        if ($this->historySwitch) {
+            $this->chatHistory[] = ['role' => 'assistant', 'content' => $answer];
+            $this->chatRoll .= 'assistant: '.$answer."\n\n";
         }
 
-        // Restore the previous error reporting level
-        error_reporting($previous_error_reporting);
-*/
-        $this->aiOutput = json_decode($result, JSON_OBJECT_AS_ARRAY);
+        return $answer;
+    }
 
+    protected function hugProcessAnswer()
+    {
         //extract continue chat
         $generatedText = $this->aiOutput[0]['generated_text'];
 
@@ -811,7 +855,6 @@ exit("EXIT hugCompletion \n
         }
 
         //format output and return it
-
         if ($this->aiWrap > 0) {
             $answer = wordwrap($answer, $this->aiWrap, "\n", true);
             $temp = str_replace("\n", "\n    ", $answer);
@@ -820,151 +863,9 @@ exit("EXIT hugCompletion \n
 
         return $answer;
     }
-    function newCompletion($userInput){
 
-        // Add webpage if requested
-        if (strpos($userInput, '_PAGE_')) $userInput = str_replace('_PAGE_', $this->webPage, $userInput);
-
-	// Store LLM input for debugging and pipe routine
-        $this->aiInput = $userInput;
-	
-	if(substr($this->apiKey,0,2) === "hf"){
-	    $this->hugAddUserInput();
-	    $aiMessage = $this->chatHistory;
-	    $contype = "Content-Type: application/json";
-	}else{
-	    $this->straicoAddUserInput();
-            $aiMessage = $this->chatRoll;
-	    $contype = "Content-Type: application/x-www-form-urlencoded";
-	}
-//var_dump($aiMessage);
-//exit("EXITING newcompletion\n");
-
-        //parameters 
-	$parameters = $this->setParameters();
-	
-	//Prepare payload
-	
-	//prepare payload for huggingface
-	if(substr($this->apiKey,0,2) === "hf"){
-	    $payload = json_encode([
-		'model' => $this->aiModel,
-		'inputs' => $aiMessage,
-		'parameters' => $parameters,
-	    ]);
-	}else{
-	// Prepare query Straico
-        $payload = http_build_query([
-		'model' => $this->aiModel,
-		'message' => $aiMessage
-	    ]);
-	}
-	
-	
-        // Prepare options
-	$options = $this->setOptions($payload, $contype);
-
-        // Create stream
-        $context = stream_context_create($options);
-	
-	// Call api
-	$result = $this->apiPost($context);
-	
-        $this->aiOutput = json_decode($result, true);
-
-	//Handoff to hf or straico proccessing from here
-	if(substr($this->apiKey,0,2) === "hf"){
-	    $answer = $this->hugProcessAnswer();
-	}else{
-	    $answer = $this->straicoProcessAnswer();
-	}
-	
-        //write to log
-        if ($this->aiLog) $this->addLog($this->aiInput, $answer);
-
-
-        //do pipe
-        if ($this->userPipe) $this->apiPipe();
-
-
-        //format output and return it
-        if ($this->aiWrap > 0) {
-            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
-            $temp = str_replace("\n", "\n    ", $answer);
-            $answer = '    '.$temp."\n";
-        }
-	//reset history if we dont want it.
-	if (! $this->historySwitch ) $this->initChat();
-	
-	return $answer;
-    }
-	 
-    protected function setParameters(){
-    	    $parameters = [
-            'do_sample' => $this->do_sample,
-            'return_full_text' => $this->return_full_text,
-            'top_k' => $this->top_k,
-            'temperature' => $this->temperature,
-            'repetition_penalty' => $this->repetition_penalty,
-            'max_new_tokens' => $this->max_new_tokens,
-        ];
-	return $parameters;
-    }
-    protected function setOptions($payload,$contype){
-	// Prepare options
-        $options = [
-            'http' => [
-                'header' => 'Authorization: Bearer '.$this->apiKey."\r\n".
-                    $contype."\r\n".
-                    'User-Agent: '.$this->userAgent." \r\n",
-                'method' => 'POST',
-                'content' => $payload,
-            ],
-        ];
-	return $options;
-    }
-    protected function straicoProcessAnswer(){
-
-        $this->aiAnswer = $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
-        $answer = $this->aiAnswer;
-        //update History
-
-        if ($this->historySwitch) {
-            $this->chatHistory[] = ['role' => 'assistant', 'content' => $answer];
-            $this->chatRoll .= 'assistant: '.$answer."\n\n";
-        }
-
-        return $answer;
-    }
-    
-    protected function hugProcessAnswer(){
-	//extract continue chat
-        $generatedText = $this->aiOutput[0]['generated_text'];
-
-        //extract answer
-        $chunks = explode('<|end|>', $generatedText);
-        $answer = $chunks[0];
-
-        $this->chatHistory .= "$answer<|end|>\n";
-
-        if ($this->aiLog) {
-            $file = $this->logPath.'HugChat.log';
-            file_put_contents($file, "ME:\n".$this->aiInput."\n\n", FILE_APPEND);
-            file_put_contents($file, $this->aiModel.":\n".$answer."\n\n", FILE_APPEND);
-        }
-
-        if ($this->userPipe) $this->apiPipe();
-
-        //format output and return it
-        if ($this->aiWrap > 0) {
-            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
-            $temp = str_replace("\n", "\n    ", $answer);
-            $answer = '    '.$temp."\n";
-        }
-        return $answer;
-    }
-
-    protected function hugAddUserInput(){
+    protected function hugAddUserInput()
+    {
 
         if (! $this->chatHistory) {
             // For the first conversation turn, only include the system prompt and user input
@@ -976,20 +877,23 @@ exit("EXIT hugCompletion \n
             $this->chatHistory .= "<|user|>\n".$this->aiInput."<|end|>\n";
             $this->chatHistory .= "<|assistant|>\n";
         }
-	return;
+
     }
-    protected function straicoAddUserInput(){
+
+    protected function straicoAddUserInput()
+    {
 
         if ($this->chatRoll) {
             $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll .= "user: ".$this->aiInput."\n\n";
+            $this->chatRoll .= 'user: '.$this->aiInput."\n\n";
         } else {
             $this->chatHistory[] = ['role' => 'system', 'content' => $this->sysRole];
             $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll = 'system: '.$this->sysRole."\n\n"."user: ".$this->aiInput."\n\n";
+            $this->chatRoll = 'system: '.$this->sysRole."\n\n".'user: '.$this->aiInput."\n\n";
         }
-	return;
-    }    
+
+    }
+
     /*
     * Function: agentDo($name,$input)
     * Input   : $name = constant name $prompt userinput
@@ -999,15 +903,15 @@ exit("EXIT hugCompletion \n
     * Remarks:
     *
     */
-    protected function agentDo($sysRole, $userInput)
+    protected function agentDo( $userInput)
     {
 
         $storeHistory = $this->chatHistory;
         $storeChat = $this->chatRoll;
-       
+
         $this->initChat();
 
-        $answer = $this->apiCompletion($sysRole, $userInput);
+        $answer = $this->newCompletion($userInput);
 
         $this->chatHistory = $storeHistory;
         $this->chatRoll = $storeChat;
@@ -1067,28 +971,27 @@ exit("EXIT hugCompletion \n
 
         $endPoint = 'https://api.straico.com/v0/models';
 
-	$result = $this->apiGet($endPoint);
-	
-	$modelArray = json_decode($result, true);
+        $result = $this->apiGet($endPoint);
 
-	$chModels = $modelArray['data'];
+        $modelArray = json_decode($result, true);
 
-	
-	foreach( $chModels as $tranform){
+        $chModels = $modelArray['data'];
 
-	    //create usable tag.
-	    $granate = explode(":",$tranform['name']);
-	    if(array_key_exists(1,$granate)){
-		$tag = str_replace(" ", "_", trim($granate[1]));
-	    }else{
-		$tag = str_replace(" ", "_", trim($tranform['name']));
-	    }
-	    $this->useModels[] = [ 'tag' => $tag, 
-	                           'model' => $tranform['model'],
-				   'pre' => '',
-                                   'past' => '',
-                                 ]; 
-	}
+        foreach ($chModels as $tranform) {
+
+            //create usable tag.
+            $granate = explode(':', $tranform['name']);
+            if (array_key_exists(1, $granate)) {
+                $tag = str_replace(' ', '_', trim($granate[1]));
+            } else {
+                $tag = str_replace(' ', '_', trim($tranform['name']));
+            }
+            $this->useModels[] = ['tag' => $tag,
+                'model' => $tranform['model'],
+                'pre' => '',
+                'past' => '',
+            ];
+        }
     }
     /*
     * Function: hugModels()
@@ -1104,20 +1007,20 @@ exit("EXIT hugCompletion \n
         try {
             // Set up endpoint URL and API key
             $endpoint = 'https://api-inference.huggingface.co/framework/text-generation-inference';
-	    $result = $this->apiGet($endpoint);
-	    
-/*            // Configure request options (headers and method)
-            $options = [
-                'http' => [
-                    'header' => "Content-Type: application/json\r\n",
-                    'method' => 'GET',
-                ],
-            ];
+            $result = $this->apiGet($endpoint);
 
-            // Send HTTP GET request using configured context
-            $context = stream_context_create($options);
-            $result = file_get_contents($endpoint, false, $context);
-*/
+            /*            // Configure request options (headers and method)
+                        $options = [
+                            'http' => [
+                                'header' => "Content-Type: application/json\r\n",
+                                'method' => 'GET',
+                            ],
+                        ];
+
+                        // Send HTTP GET request using configured context
+                        $context = stream_context_create($options);
+                        $result = file_get_contents($endpoint, false, $context);
+            */
             // Decode JSON response into array
             $answer = json_decode($result, true);
 
@@ -1348,6 +1251,7 @@ exit("EXIT hugCompletion \n
         $this->chatHistory = [];
         $this->chatRoll = '';
     }
+
     /*
     * Function: listModels()
     * Input   : none
@@ -1391,7 +1295,6 @@ exit("EXIT hugCompletion \n
 
         return $modelsFound;
     }
-
 
     /*
     * Function: loadHistory($name)
@@ -1456,7 +1359,9 @@ exit("EXIT hugCompletion \n
         $storeName = $this->intModel;
 
         //prevent repetitious pipe
-        if ($this->userPipe) $this->apiPipe();
+        if ($this->userPipe) {
+            $this->apiPipe();
+        }
         $storePipe = $this->userPipe;
         $this->userPipe = '';
 
@@ -1549,13 +1454,15 @@ exit("EXIT hugCompletion \n
         $this->intModel = $input;
 
         $this->aiModel = $this->useModels[$input - 1]['model'];
-        $this->aiRole = "cli ";
-        $this->pubRole = "cli ";
+        $this->aiRole = 'cli ';
+        $this->pubRole = 'cli ';
 
-	//replace endpoint for Huggingface
-	if(substr($this->apiKey,0,2) === "hf") $this->endPoint .= $this->aiModel; 
+        //replace endpoint for Huggingface
+        if (substr($this->apiKey, 0, 2) === 'hf') {
+            $this->endPoint .= $this->aiModel;
+        }
 
-        return "Model set to: ".$this->aiModel." \n";
+        return 'Model set to: '.$this->aiModel." \n";
     }
 
     /*
