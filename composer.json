@@ -3,6 +3,8 @@
         "laravel/pint": "^1.15"
     },
     "require": {
-        "laravel/prompts": "^0.1.20"
+        "laravel/prompts": "^0.1.20",
+        "symfony/browser-kit": "^7.0",
+        "symfony/http-client": "^7.0"
     }
 }
