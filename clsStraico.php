@@ -67,7 +67,7 @@ Your task is to create a paper or article based on the information above, and th
 
 IDEA: ';
 
-    protected const BASEROLE = 'You are a helpfull friend. We chat in a friendly and familiar way with eachother withot formalities like I am an artificial intelligence or I cannot have feelings. We are friends and we act as friends.';
+    protected const BASEROLE = 'You are a helpfull friend. We chat in a friendly and familiar way with eachother without formalities like I am an artificial intelligence or I cannot have feelings. We are friends and we act as friends.';
 
     protected const BIGBLOG = 'Craft a captivating and engaging 1000-word blog post on the Given subject. Consider incorporating the following elements to enhance reader interest and foster a thought-provoking exploration of the subject: delve into the history, analyze it, explore it, provide a call to action. The subject is: ';
 
@@ -555,12 +555,17 @@ It is your task, with the information above, to answer the users prompt.';
     // works
     protected function apiPost($context)
     {
-
         // Temporarily disable error reporting
         $previous_error_reporting = error_reporting(0);
 
+        if (substr($this->apiKey, 0, 2) === 'hf') {
+	    $endpoint = $this->endPoint . $this->aiModel;
+	}else{
+	    $endpoint = $this->endPoint;
+	}
+
         // Communicate
-        $result = @file_get_contents($this->endPoint, false, $context);
+        $result = @file_get_contents($endpoint, false, $context);
 
         // Restore the previous error reporting level
         error_reporting($previous_error_reporting);
@@ -709,7 +714,6 @@ It is your task, with the information above, to answer the users prompt.';
     */
     public function newCompletion($userInput)
     {
-
         // Add webpage if requested
         if (strpos($userInput, '_PAGE_')) {
             $userInput = str_replace('_PAGE_', $this->webPage, $userInput);
@@ -734,7 +738,7 @@ It is your task, with the information above, to answer the users prompt.';
         //prepare payload for huggingface
         if (substr($this->apiKey, 0, 2) === 'hf') {
             $payload = json_encode([
-                'model' => $this->aiModel,
+//                'model' => $this->aiModel,
                 'inputs' => $aiMessage,
                 'parameters' => $parameters,
             ]);
@@ -745,9 +749,9 @@ It is your task, with the information above, to answer the users prompt.';
                 'message' => $aiMessage,
             ]);
         }
-
         // Prepare options
         $options = $this->setOptions($payload, $contype);
+
 
         // Create stream
         $context = stream_context_create($options);
@@ -784,7 +788,6 @@ It is your task, with the information above, to answer the users prompt.';
         if (! $this->historySwitch) {
             $this->initChat();
         }
-
         return $answer;
     }
 
@@ -911,7 +914,7 @@ It is your task, with the information above, to answer the users prompt.';
 
         $this->initChat();
 
-        $answer = $this->newCompletion($userInput);
+        $answer = $this->newcompletion($userInput);
 
         $this->chatHistory = $storeHistory;
         $this->chatRoll = $storeChat;
@@ -1457,10 +1460,6 @@ It is your task, with the information above, to answer the users prompt.';
         $this->aiRole = 'cli ';
         $this->pubRole = 'cli ';
 
-        //replace endpoint for Huggingface
-        if (substr($this->apiKey, 0, 2) === 'hf') {
-            $this->endPoint .= $this->aiModel;
-        }
 
         return 'Model set to: '.$this->aiModel." \n";
     }
