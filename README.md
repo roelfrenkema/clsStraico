@@ -2,7 +2,13 @@
 
 ![straico](https://github.com/roelfrenkema/clsStraico/blob/main/githubclsstraico.png) 
 
-## Straico's own [API page\(s\)](https://documenter.getpostman.com/view/5900072/2s9YyzddrR) 
+## More about Straico's own 
+
+[API page\(s\)](https://documenter.getpostman.com/view/5900072/2s9YyzddrR) 
+
+and
+
+[@codingmenace youtube howto](https://www.youtube.com/watch?v=3hozFgV3xjc)
 
 ## Download
 
