@@ -454,7 +454,8 @@ It is your task, with the information above, to answer the users prompt.';
 
     public $aiLog = false;			//log convo to file
 
-    public $aiModel = 'cohere/command-r-plus';	//current working model
+    public $aiModel = '';	//current working model
+    protected $aiModelTag = '';
 
     public $aiWrap = 0;			//wrap output.
 
@@ -555,14 +556,17 @@ It is your task, with the information above, to answer the users prompt.';
     // works
     protected function apiPost($context)
     {
-        // Temporarily disable error reporting
-        $previous_error_reporting = error_reporting(0);
 
         if (substr($this->apiKey, 0, 2) === 'hf') {
 	    $endpoint = $this->endPoint . $this->aiModel;
-	}else{
+	}elseif($this->apiKey){
 	    $endpoint = $this->endPoint;
-	}
+	}else{
+	    $endpoint = $this->endPoint."chat";
+	}    
+
+        // Temporarily disable error reporting
+        $previous_error_reporting = error_reporting(0);
 
         // Communicate
         $result = @file_get_contents($endpoint, false, $context);
@@ -571,6 +575,7 @@ It is your task, with the information above, to answer the users prompt.';
         error_reporting($previous_error_reporting);
 
         // Check if an error occurred
+
         if ($result === false) {
             $error = error_get_last();
             if ($error !== null) {
@@ -722,15 +727,21 @@ It is your task, with the information above, to answer the users prompt.';
         // Store LLM input for debugging and pipe routine
         $this->aiInput = $userInput;
 
+
         if (substr($this->apiKey, 0, 2) === 'hf') {
             $this->hugAddUserInput();
             $aiMessage = $this->chatHistory;
             $contype = 'Content-Type: application/json';
-        } else {
+        } elseif($this->apiKey) {
             $this->straicoAddUserInput();
             $aiMessage = $this->chatRoll;
             $contype = 'Content-Type: application/x-www-form-urlencoded';
-        }
+        }else{
+            $this->straicoAddUserInput();
+            $aiMessage = $this->chatHistory;
+            $contype = 'Content-Type: application/json';
+	}
+
         $parameters = $this->setParameters();
 
         //Prepare payload
@@ -738,20 +749,26 @@ It is your task, with the information above, to answer the users prompt.';
         //prepare payload for huggingface
         if (substr($this->apiKey, 0, 2) === 'hf') {
             $payload = json_encode([
-//                'model' => $this->aiModel,
                 'inputs' => $aiMessage,
                 'parameters' => $parameters,
             ]);
-        } else {
+        } elseif($this->apiKey) {
             // Prepare query Straico
             $payload = http_build_query([
                 'model' => $this->aiModel,
                 'message' => $aiMessage,
             ]);
-        }
+        }else{
+	    //prepare for ollama
+            $payload = json_encode([
+                'model' => $this->aiModelTag,
+                'messages' => $aiMessage,
+		'stream' => false,
+            ]);
+	}    
+	    
         // Prepare options
         $options = $this->setOptions($payload, $contype);
-
 
         // Create stream
         $context = stream_context_create($options);
@@ -764,9 +781,11 @@ It is your task, with the information above, to answer the users prompt.';
         //Handoff to hf or straico proccessing from here
         if (substr($this->apiKey, 0, 2) === 'hf') {
             $answer = $this->hugProcessAnswer();
-        } else {
+        } elseif($this->apiKey) {
             $answer = $this->straicoProcessAnswer();
-        }
+        }else{
+	    $answer = $this->ollamaProcessAnswer();
+	}
 
         //write to log
         if ($this->aiLog) {
@@ -866,6 +885,20 @@ It is your task, with the information above, to answer the users prompt.';
 
         return $answer;
     }
+    protected function ollamaProcessAnswer()
+    {
+
+        $this->aiAnswer = $this->aiOutput['message']['content'];
+        $answer = $this->aiAnswer;
+
+        //update History
+        if ($this->historySwitch) {
+            $this->chatHistory[] = ['role' => 'assistant', 'content' => $answer];
+            $this->chatRoll .= 'assistant: '.$answer."\n\n";
+        }
+
+        return $answer;
+    }
 
     protected function hugAddUserInput()
     {
@@ -884,6 +917,19 @@ It is your task, with the information above, to answer the users prompt.';
     }
 
     protected function straicoAddUserInput()
+    {
+
+        if ($this->chatRoll) {
+            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
+            $this->chatRoll .= 'user: '.$this->aiInput."\n\n";
+        } else {
+            $this->chatHistory[] = ['role' => 'system', 'content' => $this->sysRole];
+            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
+            $this->chatRoll = 'system: '.$this->sysRole."\n\n".'user: '.$this->aiInput."\n\n";
+        }
+
+    }
+    protected function OllamaAddUserInput()
     {
 
         if ($this->chatRoll) {
@@ -995,6 +1041,7 @@ It is your task, with the information above, to answer the users prompt.';
                 'past' => '',
             ];
         }
+	$this->setModel(1);
     }
     /*
     * Function: hugModels()
@@ -1012,18 +1059,6 @@ It is your task, with the information above, to answer the users prompt.';
             $endpoint = 'https://api-inference.huggingface.co/framework/text-generation-inference';
             $result = $this->apiGet($endpoint);
 
-            /*            // Configure request options (headers and method)
-                        $options = [
-                            'http' => [
-                                'header' => "Content-Type: application/json\r\n",
-                                'method' => 'GET',
-                            ],
-                        ];
-
-                        // Send HTTP GET request using configured context
-                        $context = stream_context_create($options);
-                        $result = file_get_contents($endpoint, false, $context);
-            */
             // Decode JSON response into array
             $answer = json_decode($result, true);
 
@@ -1044,6 +1079,45 @@ It is your task, with the information above, to answer the users prompt.';
         } catch (\Exception $e) {
             echo 'Error: '.$e->getMessage();
         }
+	$this->setModel(1);
+    }
+    /*
+    * Function: hugModels()
+    * Input   : none
+    * Output  : none
+    * Purpose : Retrieve huggingface text models
+    *
+    * Remarks:
+    */
+
+    protected function ollamaModels()
+    {
+        try {
+            // Set up endpoint URL and API key
+            $endpoint = $this->endPoint."tags";
+            $result = $this->apiGet($endpoint);
+
+            // Decode JSON response into array
+            $answer = json_decode($result, true);
+            // Process models from the response
+            $this->useModels = [];
+
+            foreach ($answer['models'] as $model) {
+                $fname = $model['model'];
+                $nameParts = explode(':', $fname);
+                $tag = $nameParts[0];
+
+                $this->useModels[] = [
+                    'tag' => $tag,
+                    'model' => $fname,
+                    'pre' => '',
+                    'past' => '',
+                ];
+            }
+        } catch (\Exception $e) {
+            echo 'Error: '.$e->getMessage();
+        }
+	$this->setModel(1);
     }
 
     protected function apiGet($endPoint)
@@ -1457,6 +1531,7 @@ It is your task, with the information above, to answer the users prompt.';
         $this->intModel = $input;
 
         $this->aiModel = $this->useModels[$input - 1]['model'];
+        $this->aiModelTag = $this->useModels[$input - 1]['tag'];
         $this->aiRole = 'cli ';
         $this->pubRole = 'cli ';
 
