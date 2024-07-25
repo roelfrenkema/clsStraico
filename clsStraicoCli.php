@@ -147,6 +147,14 @@ class clsStraicoCli extends Straico
         } elseif (substr($input, 0, 7) == '/upload') {
             $answer = parent::strFileUpload(substr($input, 8));
 
+          // create a file array max 4 comma delimited files
+        } elseif (substr($input, 0, 12) == '/promptfiles') {
+            $answer = parent::intFilePaths(substr($input, 13));
+
+          // create a file array max 4 comma delimited files
+        } elseif (substr($input, 0, 8) == '/ytfiles') {
+            $answer = parent::intYoutubeUrls(substr($input, 9));
+
             // Create an image
         } elseif (substr($input, 0, 6) == '/image') {
 

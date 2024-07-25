@@ -237,10 +237,18 @@ Alternatively use one of the following internal commands.
     /listmodels	<seach>		- List available models.
 				  <search> will limit the models
 				  returned.
+    /promptfiles <path>		- populate a array for prompting straico
+				  <path> is a string pointing to max. 4
+				  files with the extensions pdf, docx, 
+				  pptx, txt, xlsx, mp3, mp4, html, csv, 
+				  json
     /setmodel <int>		- Set the active model to number of 
 				  model.
     /setpipe			- set a new pipe string
     /unsetpipe			- destroy pipe
+    /ytfiles <url>		- populate an array for straico prompt
+                                  with <url> being a comma delimited
+				  string with maximal 4 youtube urls 
     
             
   Assistants:
@@ -508,7 +516,12 @@ It is your task, with the information above, to answer the users prompt.';
     // Cli routine. Then in setmodels add model for huggingface
     public $endPoint = ''; //endpoint that needs to be called
     
+    // array filled with youtube urls will be reset at intInit
+    public $strYoutube = [];
 
+    // array filled with youtube urls will be reset at intInit
+    public $strFilePaths = [];
+    
     /*
     * Function: __construct
     * Input   : not applicable
@@ -965,6 +978,40 @@ It is your task, with the information above, to answer the users prompt.';
     }
 
 
+    function intFilePaths($input) 
+    {
+    /*
+    * Function: intFilePaths($input)
+    * Input   : Comma delimited string
+    * Output  : fills $this->strFilepaths
+    * Purpose : Set files for prompt.
+    *
+    * Remarks:
+    * Last visited 25-07-24
+    */
+	$allowed_extensions = ['pdf', 'docx', 'pptx', 'txt', 'xlsx', 'mp3', 'mp4', 'html', 'csv', 'json'];
+
+	$filenames = explode(',', $input);
+	
+	$valid_filenames = [];
+
+	foreach ($filenames as $filename) {
+	    $extension = pathinfo($filename, PATHINFO_EXTENSION);
+	    if (in_array($extension, $allowed_extensions)) {
+		array_push($valid_filenames, trim($filename));
+	    } else {
+		echo "Warning: Invalid extension for file '$filename'. Skipping.\n";
+	    }
+	}
+	
+	if (count($valid_filenames) > 4) {
+	    echo "Warning: More than 4 filenames were provided. Only the first 4 will be added to the array.";
+	    $valid_filenames = array_slice($valid_filenames, 0, 4);
+	}
+    
+	$this->strFilePaths = $valid_filenames;
+    
+    }
     
     public function intGetModels()
     {
@@ -1016,6 +1063,9 @@ It is your task, with the information above, to answer the users prompt.';
         $this->chatHistory = [];
         $this->chatRoll = '';
 	$this->sysRole = self::BASEROLE;
+	$this->strYoutube = [];
+	$this->strFilePaths = [];
+	
     }
 
     public function intSetModel($input)
@@ -1051,7 +1101,38 @@ It is your task, with the information above, to answer the users prompt.';
     }
 
 
+    public function intYoutubeUrls($input) 
+    {
+    /*
+    * Internal add yt string to array
+    * Function: addYoutubeUrls($input)
+    * Input   : Comma delimeted list of urls
+    * Output  : 
+    * Purpose : Fill an array for use in prompting straico models
+    *
+    * Remarks:
+    * Last visited 25-07-24
+    */
+	$urls = explode(',', $input);
+	$youtube_urls = [];
 
+	foreach ($urls as $url) {
+	    if (strpos($url, 'youtube') !== false && strpos($url, 'watch?v=') !== false) {
+		array_push($youtube_urls, trim($url));
+	    }
+	    if(count($youtube_urls) == 4){
+		break;
+	    }
+	}
+	
+	if (count($youtube_urls) > 4) {
+	    echo "Warning: More than 4 YouTube URLs were provided. Only the first 4 will be added to the array.";
+	    $youtube_urls = array_slice($youtube_urls, 0, 4);
+	}
+	
+	$this->strYoutube=$youtube_urls;
+	
+	}
     protected function strAddUserInput()
     {
     /*
@@ -1100,15 +1181,11 @@ It is your task, with the information above, to answer the users prompt.';
         $this->aiInput = $input;
 
 	$aiMessage = $this->strAddUserInput();
-	$models = $this->strAiModels;
-	$file_urls = [];
-	$youtube_urls =[];
 	
 	$data['message'] = $aiMessage;
-
 	$data['models'][] = $this->aiModel;
-	if (!empty($file_urls)) $data['file_urls'] = $file_urls;
-	if (!empty($youtube_urls)) $data['youtube_urls'] = $youtube_urls;
+	if (!empty($this->strFilePaths)) $data['file_urls'] = $this->strFilePaths;
+	if (!empty($this->strYoutube)) $data['youtube_urls'] = $this->strYoutube;
 	
 	$curl = curl_init();
 
