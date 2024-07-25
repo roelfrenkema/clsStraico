@@ -418,11 +418,7 @@ Instructions:
 It is your task, with the information above, to answer the users prompt.';
 
     protected const AGENT = 'clsStraico.php v2.0.0b (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
-
-    public $chModels = [];		//Straico chat models
-    
-    public $imModels = [];              //Straico image models
-
+   
     protected $aiAnswer;		//answer of ai
 
     protected $aiInput = '';		//complete ai input
@@ -577,62 +573,6 @@ It is your task, with the information above, to answer the users prompt.';
 	}
     }
 
-    // works
-    protected function apiPost($context)
-    {
-    /*
-     * Simple posting Api 
-     * Function: apiGet($endPoint)
-     * Input   : an endpoint to query
-     * Output  : collected information
-     * Purpose : To be removed.
-     */
-
-	/*
-	 * Set post endpoint to apimodel
-	 */ 
-        if (substr($this->apiKey, 0, 2) === 'hf') {
-	    $endpoint = $this->endPoint . $this->aiModel;
-	}elseif($this->apiModel = 'Straico'){
-	    $endpoint = $this->endPoint.'/v1/prompt/completion';
-	}else{
-	    $endpoint = $this->endPoint."chat";
-	}
-	    
-//var_dump($endpoint);
-
-
-        // Temporarily disable error reporting
-        $previous_error_reporting = error_reporting(0);
-
-        // Communicate
-        $result = @file_get_contents($endpoint, false, $context);
-
-//var_dump($result);
-
-        // Restore the previous error reporting level
-        error_reporting($previous_error_reporting);
-
-        // Check if an error occurred
-
-        if ($result === false) {
-            $error = error_get_last();
-            if ($error !== null) {
-                $message = explode(':', $error['message']);
-//var_dump($error['message']);
-
-                echo "Error: {$message[3]} This can be a temporary API failure, try again later!\n";
-
-                return;
-            } else {
-                echo "An unknown error occurred while fetching your answer. Please try again!\n";
-
-                return;
-            }
-        }
-
-        return $result;
-    }
 
     /*
     * Function: apiCompletion($aiMessage)
@@ -749,124 +689,6 @@ It is your task, with the information above, to answer the users prompt.';
         return $answer;
     }
 
-    public function newCompletion($userInput)
-    {
-    /*
-    * Function: newCompletion($userInput)
-    * Input   : $userInput - is the prompt
-    * Output  : returns response content
-    * Purpose : Complete an API call with the prompt info
-    *
-    * Remarks: Removed once we have hugchat changed.
-    *
-    */
-	
-echo "OK";
-exit;
-        // Store LLM input for debugging and pipe routine
-        $this->aiInput = $userInput;
-
-        if ($this->apiModel === 'OpenAi') {
-            $this->newUserInputOpenAi();
-            $aiMessage = $this->chatHistory;
-            $contype = 'Content-Type: application/json';
-	    exit;
-        }elseif($this->apiModel === 'Straico') {
-            $this->straicoAddUserInput();
-	    //We need to fix our well formed coversation in something
-	    //Straico models will understand.
-	    $aiMessage='';
-	    foreach( $this->chatHistory as $line){
-		$aiMessage .= $line['role'].": ".$line['content']."\n";
-	    }
-            $contype = 'Content-Type: application/json';
- 	}elseif($this->apiModel === 'Hugchat'){
-	    $this->hugAddUserInput();
-	    exit;
-	}
-	    
-
-//var_dump($this->chatHistory);
-//var_dump($aiMessage);
-//exit;
-
-        $parameters = $this->setParameters();
-
-        //Prepare payload
-
-        //prepare payload for huggingface
-        if (substr($this->apiKey, 0, 2) === 'hf') {
-            $payload = json_encode([
-                'inputs' => $aiMessage,
-                'parameters' => $parameters,
-            ]);
-        } elseif($this->apiModel = 'Straico') {
-            // Prepare query Straico
-            $payload = json_encode([
-                'models' => [$this->aiModel],
-                'message' => $aiMessage,
-            ]);
-        }else{
-	    //prepare for ollama
-            $payload = json_encode([
-                'model' => $this->aiModelTag,
-                'messages' => $aiMessage,
-		'stream' => false,
-            ]);
-	}    
-	    
-        // Prepare options
-        $options = $this->setOptions($payload, $contype);
-	
-//var_dump($payload);
-//var_dump($contype);
-
-        // Create stream
-        $context = stream_context_create($options);
-//var_dump($context);	
-//exit;
-
-        // Call api
-        $result = $this->apiPost($context);
-
-//var_dump($result);
-//exit;
-
-        $this->aiOutput = json_decode($result, true);
-//var_dump($this->aiOutput);
-//exit;
-
-        //Handoff to hf or straico proccessing from here
-        if (substr($this->apiKey, 0, 2) === 'hf') {
-            $answer = $this->hugProcessAnswer();
-        } elseif($this->apiKey) {
-            $answer = $this->straicoProcessAnswer();
-        }else{
-	    $answer = $this->ollamaProcessAnswer();
-	}
-
-        //write to log
-        if ($this->aiLog) {
-            $this->addLog($this->aiInput, $answer);
-        }
-
-        //do pipe
-        if ($this->userPipe) {
-            $this->apiPipe();
-        }
-
-        //format output and return it
-        if ($this->aiWrap > 0) {
-            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
-            $temp = str_replace("\n", "\n    ", $answer);
-            $answer = '    '.$temp."\n";
-        }
-        //reset history if we dont want it.
-        if (! $this->historySwitch) {
-            $this->intInitChat();
-        }
-        return $answer;
-    }
 
     protected function setParameters()
     {
@@ -900,24 +722,6 @@ exit;
 
 
 
-    protected function ollamaProcessAnswer()
-    {
-
-        $this->aiAnswer = $this->aiOutput['message']['content'];
-        $answer = $this->aiAnswer;
-
-        //update History
-        if ($this->historySwitch) {
-            $this->chatHistory[] = ['role' => 'assistant', 'content' => $answer];
-            $this->chatRoll .= 'assistant: '.$answer."\n\n";
-        }
-
-        return $answer;
-    }
-
-
-
-
     /*
     * Function: self::AGENTDo($name,$input)
     * Input   : $name = constant name $prompt userinput
@@ -944,24 +748,6 @@ exit;
 
     }
 
-    /*
-    * Function: addHistory()
-    * Input   : User,Assistant
-    * Output  : Returns array for conversation
-    * Purpose : Retain memory
-    *
-    * Remarks:
-    *
-    * Private function used by $this->userPrompt()
-    */
-    private function addHistory($user, $assistant)
-    {
-
-        $this->chatHistory[] = ['role' => 'user', 'content' => $user];
-        $this->chatHistory[] = ['role' => 'assistant', 'content' => $assistant];
-        $this->chatRoll .= "user: $user\n\n";
-        $this->chatRoll .= "assistant: $assistant\n\n";
-    }
 
     /*
     * Function: addlog()
@@ -1191,6 +977,7 @@ exit;
     * Purpose : Retrieve Open AI models
     *
     * Remarks:
+    * Last visited 25-07-24
     */
     
            
@@ -1638,21 +1425,6 @@ exit;
         return json_decode($result, JSON_OBJECT_AS_ARRAY);
     }
 
-    /*
-    * Function: chatTime()
-    * Input   : none
-    * Output  : sets current time in chat
-    * Purpose : make llm time aware
-    *
-    * Remarks:
-    *
-    */
-    private function chatTime()
-    {
-        $input = 'Time and date is '.date('Y-m-d H:i:s');
-        $output = 'Noted.';
-        $this->addHistory($input, $output);
-    }
 
     public function checkUserInput($timeout = 0)
     {
@@ -1685,21 +1457,6 @@ exit;
 
     }
 
-    protected function getFile($fileName)
-    {
-
-        if (! is_file($fileName)) {
-            $answer = "WARNING: File not found!\n";
-        } else {
-            $this->webPage = file_get_contents($fileName);
-            $answer = "SUCCESS: File $fileName loaded!\n";
-        }
-
-        return $answer;
-    }
-
-
-
 
     /*
     * Function: loadHistory($name)
@@ -1728,23 +1485,6 @@ exit;
         $answer .= 'Destroy history with command /histdelete';
 
         return $answer;
-    }
-    /*
-    * Function: loadModels()
-    * Input   : none
-    * Output  : print model list
-    * Purpose : printing a nicely formated model list with info and
-    *           pointer to use for /setmodel
-    *
-    * Remarks:
-    *
-    * Private function used by $this->userPrompt()
-    */
-
-    public function loadModels($name)
-    {
-        $this->useModels = [];
-        include $this->userHome.$name;
     }
 
     /*
