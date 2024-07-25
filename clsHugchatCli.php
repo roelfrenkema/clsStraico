@@ -49,7 +49,7 @@ class clsHugchatCli extends Straico
 
             // return version
         } elseif ($input == '/version') {
-            $answer = "Welcome to clsHugchat $this->clsVersion - enjoy!\n";
+            $answer = parent::AGENT;
 
             // Set page wrap
         } elseif (substr($input, 0, 8) == '/setwrap') {
@@ -65,17 +65,6 @@ class clsHugchatCli extends Straico
             parent::intInitChat();
             $answer = 'Returned to baserole';
 
-            // Get a file
-        } elseif (substr($input, 0, 8) == '/getfile') {
-            $answer = parent::getFile(substr($input, 9));
-
-            // Get a webpage
-        } elseif (substr($input, 0, 8) == '/getpage') {
-            $answer = parent::getWebpage(substr($input, 9));
-
-            // Do a websearch
-        } elseif (substr($input, 0, 10) == '/websearch') {
-            $answer = parent::webSearch(substr($input, 11));
 
             // List available models
         } elseif (substr($input, 0, 11) == '/listmodels') {

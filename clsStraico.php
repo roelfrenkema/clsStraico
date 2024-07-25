@@ -446,8 +446,6 @@ It is your task, with the information above, to answer the users prompt.';
 
     protected $chatRoll = '';		//Keep a history use internal
 
-    protected $clsVersion = '1.12.0';	//version
-
     protected $usrPrompt = '> ';		//userprompt preserved getInput()
 
     public $aiLog = false;			//log convo to file
@@ -587,7 +585,7 @@ It is your task, with the information above, to answer the users prompt.';
     */
     public function apiCompletion($userInput)
     {
-
+	
         $endPoint = 'https://api.straico.com/v0/prompt/completion';
 
         // Add webpage if requested
@@ -1536,7 +1534,7 @@ It is your task, with the information above, to answer the users prompt.';
             $modName = 'BASEROLE';
         }
 
-        $sysModel = constant('Straico::'.$modName);
+        $sysModel = constant('self::'.$modName);
 
         $mp = 0;
 
@@ -1545,18 +1543,21 @@ It is your task, with the information above, to answer the users prompt.';
             $this->intInitChat();
             $mp++;
 
-            //set endpoint
-            $this->setModel($mp);
+            $this->intSetModel($mp);
 
-            echo "\n\nModel:".$model['tag']."\n";
+            echo "\n\nModel:".$this->aiModelTag."\n";
 
-            $response = $this->apiCompletion($sysModel, $userInput);
+	    if($apiModel === 'Straico'){
+		$response = $this->strCompletion($userInput);
+	    }elseif($apiModel === 'Hugchat'){
+		$response = $this->hugCompletion($userInput);
+	    }
+	    
             echo "$response\n";
 
         }
 
-        // restore endPoint
-        $this->setModel($storeName);
+        $this->intSetModel($storeName);
 
         // restore pipe
         $this->userPipe = $storePipe;

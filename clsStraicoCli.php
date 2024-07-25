@@ -68,7 +68,7 @@ class clsStraicoCli extends Straico
 
             // return version
         } elseif ($input == '/version') {
-            $answer = "Welcome to clsStraico $this->clsVersion - enjoy!\n";
+            $answer = parent::AGENT;
 
             // Set page wrap
         } elseif (substr($input, 0, 8) == '/setwrap') {
@@ -84,17 +84,6 @@ class clsStraicoCli extends Straico
             parent::intInitChat();
             $answer = 'Returned to baserole';
 
-            // Get a file
-        } elseif (substr($input, 0, 8) == '/getfile') {
-            $answer = parent::getFile(substr($input, 9));
-
-            // Get a webpage
-        } elseif (substr($input, 0, 8) == '/getpage') {
-            $answer = parent::getWebpage(substr($input, 9));
-
-            // Do a websearch
-        } elseif (substr($input, 0, 10) == '/websearch') {
-            $answer = parent::webSearch(substr($input, 11));
 
             // List available models
         } elseif (substr($input, 0, 11) == '/listmodels') {
@@ -103,7 +92,7 @@ class clsStraicoCli extends Straico
 
             // Set model
         } elseif (substr($input, 0, 9) == '/setmodel') {
-            $answer = parent::setModel(substr($input, 10));
+            $answer = parent::intSetModel(substr($input, 10));
 
             // Stop logging
         } elseif (substr($input, 0, 9) == '/logoff') {
