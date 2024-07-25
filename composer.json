@@ -5,6 +5,7 @@
     "require": {
         "laravel/prompts": "^0.1.20",
         "symfony/browser-kit": "^7.0",
-        "symfony/http-client": "^7.0"
+        "symfony/http-client": "^7.0",
+        "pear/http_request2": "^2.6"
     }
 }

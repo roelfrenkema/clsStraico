@@ -115,7 +115,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_PROTOCOLS => \CURLPROTO_HTTP | \CURLPROTO_HTTPS,
             \CURLOPT_REDIR_PROTOCOLS => \CURLPROTO_HTTP | \CURLPROTO_HTTPS,
             \CURLOPT_FOLLOWLOCATION => true,
-            \CURLOPT_MAXREDIRS => 0 < $options['max_redirects'] ? $options['max_redirects'] : 0,
+            \CURLOPT_MAXREDIRS => max(0, $options['max_redirects']),
             \CURLOPT_COOKIEFILE => '', // Keep track of cookies during redirects
             \CURLOPT_TIMEOUT => 0,
             \CURLOPT_PROXY => $proxy,
@@ -250,8 +250,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
             if (isset($options['normalized_headers']['content-length'][0])) {
                 $curlopts[\CURLOPT_INFILESIZE] = (int) substr($options['normalized_headers']['content-length'][0], \strlen('Content-Length: '));
-            } elseif (!isset($options['normalized_headers']['transfer-encoding'])) {
-                $curlopts[\CURLOPT_INFILESIZE] = -1;
+            }
+            if (!isset($options['normalized_headers']['transfer-encoding'])) {
+                $curlopts[\CURLOPT_HTTPHEADER][] = 'Transfer-Encoding:'.(isset($curlopts[\CURLOPT_INFILESIZE]) ? '' : ' chunked');
             }
 
             if ('POST' !== $method) {
@@ -554,11 +555,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 throw new InvalidArgumentException(sprintf('Cannot set "%s" with "extra.curl", use option "%s" instead.', $constName, $curloptsToConfig[$opt]));
             }
 
-            if (\in_array($opt, $methodOpts)) {
+            if (\in_array($opt, $methodOpts, true)) {
                 throw new InvalidArgumentException('The HTTP method cannot be overridden using "extra.curl".');
             }
 
-            if (\in_array($opt, $curloptsToCheck)) {
+            if (\in_array($opt, $curloptsToCheck, true)) {
                 $constName = $this->findConstantName($opt) ?? $opt;
                 throw new InvalidArgumentException(sprintf('Cannot set "%s" with "extra.curl".', $constName));
             }

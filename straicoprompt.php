@@ -34,7 +34,7 @@ require_once 'clsStraicoCli.php';
 require_once $home.'/git/clsStraico/vendor/autoload.php';
 use function Laravel\Prompts\textarea;
 
-$straico = new clsStraicoCli;
+$straico = new clsStraicoCli('Straico');
 
 /*
  * Logpath now equals a working directory. All files are saved here like
@@ -65,10 +65,10 @@ $straico->logPath = $home.'/git/clsStraico/';
  *   /histdelete	- Delete history
  *
  */
-$straico->historySwitch = false;
+$straico->historySwitch = true;
 
 //'13' being llama atm check model number by listmodels
-$straico->setModel(13);
+//$straico->setModel(13);
 
 /*
     Start looping till finished with /exit
@@ -83,7 +83,7 @@ while ($aiMessage !== '/exit') {
     //echo "\n";
 
     // lavarel input box
-    $prompt = textarea('<fg=white>Prompting: '.$straico->aiModel.' in Role: '.$straico->pubRole.'</>');
+    $prompt = textarea('<fg=white>Prompting: '.$straico->aiModelTag.' in Role: '.$straico->pubRole.'</>');
 
     // process prompt
     $aiMessage = $straico->userPrompt($prompt);

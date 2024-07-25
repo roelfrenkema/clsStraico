@@ -428,6 +428,12 @@ Instructions:
 
 It is your task, with the information above, to answer the users prompt.';
 
+    protected const AGENT = 'clsStraico.php v2.0.0b (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
+
+    public $chModels = [];		//Straico chat models
+    
+    public $imModels = [];              //Straico image models
+
     protected $aiAnswer;		//answer of ai
 
     protected $aiInput = '';		//complete ai input
@@ -436,11 +442,20 @@ It is your task, with the information above, to answer the users prompt.';
 
     protected $aiRole = 'cli';		//Keep track of the role
 
+    public $apiModel = '';       //What kind of Api do we use
+
     public $pubRole = 'cli';		//publicly exposed
 
     protected $apiKey = '';		//secure apiKey
-
-    protected $useModels = [];		//filled with available models
+    
+    /* 
+     * filled with available chatmodel data.
+     */ 
+    protected $useModels = [];
+    /* 
+     * filled with available imagemodel data.
+     */ 
+    protected $useImgModels = [];
 
     protected $chatHistory;		//Keep a history to emulate chat
 
@@ -448,14 +463,13 @@ It is your task, with the information above, to answer the users prompt.';
 
     protected $clsVersion = '1.12.0';	//version
 
-    protected $userAgent = '';		//Useragent string
-
     protected $usrPrompt = '> ';		//userprompt preserved getInput()
 
     public $aiLog = false;			//log convo to file
 
-    public $aiModel = '';	//current working model
-    protected $aiModelTag = '';
+    public $aiModel = '';	        //current working model
+
+    public $aiModelTag = '';            //current model name
 
     public $aiWrap = 0;			//wrap output.
 
@@ -510,6 +524,7 @@ It is your task, with the information above, to answer the users prompt.';
     // endpoint that should be called. Best place to set is is probably
     // Cli routine. Then in setmodels add model for huggingface
     public $endPoint = ''; //endpoint that needs to be called
+    
 
     /*
     * Function: __construct
@@ -534,42 +549,77 @@ It is your task, with the information above, to answer the users prompt.';
         if (! extension_loaded('openssl')) {
             exit("PHP module openssl is needed to run clsStraico. Please install it. Exiting!\n");
         }
-        /*
-         * Should not be set here but in the extension.
-         *
-         *        if (getenv('STRAICO_APIKEY')) {
-                    $this->apiKey = getenv('STRAICO_APIKEY');
-                } else {
-                    exit("Could not find environment variable STRAICO_APIKEY with the API key. Exiting!\n");
-                }
-        */
         $this->arUser = $this->apiUser();
         $this->straicoModels();
         if (getenv('WORD_WRAP')) {
             $this->aiWrap = getenv('WORD_WRAP');
         }
         $this->userHome = $_ENV['HOME'];
-        $this->userAgent = 'clsStraico.php v1.7.3 (Debian GNU/Linux 12 (bookworm) x86_64) PHP 8.2.7 (cli)';
-        $this->initChat();
+        $this->intInitChat();
+    }
+
+    protected function apiGet($endPoint) 
+    {
+    /*
+     * Api info retrieval
+     * Function: apiGet($endPoint)
+     * Input   : an endpoint to query
+     * Output  : collected information
+     * Purpose : To retrieve data from a specified API endpoint using cURL.
+     */
+
+	$ch = curl_init(); // Initialize the cURL session
+
+	// Set the URL and other options for the request
+	curl_setopt($ch, CURLOPT_URL, $endPoint);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $this->apiKey));
+
+	// Execute the request and store the response in a variable
+	$result = curl_exec($ch);
+
+	// Close the cURL session
+	curl_close($ch);
+
+	if (curl_errno($ch)) {
+	    echo "Error: " . curl_error($ch);
+	} else {
+	    return $result;
+	}
     }
 
     // works
     protected function apiPost($context)
     {
+    /*
+     * Simple posting Api 
+     * Function: apiGet($endPoint)
+     * Input   : an endpoint to query
+     * Output  : collected information
+     * Purpose : To be removed.
+     */
 
+	/*
+	 * Set post endpoint to apimodel
+	 */ 
         if (substr($this->apiKey, 0, 2) === 'hf') {
 	    $endpoint = $this->endPoint . $this->aiModel;
-	}elseif($this->apiKey){
-	    $endpoint = $this->endPoint;
+	}elseif($this->apiModel = 'Straico'){
+	    $endpoint = $this->endPoint.'/v1/prompt/completion';
 	}else{
 	    $endpoint = $this->endPoint."chat";
-	}    
+	}
+	    
+//var_dump($endpoint);
+
 
         // Temporarily disable error reporting
         $previous_error_reporting = error_reporting(0);
 
         // Communicate
         $result = @file_get_contents($endpoint, false, $context);
+
+//var_dump($result);
 
         // Restore the previous error reporting level
         error_reporting($previous_error_reporting);
@@ -580,6 +630,8 @@ It is your task, with the information above, to answer the users prompt.';
             $error = error_get_last();
             if ($error !== null) {
                 $message = explode(':', $error['message']);
+//var_dump($error['message']);
+
                 echo "Error: {$message[3]} This can be a temporary API failure, try again later!\n";
 
                 return;
@@ -638,7 +690,7 @@ It is your task, with the information above, to answer the users prompt.';
             'http' => [
                 'header' => 'Authorization: Bearer '.$this->apiKey."\r\n".
                         "Content-Type: application/x-www-form-urlencoded\r\n",
-                'User-Agent: '.$this->userAgent." \r\n",
+                'User-self::AGENT: '.self::AGENT." \r\n",
                 'method' => 'POST',
                 'content' => $data,
             ],
@@ -708,39 +760,46 @@ It is your task, with the information above, to answer the users prompt.';
         return $answer;
     }
 
+    public function newCompletion($userInput)
+    {
     /*
     * Function: newCompletion($userInput)
     * Input   : $userInput - is the prompt
     * Output  : returns response content
     * Purpose : Complete an API call with the prompt info
     *
-    * Remarks:
+    * Remarks: Removed once we have hugchat changed.
     *
     */
-    public function newCompletion($userInput)
-    {
-        // Add webpage if requested
-        if (strpos($userInput, '_PAGE_')) {
-            $userInput = str_replace('_PAGE_', $this->webPage, $userInput);
-        }
-
+	
+echo "OK";
+exit;
         // Store LLM input for debugging and pipe routine
         $this->aiInput = $userInput;
 
-
-        if (substr($this->apiKey, 0, 2) === 'hf') {
-            $this->hugAddUserInput();
+        if ($this->apiModel === 'OpenAi') {
+            $this->newUserInputOpenAi();
             $aiMessage = $this->chatHistory;
             $contype = 'Content-Type: application/json';
-        } elseif($this->apiKey) {
+	    exit;
+        }elseif($this->apiModel === 'Straico') {
             $this->straicoAddUserInput();
-            $aiMessage = $this->chatRoll;
-            $contype = 'Content-Type: application/x-www-form-urlencoded';
-        }else{
-            $this->straicoAddUserInput();
-            $aiMessage = $this->chatHistory;
+	    //We need to fix our well formed coversation in something
+	    //Straico models will understand.
+	    $aiMessage='';
+	    foreach( $this->chatHistory as $line){
+		$aiMessage .= $line['role'].": ".$line['content']."\n";
+	    }
             $contype = 'Content-Type: application/json';
+ 	}elseif($this->apiModel === 'Hugchat'){
+	    $this->hugAddUserInput();
+	    exit;
 	}
+	    
+
+//var_dump($this->chatHistory);
+//var_dump($aiMessage);
+//exit;
 
         $parameters = $this->setParameters();
 
@@ -752,10 +811,10 @@ It is your task, with the information above, to answer the users prompt.';
                 'inputs' => $aiMessage,
                 'parameters' => $parameters,
             ]);
-        } elseif($this->apiKey) {
+        } elseif($this->apiModel = 'Straico') {
             // Prepare query Straico
-            $payload = http_build_query([
-                'model' => $this->aiModel,
+            $payload = json_encode([
+                'models' => [$this->aiModel],
                 'message' => $aiMessage,
             ]);
         }else{
@@ -769,14 +828,24 @@ It is your task, with the information above, to answer the users prompt.';
 	    
         // Prepare options
         $options = $this->setOptions($payload, $contype);
+	
+//var_dump($payload);
+//var_dump($contype);
 
         // Create stream
         $context = stream_context_create($options);
+//var_dump($context);	
+//exit;
 
         // Call api
         $result = $this->apiPost($context);
 
+//var_dump($result);
+//exit;
+
         $this->aiOutput = json_decode($result, true);
+//var_dump($this->aiOutput);
+//exit;
 
         //Handoff to hf or straico proccessing from here
         if (substr($this->apiKey, 0, 2) === 'hf') {
@@ -805,7 +874,7 @@ It is your task, with the information above, to answer the users prompt.';
         }
         //reset history if we dont want it.
         if (! $this->historySwitch) {
-            $this->initChat();
+            $this->intInitChat();
         }
         return $answer;
     }
@@ -831,7 +900,7 @@ It is your task, with the information above, to answer the users prompt.';
             'http' => [
                 'header' => 'Authorization: Bearer '.$this->apiKey."\r\n".
                     $contype."\r\n".
-                    'User-Agent: '.$this->userAgent." \r\n",
+                    'User-self::AGENT: '.self::AGENT." \r\n",
                 'method' => 'POST',
                 'content' => $payload,
             ],
@@ -840,51 +909,8 @@ It is your task, with the information above, to answer the users prompt.';
         return $options;
     }
 
-    protected function straicoProcessAnswer()
-    {
 
-        $this->aiAnswer = $this->aiOutput['data']['completion']['choices'][0]['message']['content'];
-        $answer = $this->aiAnswer;
-        //update History
 
-        if ($this->historySwitch) {
-            $this->chatHistory[] = ['role' => 'assistant', 'content' => $answer];
-            $this->chatRoll .= 'assistant: '.$answer."\n\n";
-        }
-
-        return $answer;
-    }
-
-    protected function hugProcessAnswer()
-    {
-        //extract continue chat
-        $generatedText = $this->aiOutput[0]['generated_text'];
-
-        //extract answer
-        $chunks = explode('<|end|>', $generatedText);
-        $answer = $chunks[0];
-
-        $this->chatHistory .= "$answer<|end|>\n";
-
-        if ($this->aiLog) {
-            $file = $this->logPath.'HugChat.log';
-            file_put_contents($file, "ME:\n".$this->aiInput."\n\n", FILE_APPEND);
-            file_put_contents($file, $this->aiModel.":\n".$answer."\n\n", FILE_APPEND);
-        }
-
-        if ($this->userPipe) {
-            $this->apiPipe();
-        }
-
-        //format output and return it
-        if ($this->aiWrap > 0) {
-            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
-            $temp = str_replace("\n", "\n    ", $answer);
-            $answer = '    '.$temp."\n";
-        }
-
-        return $answer;
-    }
     protected function ollamaProcessAnswer()
     {
 
@@ -900,51 +926,11 @@ It is your task, with the information above, to answer the users prompt.';
         return $answer;
     }
 
-    protected function hugAddUserInput()
-    {
 
-        if (! $this->chatHistory) {
-            // For the first conversation turn, only include the system prompt and user input
-            $this->chatHistory = "<|system|>\n".$this->sysRole."<|end|>\n";
-            $this->chatHistory .= "<|user|>\n".$this->aiInput."<|end|>\n";
-            $this->chatHistory .= "<|assistant|>\n";
-        } else {
-            //build converstation
-            $this->chatHistory .= "<|user|>\n".$this->aiInput."<|end|>\n";
-            $this->chatHistory .= "<|assistant|>\n";
-        }
 
-    }
-
-    protected function straicoAddUserInput()
-    {
-
-        if ($this->chatRoll) {
-            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll .= 'user: '.$this->aiInput."\n\n";
-        } else {
-            $this->chatHistory[] = ['role' => 'system', 'content' => $this->sysRole];
-            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll = 'system: '.$this->sysRole."\n\n".'user: '.$this->aiInput."\n\n";
-        }
-
-    }
-    protected function OllamaAddUserInput()
-    {
-
-        if ($this->chatRoll) {
-            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll .= 'user: '.$this->aiInput."\n\n";
-        } else {
-            $this->chatHistory[] = ['role' => 'system', 'content' => $this->sysRole];
-            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
-            $this->chatRoll = 'system: '.$this->sysRole."\n\n".'user: '.$this->aiInput."\n\n";
-        }
-
-    }
 
     /*
-    * Function: agentDo($name,$input)
+    * Function: self::AGENTDo($name,$input)
     * Input   : $name = constant name $prompt userinput
     * Output  : dependa
     * Purpose : Save methodes
@@ -958,7 +944,7 @@ It is your task, with the information above, to answer the users prompt.';
         $storeHistory = $this->chatHistory;
         $storeChat = $this->chatRoll;
 
-        $this->initChat();
+        $this->intInitChat();
 
         $answer = $this->newcompletion($userInput);
 
@@ -1004,139 +990,546 @@ It is your task, with the information above, to answer the users prompt.';
         file_put_contents($file, $this->aiModel.":\n".$assistant."\n\n", FILE_APPEND);
     }
 
+    protected function hugAddUserInput()
+    {
     /*
-    * Function: apiModels()
+    * Huggingchat Prompt processing 
+    * Function: hugAddUserInput()
+    * Input   : 
+    * Output  :
+    * Purpose : History
+    *
+    * Remarks:
+    * Last visited 23-07-24
+    */
+
+
+	if (! $this->chatHistory) {
+            // For the first conversation turn, only include the system prompt and user input
+            $this->chatHistory = "<|system|>\n".$this->sysRole."<|end|>\n";
+            $this->chatHistory .= "<|user|>\n".$this->aiInput."<|end|>\n";
+            $this->chatHistory .= "<|assistant|>\n";
+        } else {
+            //build converstation
+            $this->chatHistory .= "<|user|>\n".$this->aiInput."<|end|>\n";
+            $this->chatHistory .= "<|assistant|>\n";
+        }
+	
+    }
+    
+    protected function hugCompletion($input)
+    {
+    /*
+    * Huggingchat Prompt Completion
+    * Function: hugCompletion()
+    * Input   : prompt
+    * Output  : answer
+    * Purpose : Chat or query
+    *
+    * Remarks:
+    * Last visited 25-07-24
+    */
+    
+    
+	// Store LLM input for debugging and pipe routine
+        $this->aiInput = $input;
+	
+	if (!isset($this->chatHistory) || !is_array($this->chatHistory) || empty($this->chatHistory)) {
+	    $data['inputs'] = $this->sysRole.$input;
+	}else{
+	    $data['inputs'] = $input;
+	    $data['past_user_inputs'] = array_merge($this->chatHistory['past_user_inputs']);
+	    $data['generated_responses'] = array_merge($this->chatHistory['generated_responses']);
+	}    
+
+	$curl = curl_init();
+
+	curl_setopt_array($curl, array(
+	    CURLOPT_URL => 'https://api-inference.huggingface.co/models/'.$this->aiModel,
+	    CURLOPT_RETURNTRANSFER => true,
+	    CURLOPT_ENCODING => '',
+	    CURLOPT_MAXREDIRS => 10,
+	    CURLOPT_TIMEOUT => 0,
+	    CURLOPT_FOLLOWLOCATION => true,
+	    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	    CURLOPT_CUSTOMREQUEST => 'POST',
+	    CURLOPT_POSTFIELDS => json_encode($data),
+	    CURLOPT_HTTPHEADER => array(
+		'Authorization: Bearer '.$this->apiKey,
+		'Content-Type: application/json',
+		'User-self::AGENT: '.self::AGENT,
+		),
+	    )
+	);
+
+	$response = curl_exec($curl);
+	if (curl_errno($curl)) echo "Error: " . curl_error($curl);
+
+	curl_close($curl);
+
+	$this->aiOutput = json_decode($response, JSON_OBJECT_AS_ARRAY);
+	
+	if(isset($this->aiOutput['error'])){
+		$answer = $this->aiOutput['error'];
+		return $answer;
+	}
+	
+	$answer = $this->hugProcessChat();
+	
+	
+	
+	//write to log
+        if ($this->aiLog) {
+            $this->addLog($this->aiInput, $answer);
+        }
+
+        //do pipe
+        if ($this->userPipe) {
+            $this->apiPipe();
+        }
+
+        //format output and return it
+        if ($this->aiWrap > 0) {
+            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
+            $temp = str_replace("\n", "\n    ", $answer);
+            $answer = '    '.$temp."\n";
+        }
+        
+	//reset history if we dont want it.
+        if (! $this->historySwitch) {
+            $this->intInitChat();
+        }
+        
+	return $answer;
+    }
+
+    protected function hugListModels($searchString = null)
+    {
+    /*
+    * Function: hugListModels()
     * Input   : none
-    * Output  : Returns array of models available
-    * Purpose : List current models and info
+    * Output  : print model list
+    * Purpose : printing a nicely formated model list with info and
+    *           pointer to use for /setmodel
+    *
+    * Remarks:
+    *
+    */
+        $modelsFound = [];
+        $point = 0;
+
+        // Iterate over models and check if they match the search string (case-insensitive)
+        foreach ($this->useModels as $arModel) {
+            $point++;
+
+            // If no search string is provided or if the current model matches the search string, proceed to display it
+            if (! $searchString || stripos($arModel['model_id'], $searchString) !== false) {
+
+                // Add the current model to the found models array
+		$modelsFound[] = [
+		    'counter' => $point,
+		    'name' => $arModel['model_id'],
+		    'task' => $arModel['task'],
+		];
+
+                // Display the model information
+                echo "Model $point:\n";
+                if ($arModel['model_id'] === $this->aiModel) {
+                    echo '* ';
+                }
+                echo "- Name: {$arModel['model_id']}\n";
+                echo "- Task: {$arModel['task']}\n";
+                echo "---\n";
+            }
+        }
+
+        return $modelsFound;
+    }
+
+
+    protected function hugProcessChat()
+    {
+    /*
+    * Huggingchat Answer proccessing
+    * Function: hugProcessAnswer()
+    * Input   : 
+    * Output  : $answer
+    * Purpose : Answer user
+    *
+    * Remarks:
+    * Last visited 23-07-24
+    */
+
+        //extract continue chat
+        if(isset($this->aiOutput[0]['generated_text'])){
+	    $answer = $this->aiOutput[0]['generated_text'];
+	}else{
+	    return $this->aiOutput;
+	}
+
+
+        $this->chatHistory['past_user_inputs'][] = $this->aiInput;
+	$this->chatHistory['generated_responses'][] = $answer;
+
+        if ($this->aiLog) {
+            $file = $this->logPath.'HugChat.log';
+            file_put_contents($file, "ME:\n".$this->aiInput."\n\n", FILE_APPEND);
+            file_put_contents($file, $this->aiModel.":\n".$answer."\n\n", FILE_APPEND);
+        }
+
+        if ($this->userPipe) {
+            $this->apiPipe();
+        }
+
+        //format output and return it
+        if ($this->aiWrap > 0) {
+            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
+            $temp = str_replace("\n", "\n    ", $answer);
+            $answer = '    '.$temp."\n";
+        }
+
+        return $answer;
+    }
+
+
+    
+    public function intGetModels()
+    {
+    /*
+    * Function: intGetModels()
+    * Input   : 
+    * Output  : fills $this->useModels
+    * Purpose : Retrieve Open AI models
+    *
+    * Remarks:
+    */
+    
+           
+	// Set up endpoint URL and API key for the different apimodels
+	if($this->apiModel === 'Straico'){
+		$endpoint = "https://api.straico.com/v1/models";
+	}elseif($this->apiModel === 'Hugchat'){
+	    $endpoint = "https://api-inference.huggingface.co/framework/text-generation-inference";
+	}
+	
+	// Poll for models	  
+	$result = $this->apiGet($endpoint);
+
+        // Decode JSON response into array
+	$answer = json_decode($result, true);
+
+	if($this->apiModel === 'Straico'){
+	    $this->useModels = $answer['data']['chat'];
+	    $this->useImgModels = $answer['data']['image'];
+	}elseif($this->apiModel === 'Hugchat'){
+	    $this->useModels = $answer;
+	}
+
+	//Set the first model as default
+	echo $this->intSetModel(1);
+    }
+
+    protected function intInitChat()
+    {
+    /*
+    * Function	: intInitChat()
+    * Input   	: none
+    * Output  	: none
+    * Purpose 	: reset/initialise chathistory
+    * Return	: clean chat environment
+    * Remarks:
+    */
+        $this->chatHistory = [];
+        $this->chatRoll = '';
+	$this->sysRole = self::BASEROLE;
+    }
+
+    public function intSetModel($input)
+    {
+    /*
+    * Function: intSetModel($input)
+    * Input   : $input - number of model
+    * Output  : info on new model
+    * Purpose : change llm in use
     *
     * Remarks:
     *
     * Private function used by $this->userPrompt()
     */
+	$this->intInitChat();
 
-    protected function straicoModels()
-    {
+        $this->intModel = $input;
 
-        $endPoint = 'https://api.straico.com/v0/models';
+	if($this->apiModel === 'Straico'){
+	    $this->aiModel = $this->useModels[$input - 1]['model'];
+	    $this->strAiModels[] = $this->useModels[$input - 1]['model'];
+	    $this->aiModelTag = $this->useModels[$input - 1]['name'];
+	}elseif($this->apiModel === 'Hugchat'){
+	    $this->aiModel = $this->useModels[$input - 1]['model_id'];
+	    $tag = explode('/', $this->useModels[$input - 1]['model_id']);
+	    $this->aiModelTag = $tag[1];
+	}
+	
+	$this->aiRole = 'cli ';
+	$this->pubRole = 'cli ';
 
-        $result = $this->apiGet($endPoint);
-
-        $modelArray = json_decode($result, true);
-
-        $chModels = $modelArray['data'];
-
-        foreach ($chModels as $tranform) {
-
-            //create usable tag.
-            $granate = explode(':', $tranform['name']);
-            if (array_key_exists(1, $granate)) {
-                $tag = str_replace(' ', '_', trim($granate[1]));
-            } else {
-                $tag = str_replace(' ', '_', trim($tranform['name']));
-            }
-            $this->useModels[] = ['tag' => $tag,
-                'model' => $tranform['model'],
-                'pre' => '',
-                'past' => '',
-            ];
-        }
-	$this->setModel(1);
+        return 'Model set to: '.$this->aiModel." \n";
     }
+
+
+
+    protected function strAddUserInput()
+    {
     /*
-    * Function: hugModels()
-    * Input   : none
-    * Output  : none
-    * Purpose : Retrieve huggingface text models
+    * Straico Userinput history
+    * Function: strAddUserInput()
+    * Input   : 
+    * Output  : String
+    * Purpose : create a history like prompt for Straico models
     *
     * Remarks:
+    * Last visited 25-07-24
     */
 
-    protected function hugModels()
-    {
-        try {
-            // Set up endpoint URL and API key
-            $endpoint = 'https://api-inference.huggingface.co/framework/text-generation-inference';
-            $result = $this->apiGet($endpoint);
-
-            // Decode JSON response into array
-            $answer = json_decode($result, true);
-
-            // Process models from the response
-            $this->useModels = [];
-            foreach ($answer as $model) {
-                $fname = $model['model_id'];
-                $nameParts = explode('/', $fname);
-                $tag = isset($nameParts[1]) ? $nameParts[1] : '';
-
-                $this->useModels[] = [
-                    'tag' => $tag,
-                    'model' => $fname,
-                    'pre' => '',
-                    'past' => '',
-                ];
-            }
-        } catch (\Exception $e) {
-            echo 'Error: '.$e->getMessage();
+        if ($this->chatRoll) {
+            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
+            $this->chatRoll .= 'user: '.$this->aiInput."\n\n";
+        } else {
+            $this->chatHistory[] = ['role' => 'system', 'content' => $this->sysRole];
+            $this->chatHistory[] = ['role' => 'user', 'content' => $this->aiInput];
+            $this->chatRoll = 'system: '.$this->sysRole."\n\n".'user: '.$this->aiInput."\n\n";
         }
-	$this->setModel(1);
+	
+	//We need to fix our well formed coversation in something
+	//Straico models will understand.
+	$aiMessage='';
+	foreach( $this->chatHistory as $line){
+	    $aiMessage .= $line['role'].": ".$line['content']."\n";
+	}
+	return $aiMessage;
     }
+    
+    protected function strCompletion($input)
+    {
     /*
-    * Function: hugModels()
-    * Input   : none
-    * Output  : none
-    * Purpose : Retrieve huggingface text models
+    * Straico Prompt Completion
+    * Function: strCompletion()
+    * Input   : full filename
+    * Output  : Storage info
+    * Purpose : Upload files to Straico
     *
     * Remarks:
+    * Last visited 23-07-24
     */
+    
+	// Store LLM input for debugging and pipe routine
+        $this->aiInput = $input;
 
-    protected function ollamaModels()
-    {
-        try {
-            // Set up endpoint URL and API key
-            $endpoint = $this->endPoint."tags";
-            $result = $this->apiGet($endpoint);
+	$aiMessage = $this->strAddUserInput();
+	$models = $this->strAiModels;
+	$file_urls = [];
+	$youtube_urls =[];
+	
+	$data['message'] = $aiMessage;
 
-            // Decode JSON response into array
-            $answer = json_decode($result, true);
-            // Process models from the response
-            $this->useModels = [];
+	$data['models'][] = $this->aiModel;
+	if (!empty($file_urls)) $data['file_urls'] = $file_urls;
+	if (!empty($youtube_urls)) $data['youtube_urls'] = $youtube_urls;
+	
+	$curl = curl_init();
 
-            foreach ($answer['models'] as $model) {
-                $fname = $model['model'];
-                $nameParts = explode(':', $fname);
-                $tag = $nameParts[0];
+	curl_setopt_array($curl, array(
+	    CURLOPT_URL => 'https://api.straico.com/v1/prompt/completion',
+	    CURLOPT_RETURNTRANSFER => true,
+	    CURLOPT_ENCODING => '',
+	    CURLOPT_MAXREDIRS => 10,
+	    CURLOPT_TIMEOUT => 0,
+	    CURLOPT_FOLLOWLOCATION => true,
+	    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	    CURLOPT_CUSTOMREQUEST => 'POST',
+	    CURLOPT_POSTFIELDS => json_encode($data),
+	    CURLOPT_HTTPHEADER => array(
+		'Authorization: Bearer '.$this->apiKey,
+		'Content-Type: application/json',
+		'User-self::AGENT: '.self::AGENT,
+		),
+	    )
+	);
 
-                $this->useModels[] = [
-                    'tag' => $tag,
-                    'model' => $fname,
-                    'pre' => '',
-                    'past' => '',
-                ];
-            }
-        } catch (\Exception $e) {
-            echo 'Error: '.$e->getMessage();
+	$response = curl_exec($curl);
+
+	curl_close($curl);
+
+	$this->aiOutput = json_decode($response, JSON_OBJECT_AS_ARRAY);
+
+	if($this->aiOutput['success']){
+	    $answer = $this->strProcessAnswer();
+	}else{
+	    var_dump($this->aiOutput);
+	    exit;
+	}
+	
+	//write to log
+        if ($this->aiLog) {
+            $this->addLog($this->aiInput, $answer);
         }
-	$this->setModel(1);
+
+        //do pipe
+        if ($this->userPipe) {
+            $this->apiPipe();
+        }
+
+        //format output and return it
+        if ($this->aiWrap > 0) {
+            $answer = wordwrap($answer, $this->aiWrap, "\n", true);
+            $temp = str_replace("\n", "\n    ", $answer);
+            $answer = '    '.$temp."\n";
+        }
+        
+	//reset history if we dont want it.
+        if (! $this->historySwitch) {
+            $this->intInitChat();
+        }
+        
+	return $answer;
     }
 
-    protected function apiGet($endPoint)
+    protected function strImageRender($model, $prompt, $aspect,$variations)
     {
+    /*
+    * Straico Image creator
+    * Function: strImageRender($model = "openai/dall-e-3",$prompt = "A picture of Gramps", $aspect = "landscape",$variations = 1)
+    * Input   : 
+    * Output  : Download url info
+    * Purpose : Create Images Straico
+    *
+    * Remarks:
+    * Last visited 21-06-24
+    */
+    
+	$curl = curl_init();
 
-        $options = [
-            'http' => [
-                'header' => 'Authorization: Bearer '.$this->apiKey."\r\n",
-                'method' => 'GET',
-            ],
-        ];
+	curl_setopt_array($curl, array(
+	    CURLOPT_URL => 'https://api.straico.com/v0/image/generation',
+	    CURLOPT_RETURNTRANSFER => true,
+	    CURLOPT_ENCODING => '',
+	    CURLOPT_MAXREDIRS => 10,
+	    CURLOPT_TIMEOUT => 0,
+	    CURLOPT_FOLLOWLOCATION => true,
+	    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	    CURLOPT_CUSTOMREQUEST => 'POST',
+	    CURLOPT_POSTFIELDS =>'{
+		"model": "'.$model.'",
+		"description": "'.$prompt.'",
+		"size": "'.$aspect.'",
+		"variations": '.$variations.'
+		}',
+	    CURLOPT_HTTPHEADER => array(
+		'Authorization: Bearer '.$this->apiKey,
+		'Content-Type: application/json',
+		'User-self::AGENT: '.self::AGENT,
+		),
+	    )
+	);
 
-        $context = stream_context_create($options);
+    
+	if (curl_errno($ch)) echo "Error: " . curl_error($ch);
+    
+	$response = curl_exec($curl);
 
-        $result = file_get_contents($endPoint, false, $context);
+	curl_close($curl);
+    
+	$answer = json_decode($response, JSON_OBJECT_AS_ARRAY);
 
-        return $result;
-
+	if($answer['success']){
+	    $info = "Your zip url is: ".$answer['data']['zip']."\n";
+	    $info .= "You can get singel images on:\n";
+	    foreach($answer['data']['images'] as $image){
+		$info .= $image;
+	    }
+	    return $info;
+	}else{
+	    var_dump($answer);
+	    return "Something went wrong during image creation.";
+	}
+    
     }
+
+    protected function strFileUpload($file){
+    /*
+    * Straico File upload
+    * Function: strFileUpload($file)
+    * Input   : full filename
+    * Output  : Storage info
+    * Purpose : Upload files to Straico
+    *
+    * Remarks:
+    * Last visited 21-06-24
+    */
+	
+	$extension = pathinfo($file, PATHINFO_EXTENSION);
+	if(! preg_match("/pdf|docx|pptx|txt|xlsx|mp3|mp4|html|csv|json/i",$extension)){
+	    return "Extension ".$extension." is not allowed. Use any of pdf, docx, pptx, txt, xlsx, mp3, mp4, html, csv, json";
+	}
+	
+	$curl = curl_init();
+
+	curl_setopt_array($curl, array(
+	    CURLOPT_URL => 'https://api.straico.com/v0/file/upload',
+	    CURLOPT_RETURNTRANSFER => true,
+	    CURLOPT_ENCODING => '',
+	    CURLOPT_MAXREDIRS => 10,
+	    CURLOPT_TIMEOUT => 0,
+	    CURLOPT_FOLLOWLOCATION => true,
+	    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	    CURLOPT_CUSTOMREQUEST => 'POST',
+	    CURLOPT_POSTFIELDS => array('file'=> new CURLFILE($file)),
+	    CURLOPT_HTTPHEADER => array(
+		'Authorization: Bearer '.$this->apiKey,
+		'Content-Type: multipart/form-data',
+		'User-self::AGENT: '.self::AGENT,
+		),
+	    )
+	);
+
+	$response = curl_exec($curl);
+	curl_close($curl);
+
+// success?
+	$answer = json_decode($response, JSON_OBJECT_AS_ARRAY);
+	var_dump($answer);
+	if($answer['data']['success']){ 
+	    return "Your URL is: ". $answer['data']['url'];
+	}else{
+	    return "Something went wrong during uploading.";
+	}
+    }
+
+    protected function strProcessAnswer()
+    {
+//var_dump($this->aiOutput);
+//exit;
+	/*
+	 * Get all answers available
+	 */
+	$stack = [];
+        foreach($this->aiOutput['data']['completions'] as $model){
+	    $stack[] = $model['completion']['choices'][0]['message']['content'];
+	}
+//var_dump($stack);
+// TODO: work on multimodels	
+	//$this->aiOutput['data']['completions']['completion']['choices'][0]['message']['content'];
+        $answer = $stack[0];
+        //update History
+
+        if ($this->historySwitch) {
+            $this->chatHistory[] = ['role' => 'assistant', 'content' => $answer];
+            $this->chatRoll .= 'assistant: '.$answer."\n\n";
+        }
+
+        return $answer;
+    }
+
 
     /*
     * Function: apiPipe()
@@ -1269,65 +1662,7 @@ It is your task, with the information above, to answer the users prompt.';
         return $answer;
     }
 
-    /*
-    * Function: getWebpage($url)
-    * Input   : url of page
-    * Output  : Stores retrieved page as string in $this->webPage
-    * Purpose : retrieve a webpage to use in a prompt
-    *
-    * Remarks:
-    *
-    */
-    protected function getWebpage($url)
-    {
 
-        $options = [
-            'http' => [
-                'method' => 'GET',
-                'header' => "Accept-language: en\r\n",
-            ],
-        ];
-
-        $context = stream_context_create($options);
-
-        // Temporarily disable error reporting
-        $previous_error_reporting = error_reporting(0);
-
-        echo 'current dir '.__DIR__."\n";
-
-        $this->webPage = @file_get_contents($url, false, $context);
-
-        // Check if an error occurred
-        if ($this->webPage === false) {
-            $error = error_get_last();
-            if ($error !== null) {
-                $answer = "Error: {$error['message']}\n";
-            } else {
-                $answer = "An unknown error occurred while fetching the webpage.\n";
-            }
-        } else {
-            $answer = "Page collected and now available in token _PAGE_ to use in your prompt.\n";
-        }
-
-        // Restore the previous error reporting level
-        error_reporting($previous_error_reporting);
-
-        return $answer;
-    }
-
-    /*
-    * Function	: initChat()
-    * Input   	: none
-    * Output  	: none
-    * Purpose 	: reset/initialise chathistory
-    * Return	: clean chat environment
-    * Remarks:
-    */
-    protected function initChat()
-    {
-        $this->chatHistory = [];
-        $this->chatRoll = '';
-    }
 
     /*
     * Function: listModels()
@@ -1348,23 +1683,33 @@ It is your task, with the information above, to answer the users prompt.';
         // Iterate over models and check if they match the search string (case-insensitive)
         foreach ($this->useModels as $arModel) {
             $point++;
+var_dump($arModel);
 
             // If no search string is provided or if the current model matches the search string, proceed to display it
             if (! $searchString || stripos($arModel['model'], $searchString) !== false) {
 
                 // Add the current model to the found models array
-                $modelsFound[] = [
-                    'counter' => $point,
-                    'name' => $arModel['tag'],
-                    'model' => $arModel['model'],
-                ];
+		    if($this->apiModel === "Hugchat"){
+			$modelsFound[] = [
+			    'counter' => $point,
+			    'name' => $arModel['model_id'],
+			    'model' => $arModel['model_id'],
+			];
+			echo "ok";
+		    }else{
+			$modelsFound[] = [
+			    'counter' => $point,
+			    'name' => $arModel['name'],
+			    'model' => $arModel['model'],
+			];
+		    }
 
                 // Display the model information
                 echo "Model $point:\n";
                 if ($arModel['model'] === $this->aiModel) {
                     echo '* ';
                 }
-                echo "- Name: {$arModel['tag']}\n";
+                echo "- Name: {$arModel['name']}\n";
                 echo "- Model: {$arModel['model']}\n";
                 echo "---\n";
             }
@@ -1384,7 +1729,7 @@ It is your task, with the information above, to answer the users prompt.';
     protected function loadHistory($name)
     {
 
-        $this->initChat();
+        $this->intInitChat();
 
         $id = $this->logPath.'/'.$name.'.hist';
         $this->chatHistory = json_decode(file_get_contents($id));
@@ -1474,7 +1819,7 @@ It is your task, with the information above, to answer the users prompt.';
 
         foreach ($this->useModels as $model) {
 
-            $this->initChat();
+            $this->intInitChat();
             $mp++;
 
             //set endpoint
@@ -1514,30 +1859,6 @@ It is your task, with the information above, to answer the users prompt.';
 
     }
 
-    /*
-    * Function: setModel($input)
-    * Input   : $input - user integer
-    * Output  : info on new model
-    * Purpose : change llm in use
-    *
-    * Remarks:
-    *
-    * Private function used by $this->userPrompt()
-    */
-    public function setModel($input)
-    {
-        $this->initChat();
-
-        $this->intModel = $input;
-
-        $this->aiModel = $this->useModels[$input - 1]['model'];
-        $this->aiModelTag = $this->useModels[$input - 1]['tag'];
-        $this->aiRole = 'cli ';
-        $this->pubRole = 'cli ';
-
-
-        return 'Model set to: '.$this->aiModel." \n";
-    }
 
     /*
     * Function: stopPrompt()
@@ -1553,52 +1874,5 @@ It is your task, with the information above, to answer the users prompt.';
     {
         exit($goodBye);
     }
-
-    /*
-    * Function: $webSearch($strQ)
-    * Input   : $strQ - search string
-    * Output  : result from duckduckgo
-    * Purpose : find pages for user
-    *
-    * Remarks:
-    *
-    * private function used by this->userPrompt()
-    */
-    protected function webSearch($strQ)
-    {
-
-        $q = urlencode($strQ);
-
-        // Get search
-        $url = 'https://lite.duckduckgo.com/lite/?q='.$q.'&submit=Search';
-
-        // retrieve url and clean it
-        $tidy = new tidy;
-        $tidy->parseString(file_get_contents($url));
-        $tidy->cleanRepair();
-
-        // get the search result urls
-        $dom = new DOMDocument();
-        $dom->loadHTML($tidy);
-        $elements = $dom->getElementsByTagName('a');
-        $elementsArray = [];
-
-        foreach ($elements as $domElement) {
-
-            $element = $dom->saveHTML($domElement);
-
-            $arResult = explode('=', $element);
-            $arPart['link'] = urldecode(implode(explode('&', $arResult[3], -1)));
-            $arResult = explode('>', $element);
-            $arPart['title'] = str_replace("\n", '', html_entity_decode(implode(explode('<', $arResult[1], -1))));
-
-            $elementsArray[] = $arPart;
-        }
-        $answer = '';
-        foreach ($elementsArray as $result) {
-            $answer .= 'Title: '.$result['title']."\nUrl  : ".$result['link']."\n\n";
-        }
-
-        return $results;
-    }
 }
+

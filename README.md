@@ -1,5 +1,20 @@
 # Documentation clsStraico.php
 
+## BETA VERSION
+
+This is a new beta version of clsStraico. V2.0.0b
+It is (should be) usable atm. Just clone it and run straicoprompt.php in 
+its directory.
+Documentation and other candy needs work as their has been a lot of 
+changes. But the class is well documented and I will work on it more in
+the comming days. 
+
+As you can see there is a hugchatprompt.php too. This is not useable at 
+the moment. I am working on this too. 
+
+## BETA VERSION
+
+
 ![straico](https://github.com/roelfrenkema/clsStraico/blob/main/githubclsstraico.png) 
 
 ## More about Straico's own 
