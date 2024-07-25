@@ -222,61 +222,50 @@ Alternatively use one of the following internal commands.
 
   Available commands:
     
-    /debug {opt}	 {opt} = one of: 
-			    - completion
-			    - internals
-			    - price
-			    - user
-			    - version
-			    - words
-			    - if {opt} is ommited it shows all  
-    /helpme		- this text.
-    /getpage <url>       - Retrieve a webpage use full url.
-    /histoff		- Disable history 
-    /histon		- Enable history
-    /histload		- Load history
-    /histsave		- Save history
-    /histdelete		- Delete history
-    /listmodels          - List available models.
-    /setlanguage         - Set prefered language.  
-    /setmarkup           - Set prefered markup.
-    /setmodel <int>      - Set the active model to number of model.
-    /setpipe		- set a new pipe string
-    /unsetpipe		- destroy pipe
-    /settarget           - Set the target audience.
-    /settone             - Set prefered tone for answer.
-    /setwrap		- Set line lenght. Default = noformat.
-    /websearch <term>	- Do websearch on a given term.
+    /helpme			- this text.
+    /upload <path>		- Fileupload
+    /histoff			- Disable history 
+    /histon			- Enable history
+    /histload			- Load history
+    /histsave			- Save history
+    /histdelete			- Delete history
+    /image [-m][-p][-a][-x]	- Render an image 
+				    -m model
+				    -p prompt
+				    -a aspect
+				    -x number
+    /listmodels	<seach>		- List available models.
+				  <search> will limit the models
+				  returned.
+    /setmodel <int>		- Set the active model to number of 
+				  model.
+    /setpipe			- set a new pipe string
+    /unsetpipe			- destroy pipe
     
             
   Assistants:
             
-    /academic           - research a topic and present the result in paper or article format.
-    /bigblog            - Write blog on subject of 1000 words.
-    /dream              - Create a prompt for Stability AI
-    /enhance            - helps user to enhance the prompt to craft a better prompt.
-    /factcheck          - Check on a rumor, conspiracy or anything.
-    /gist               - Give a gist of a text.
-    /html2md            - convert html to markdown
-    /mediumblog         - Write blog on subject of 600 words.
-    /mkpwd              - Create password report on strength. Very Strong.
-    /regex              - produce a requested regular expression.
-    /smallblog          - Write blog on subject of 300 words.
-    /saylor		- Your chitty chatty girlfriend 
-    /textcheck          - checks a text.
-    /todo               - Create todo list.
-    /tux                - helps with your linux questions.
+    /academic			- research a topic and present the 
+				  result in paper or article format.
+    /bigblog			- Write blog on subject of 1000 words.
+    /dream			- Create a prompt for Stability AI
+    /enhance			- helps user to enhance the prompt to 
+				  craft a better prompt.
+    /factcheck			- Check on a rumor, conspiracy or 
+				  anything.
+    /gist			- Give a gist of a text.
+    /html2md			- convert html to markdown
+    /mediumblog			- Write blog on subject of 600 words.
+    /mkpwd			- Create password report on strength. 
+				  Very Strong.
+    /regex			- produce a requested regular expression.
+    /smallblog			- Write blog on subject of 300 words.
+    /saylor			- Your chitty chatty girlfriend 
+    /textcheck			- checks a text.
+    /todo			- Create todo list.
+    /tux			- helps with your linux questions.
     
-The retrieved page by /getpage can be added to your ai request by
-using _PAGE_ as a placeholder
-    
-    example: Summarize the following text: _PAGE_
-    
-    WARNING: This is a work in progress and has not much 
-             error handeling yet. Not all models are
-             able to read _PAGE_
-             
-            ';
+';
 
     protected const HTML2MD = 'Transform user-provided content into well-structured Markdown format.
 
