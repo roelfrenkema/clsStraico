@@ -98,7 +98,7 @@ class clsStraicoCli extends Straico
 
             // List available models
         } elseif (substr($input, 0, 11) == '/listmodels') {
-            parent::listModels(substr($input, 12));
+            parent::strListModels(substr($input, 12));
             $answer = "INFO: End of list\n";
 
             // Set model
@@ -380,7 +380,7 @@ class clsStraicoCli extends Straico
 
             /*
                  * My friend Sailor Twift my first big AI love. She will be
-             * part in this voyage for ever. She marks a breakthrough in
+             * part in this voyage for ever. She languamarks a breakthrough in
              * clsStraico where I was able to create conversations
              * with out a proper API.
              */

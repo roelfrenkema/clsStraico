@@ -1493,6 +1493,53 @@ exit;
 	    return "Something went wrong during uploading.";
 	}
     }
+    protected function strListModels($searchString = null)
+    {
+
+    /*
+    * Function: strListModels()
+    * Input   : none
+    * Output  : print model list
+    * Purpose : printing a nicely formated model list with info and
+    *           pointer to use for /setmodel
+    *
+    * Remarks:
+    * Last visited 25-07-24
+    */
+        $modelsFound = [];
+        $point = 0;
+
+        // Iterate over models and check if they match the search string (case-insensitive)
+        foreach ($this->useModels as $arModel) {
+            $point++;
+
+            // If no search string is provided or if the current model 
+	    // matches the search string, proceed to display it
+            if (! $searchString || stripos($arModel['model'], $searchString) !== false) {
+
+                // Add the current model to the found models array
+			$modelsFound[] = [
+			    'counter' => $point,
+			    'name' => $arModel['name'],
+			    'model' => $arModel['model'],
+			    'ctx' => $arModel['word_limit'],
+			    'price' => $arModel['pricing']['coins'],
+			];
+	    
+
+		// Display the model information
+		echo "Model $point:\n";
+		if ($arModel['model'] === $this->aiModel) echo '* ';
+		echo "- Name : {$arModel['name']}\n";
+		echo "- Model: {$arModel['model']}\n";
+		echo "- CTX  : {$arModel['word_limit']}\n";
+		echo "- Cost : {$arModel['pricing']['coins']}\n";
+		echo "---\n";
+	    }
+        }
+
+        return $modelsFound;
+    }
 
     protected function strProcessAnswer()
     {
@@ -1653,59 +1700,6 @@ exit;
 
 
 
-    /*
-    * Function: listModels()
-    * Input   : none
-    * Output  : print model list
-    * Purpose : printing a nicely formated model list with info and
-    *           pointer to use for /setmodel
-    *
-    * Remarks:
-    *
-    * Private function used by $this->userPrompt()
-    */
-    protected function listModels($searchString = null)
-    {
-        $modelsFound = [];
-        $point = 0;
-
-        // Iterate over models and check if they match the search string (case-insensitive)
-        foreach ($this->useModels as $arModel) {
-            $point++;
-var_dump($arModel);
-
-            // If no search string is provided or if the current model matches the search string, proceed to display it
-            if (! $searchString || stripos($arModel['model'], $searchString) !== false) {
-
-                // Add the current model to the found models array
-		    if($this->apiModel === "Hugchat"){
-			$modelsFound[] = [
-			    'counter' => $point,
-			    'name' => $arModel['model_id'],
-			    'model' => $arModel['model_id'],
-			];
-			echo "ok";
-		    }else{
-			$modelsFound[] = [
-			    'counter' => $point,
-			    'name' => $arModel['name'],
-			    'model' => $arModel['model'],
-			];
-		    }
-
-                // Display the model information
-                echo "Model $point:\n";
-                if ($arModel['model'] === $this->aiModel) {
-                    echo '* ';
-                }
-                echo "- Name: {$arModel['name']}\n";
-                echo "- Model: {$arModel['model']}\n";
-                echo "---\n";
-            }
-        }
-
-        return $modelsFound;
-    }
 
     /*
     * Function: loadHistory($name)
