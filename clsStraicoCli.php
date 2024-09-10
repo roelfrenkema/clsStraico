@@ -238,6 +238,14 @@ class clsStraicoCli extends Straico
             $answer = parent::strCompletion(trim(substr($input, 11)));
 
             /*
+	     * Flux prompt maker
+             * Creates beautiful promps for use in flux.
+             */
+        } elseif (substr($input, 0, 5) == '/flux') {
+            $this->sysRole = parent::FLUX;
+            $answer = parent::strCompletion(trim(substr($input, 6)));
+
+            /*
              * Make a neurodivese gist of information. Rewrites an
          * artikel or text in a way it becomes better readable for
          * neuro diverse people. You can add you text in the prompt
